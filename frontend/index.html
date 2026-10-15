@@ -8,7 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=9">
+  <!-- Configurações Oficiais de PWA (Aplicativo Móvel) -->
+  <meta name="theme-color" content="#2563EB">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SGC Condomínio">
+  <link rel="apple-touch-icon" href="/icons/condohub-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/condohub-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -56,10 +66,14 @@
         <button id="btnToggleMobileDrawer" type="button" class="mobile-drawer-toggle" aria-label="Abrir menu de navegação" title="Abrir menu">
           <svg class="ico ico-sm" aria-hidden="true"><use href="#i-menu"/></svg>
         </button>
-        <span class="brand-dot" aria-hidden="true"></span>
+        <img src="/icons/condohub-icon.png" alt="CondoHub" class="brand-mini-logo" />
         <span id="topbarCondoName">Condomínio</span>
       </div>
       <div class="accessibility-controls" role="group" aria-label="Recursos de acessibilidade">
+        <button id="btnInstallPwa" type="button" class="acc-btn pwa-install-btn hidden" title="Instalar aplicativo móvel no smartphone ou computador" aria-label="Instalar aplicativo móvel">
+          <span class="acc-glyph" aria-hidden="true">📲</span>
+          <span id="installPwaLabel">Instalar App</span>
+        </button>
         <button id="btnDarkMode" type="button" class="acc-btn" aria-pressed="false" title="Tema escuro: descansa a vista em ambientes com pouca luz">
           <span class="acc-glyph" aria-hidden="true">&#9790;</span>
           <span id="darkModeLabel">Tema escuro</span>
@@ -90,9 +104,8 @@
       <aside class="auth-hero">
         <div class="hero-brand">
           <div class="brand-monogram" aria-hidden="true">
-            <span class="monogram-frame">
-              <span id="condoMonogram" class="monogram-letter">SGC</span>
-            </span>
+            <img src="/icons/condohub-icon.png" alt="CondoHub Logo" class="brand-hero-logo" />
+            <span id="condoMonogram" class="monogram-letter hidden">SGC</span>
           </div>
           <div class="brand-headings">
             <span class="hero-brand-kicker">Condomínio Residencial</span>
@@ -247,7 +260,9 @@
       <!-- Barra lateral -->
       <aside class="sidebar" aria-label="Navegação principal">
         <div class="sidebar-brand">
-          <span class="brand-mark brand-mark-sm"><svg class="ico" aria-hidden="true"><use href="#i-building"/></svg></span>
+          <span class="brand-mark brand-mark-sm">
+            <img src="/icons/condohub-icon.png" alt="CondoHub" class="brand-sidebar-logo" />
+          </span>
           <div class="sidebar-brand-text">
             <strong id="sidebarCondoName">Condomínio</strong>
             <span>Portal de gestão</span>
@@ -381,7 +396,7 @@
           </div>
 
           <!-- ========================================== -->
-          <!-- PAINEL DO DIA MODULAR (SEM CLICHÊS DE IA)    -->
+          <!-- PAINEL DIÁRIO MODULAR POR PERFIL DE ACESSO -->
           <!-- ========================================== -->
           <div id="dailyDashboardView" class="daily-dashboard-view">
 
@@ -1836,6 +1851,6 @@
     </button>
   </nav>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

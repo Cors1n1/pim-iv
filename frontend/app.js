@@ -3758,3 +3758,61 @@ document.addEventListener("click", (e) => {
   tr.classList.toggle("is-open");
 });
 
+// ==========================================
+// 17. SUPORTE PWA MOBILE E SERVICE WORKER
+// ==========================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => console.log('[PWA] Service Worker registrado com sucesso! Escopo:', reg.scope))
+      .catch((err) => console.warn('[PWA] Falha ao registrar Service Worker:', err));
+  });
+}
+
+let deferredInstallPrompt = null;
+const btnInstallPwa = document.getElementById('btnInstallPwa');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (btnInstallPwa) {
+    btnInstallPwa.classList.remove('hidden');
+  }
+});
+
+if (btnInstallPwa) {
+  btnInstallPwa.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      console.log('[PWA] Resposta da instalação:', outcome);
+      deferredInstallPrompt = null;
+      btnInstallPwa.classList.add('hidden');
+    } else {
+      if (typeof showCustomConfirm === 'function') {
+        showCustomConfirm({
+          title: 'Instalar Aplicativo SGC',
+          message: 'Para instalar o aplicativo no seu smartphone:\n\n• No Android/Chrome: Toque no menu (⋮) e selecione "Instalar aplicativo" ou "Adicionar à tela inicial".\n• No iPhone/Safari: Toque no botão de Compartilhar e selecione "Adicionar à Tela de Início".',
+          confirmText: 'Entendi',
+          cancelText: 'Fechar',
+          isDanger: false,
+          iconName: 'building'
+        });
+      } else {
+        alert('Para instalar o aplicativo no seu celular:\n\n• No Android: Abra o menu do Chrome e selecione "Instalar aplicativo".\n• No iPhone: Toque em Compartilhar no Safari e selecione "Adicionar à Tela de Início".');
+      }
+    }
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  console.log('[PWA] Aplicativo instalado com sucesso no aparelho!');
+  if (btnInstallPwa) {
+    btnInstallPwa.classList.add('hidden');
+  }
+  if (typeof showToast === 'function') {
+    showToast('Aplicativo instalado com sucesso na sua tela de início!', 'success');
+  }
+});
+

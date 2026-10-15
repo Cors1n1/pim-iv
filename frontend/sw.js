@@ -7,7 +7,7 @@
  *  - Suporte a instalação como aplicativo móvel (Android, iOS, Windows, macOS)
  */
 
-const CACHE_NAME = 'sgc-condominio-v1.0.0';
+const CACHE_NAME = 'sgc-condominio-v1.0.3';
 
 // Arquivos essenciais pré-carregados no momento da instalação
 const PRECACHE_ASSETS = [
@@ -16,6 +16,7 @@ const PRECACHE_ASSETS = [
   '/style.css',
   '/app.js',
   '/manifest.json',
+  '/icons/condohub-icon.png',
   '/icons/icon.svg',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -81,7 +82,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Recursos Estáticos (HTML, CSS, JS, Imagens, Fontes): Estratégia Stale-While-Revalidate
+  // Requisições de navegação (HTML / Documentos): Network-First para exibir alterações imediatamente
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+    );
+    return;
+  }
+
+  // Recursos Estáticos (CSS, JS, Imagens, Fontes): Estratégia Stale-While-Revalidate
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
@@ -95,7 +112,6 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch((err) => {
-          // Em caso de falha de rede e sem cache, fallback para a home
           if (event.request.mode === 'navigate') {
             return caches.match('/');
           }
