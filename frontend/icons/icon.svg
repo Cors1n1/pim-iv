@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo com cantos arredondados padrão de ícone de app móvel -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Círculo interno decorativo sutil -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="4"/>
+
+  <!-- Estrutura Principal dos Edifícios com Sombra -->
+  <g filter="url(#dropShadow)">
+    <!-- Prédio Secundário Esquerdo -->
+    <rect x="110" y="210" width="90" height="180" rx="8" fill="#1E293B"/>
+    <!-- Janelas Prédio Esquerdo -->
+    <rect x="125" y="230" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="160" y="230" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="125" y="270" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="160" y="270" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="125" y="310" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="160" y="310" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+
+    <!-- Prédio Secundário Direito -->
+    <rect x="312" y="230" width="90" height="160" rx="8" fill="#1E293B"/>
+    <!-- Janelas Prédio Direito -->
+    <rect x="327" y="250" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="362" y="250" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="327" y="290" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="362" y="290" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="327" y="330" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+    <rect x="362" y="330" width="22" height="22" rx="4" fill="#38BDF8" opacity="0.9"/>
+
+    <!-- Prédio Principal Central -->
+    <rect x="190" y="140" width="132" height="250" rx="10" fill="#0F172A"/>
+    <!-- Topo do Prédio Central -->
+    <path d="M 190 140 L 256 95 L 322 140 Z" fill="url(#roofGrad)"/>
+
+    <!-- Janelas Prédio Central -->
+    <rect x="212" y="165" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="250" y="165" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="288" y="165" width="24" height="24" rx="4" fill="#F8FAFC"/>
+
+    <rect x="212" y="205" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="250" y="205" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="288" y="205" width="24" height="24" rx="4" fill="#F8FAFC"/>
+
+    <rect x="212" y="245" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="250" y="245" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="288" y="245" width="24" height="24" rx="4" fill="#F8FAFC"/>
+
+    <rect x="212" y="285" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="250" y="285" width="24" height="24" rx="4" fill="#F8FAFC"/>
+    <rect x="288" y="285" width="24" height="24" rx="4" fill="#F8FAFC"/>
+
+    <!-- Porta Principal -->
+    <rect x="238" y="340" width="36" height="50" rx="4" fill="#38BDF8"/>
+  </g>
+
+  <!-- Escudo de Segurança / Automação no Canto Inferior Direito -->
+  <g transform="translate(320, 310)" filter="url(#dropShadow)">
+    <circle cx="50" cy="50" r="50" fill="#2563EB" stroke="#FFFFFF" stroke-width="6"/>
+    <!-- Ícone de Check / Segurança -->
+    <path d="M 32 52 L 44 64 L 68 38" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,57 @@
+{
+  "name": "SGC - Sistema de Gestão de Condomínio",
+  "short_name": "SGC Condomínio",
+  "description": "Aplicativo móvel completo para gestão condominial: portaria, reservas, encomendas e moradores.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F172A",
+  "theme_color": "#2563EB",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Minhas Reservas",
+      "short_name": "Reservas",
+      "description": "Agendar áreas comuns",
+      "url": "/#reservas",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Minhas Encomendas",
+      "short_name": "Encomendas",
+      "description": "Ver encomendas na portaria",
+      "url": "/#encomendas",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mural de Avisos",
+      "short_name": "Avisos",
+      "description": "Avisos e comunicados",
+      "url": "/#avisos",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

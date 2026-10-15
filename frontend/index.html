@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de Gestão de Condomínio (SGC) - Portal integrado para administração, portaria e moradores do Residencial Bela Vista.">
+  <title>SGC - Sistema de Gestão de Condomínio | Residencial Bela Vista</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+
+  <!-- Biblioteca de ícones (SVG sprite, traço fino) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M17.9 17.9A10.9 10.9 0 0 1 12 19c-6.5 0-10-7-10-7a18 18 0 0 1 4.1-5M9.9 5.2A10 10 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+    <symbol id="i-user-check" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-help-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  </svg>
+
+  <!-- Barra superior: ferramentas de acessibilidade e preferências visuais -->
+  <header class="top-bar" role="banner">
+    <div class="top-bar-content">
+      <div class="brand-mini">
+        <button id="btnToggleMobileDrawer" type="button" class="mobile-drawer-toggle" aria-label="Abrir menu de navegação" title="Abrir menu">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-menu"/></svg>
+        </button>
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span id="topbarCondoName">Condomínio</span>
+      </div>
+      <div class="accessibility-controls" role="group" aria-label="Recursos de acessibilidade">
+        <button id="btnDarkMode" type="button" class="acc-btn" aria-pressed="false" title="Tema escuro: descansa a vista em ambientes com pouca luz">
+          <span class="acc-glyph" aria-hidden="true">&#9790;</span>
+          <span id="darkModeLabel">Tema escuro</span>
+        </button>
+        <button id="btnContrast" type="button" class="acc-btn" aria-pressed="false" title="Alto contraste: letras amarelas e brancas sobre fundo preto">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-contrast"/></svg>
+          <span id="contrastLabel">Alto contraste</span>
+        </button>
+        <div class="font-stepper" role="group" aria-label="Tamanho da letra">
+          <button id="btnFontDown" type="button" class="acc-btn acc-btn-icon" title="Diminuir letra" aria-label="Diminuir tamanho da letra">A&minus;</button>
+          <span id="fontLevelLabel" class="font-level" aria-live="polite">Normal</span>
+          <button id="btnTextSize" type="button" class="acc-btn acc-btn-icon" title="Aumentar letra" aria-label="Aumentar tamanho da letra">A+</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContainer" class="main-wrapper">
+
+    <!-- ========================================== -->
+    <!-- TELA 1: LOGIN                              -->
+    <!-- ========================================== -->
+    <!-- ========================================== -->
+    <!-- ========================================== -->
+    <!-- TELA 1: LOGIN (INSTITUCIONAL RESIDENCIAL)  -->
+    <!-- ========================================== -->
+    <section id="loginSection" class="auth-layout" aria-labelledby="loginTitle">
+      <aside class="auth-hero">
+        <div class="hero-brand">
+          <div class="brand-monogram" aria-hidden="true">
+            <span class="monogram-frame">
+              <span id="condoMonogram" class="monogram-letter">SGC</span>
+            </span>
+          </div>
+          <div class="brand-headings">
+            <span class="hero-brand-kicker">Condomínio Residencial</span>
+            <h2 id="heroCondoTitle" class="hero-brand-title">Condomínio</h2>
+            <span class="hero-brand-sub">Portal Integrado de Gestão &amp; Convivência</span>
+          </div>
+        </div>
+
+        <div class="hero-body">
+          <div class="hero-manifesto">
+            <h3 class="hero-manifesto-title">Gestão eficiente e comunicação segura para todo o condomínio.</h3>
+            <p class="hero-manifesto-text">Acesso unificado para moradores, portaria e administração com total controle de acessos e serviços essenciais.</p>
+          </div>
+
+          <div class="hero-pillars" aria-label="Serviços integrados do condomínio">
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-shield"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Portaria &amp; Acesso 24 Horas</strong>
+                <span>Identificação de visitantes, prestadores de serviço e segurança patrimonial contínua.</span>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-package"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Central de Encomendas</strong>
+                <span>Protocolo digital no recebimento e notificação em tempo real ao morador.</span>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-calendar"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Convivência &amp; Transparência</strong>
+                <span>Reservas de espaços de lazer, mural oficial de avisos e prestação de contas.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-location-chip">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-building"/></svg>
+            <span>Av. Central, 1200 &bull; 3 Torres &bull; 72 Apartamentos</span>
+          </div>
+        </div>
+
+        <div class="hero-foot">
+          <div class="foot-status">
+            <span class="status-indicator-dot" aria-hidden="true"></span>
+            <span>Ambiente Seguro &bull; Proteção de Dados (LGPD)</span>
+          </div>
+          <span class="foot-version"><span id="footCondoName">SGC Condomínio</span> &bull; v4.2</span>
+        </div>
+      </aside>
+
+      <div class="auth-panel">
+        <div class="auth-card">
+          <div class="auth-header">
+            <span class="auth-kicker">Portal do Condomínio</span>
+            <h1 id="loginTitle" class="auth-title">Acesso ao Sistema</h1>
+          </div>
+
+          <div id="alertBox" class="alert-box hidden" role="alert" aria-live="polite"></div>
+
+          <form id="loginForm" class="auth-form" novalidate>
+            <div class="form-group">
+              <label for="inputEmail">
+                <span>E-mail cadastrado</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-leading-icon" aria-hidden="true">
+                  <svg class="ico ico-sm"><use href="#i-mail"/></svg>
+                </span>
+                <input type="email" id="inputEmail" placeholder="Digite seu e-mail cadastrado" required autocomplete="email" aria-required="true" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputPassword">
+                <span>Senha de acesso</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-leading-icon" aria-hidden="true">
+                  <svg class="ico ico-sm"><use href="#i-lock"/></svg>
+                </span>
+                <input type="password" id="inputPassword" placeholder="Digite sua senha de acesso" required autocomplete="current-password" aria-required="true" />
+                <button type="button" id="togglePassword" class="btn-toggle-eye" aria-label="Mostrar ou ocultar senha" title="Visualizar ou ocultar senha">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg>
+                </button>
+              </div>
+              <div id="capsLockWarning" class="caps-warning hidden" role="status" aria-live="polite">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+                <span>Atenção: A tecla Fixa (Caps Lock) está ativada no seu teclado</span>
+              </div>
+            </div>
+
+            <button type="submit" id="btnLogin" class="btn-primary">
+              <span class="btn-text">Entrar no Sistema</span>
+              <span class="spinner hidden" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div class="demo-profiles">
+            <div class="demo-header">
+              <span class="demo-title">Acesso Rápido para Teste:</span>
+            </div>
+            <div class="demo-buttons">
+              <button type="button" class="btn-chip" data-email="admin@condominio.com" data-pass="Admin@123" title="Preencher com credenciais do Síndico">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-shield"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Síndico</span>
+                  <span class="chip-scope">Administração</span>
+                </div>
+              </button>
+              <button type="button" class="btn-chip" data-email="portaria@condominio.com" data-pass="Portaria@123" title="Preencher com credenciais da Portaria">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-key"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Portaria</span>
+                  <span class="chip-scope">Guarita 24h</span>
+                </div>
+              </button>
+              <button type="button" class="btn-chip" data-email="morador@condominio.com" data-pass="Morador@123" title="Preencher com credenciais do Morador">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-building"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Morador</span>
+                  <span class="chip-scope">Residencial</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TELA 2: APLICAÇÃO (PÓS-LOGIN)              -->
+    <!-- ========================================== -->
+    <section id="dashboardSection" class="app-shell hidden" aria-labelledby="dashTitle">
+
+      <!-- Barra lateral -->
+      <aside class="sidebar" aria-label="Navegação principal">
+        <div class="sidebar-brand">
+          <span class="brand-mark brand-mark-sm"><svg class="ico" aria-hidden="true"><use href="#i-building"/></svg></span>
+          <div class="sidebar-brand-text">
+            <strong id="sidebarCondoName">Condomínio</strong>
+            <span>Portal de gestão</span>
+          </div>
+        </div>
+
+        <nav class="side-nav">
+          <p class="side-label">Menu</p>
+          <button type="button" class="nav-item active" id="navHome" data-window="windowOverview">
+            <svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg><span>Visão geral</span>
+          </button>
+          <button type="button" class="nav-item" id="navUnits" data-window="windowUnits" data-card="cardModuleUnits">
+            <svg class="ico" aria-hidden="true"><use href="#i-users"/></svg><span>Unidades e moradores</span>
+          </button>
+          <button type="button" class="nav-item" id="navDeliveries" data-window="windowDeliveries" data-card="cardModuleDeliveries">
+            <svg class="ico" aria-hidden="true"><use href="#i-package"/></svg><span id="navDeliveriesLabel">Encomendas</span>
+          </button>
+          <button type="button" class="nav-item" id="navReservations" data-window="windowReservations" data-card="cardModuleReservations">
+            <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>Reservas</span>
+          </button>
+          <button type="button" class="nav-item" id="navNotices" data-window="windowNotices" data-card="cardModuleNotices">
+            <svg class="ico" aria-hidden="true"><use href="#i-megaphone"/></svg><span>Mural de avisos</span>
+          </button>
+          <button type="button" class="nav-item" id="navTickets" data-window="windowTickets" data-card="cardModuleTickets">
+            <svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg><span>Ocorrências</span>
+          </button>
+          <button type="button" class="nav-item" id="navVisitors" data-window="windowVisitors" data-card="cardModuleVisitors">
+            <svg class="ico" aria-hidden="true"><use href="#i-user-check"/></svg><span id="navVisitorsLabel">Portaria &amp; Visitantes</span>
+          </button>
+          <button type="button" class="nav-item" id="navAudit" data-window="windowAudit" data-card="cardModuleAudit">
+            <svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Auditoria</span>
+          </button>
+          <button type="button" class="nav-item hidden" id="navSettings" data-window="windowSettings">
+            <svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>Configurações</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-meta">
+            <span id="userName" class="user-name">Carregando...</span>
+            <span id="userRoleBadge" class="role-badge">ADMIN</span>
+          </div>
+          <button id="btnLogout" type="button" class="btn-logout" title="Sair do sistema" aria-label="Sair do sistema">
+            <svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Conteúdo principal -->
+      <div class="app-main">
+
+        <!-- ========================================== -->
+        <!-- JANELA 1: VISÃO GERAL (O CORAÇÃO DO SISTEMA) -->
+        <!-- ========================================== -->
+        <!-- ========================================== -->
+        <!-- JANELA 1: VISÃO GERAL (LIMPA & AREJADA)     -->
+        <!-- ========================================== -->
+        <section id="windowOverview" class="workspace-view overview-clean">
+          
+          <!-- Cabeçalho Executivo Limpo -->
+          <header class="clean-overview-header">
+            <div class="header-welcome-col">
+              <div class="welcome-meta">
+                <span id="headerCondoBadge" class="condo-badge">Condomínio</span>
+                <span class="meta-dot">&bull;</span>
+                <span id="pageDate" class="header-date"></span>
+              </div>
+              <h2 class="welcome-heading" id="overviewUserGreeting">Visão Geral</h2>
+            </div>
+
+            <!-- Ações Primárias Discretas (No máximo 2 ou 3 botões limpos) -->
+            <div class="header-actions-col" id="overviewHeaderActions">
+              <!-- Morador -->
+              <button type="button" class="btn-clean-action" id="btnCleanReserva" data-window="windowReservations">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+                <span>Nova Reserva</span>
+              </button>
+              <button type="button" class="btn-clean-action" id="btnCleanVisitante" data-window="windowVisitors">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-user-check"/></svg>
+                <span>Liberar Visitante</span>
+              </button>
+              <button type="button" class="btn-clean-action" id="btnCleanOcorrencia" data-window="windowTickets">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+                <span>Abrir Chamado</span>
+              </button>
+
+              <!-- Portaria -->
+              <button type="button" class="btn-clean-action hidden" id="btnCleanPortariaVisitante" data-window="windowVisitors">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-user-check"/></svg>
+                <span>Entrada de Visitante</span>
+              </button>
+              <button type="button" class="btn-clean-action hidden" id="btnCleanPortariaEncomenda" data-window="windowDeliveries">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-package"/></svg>
+                <span>Registrar Encomenda</span>
+              </button>
+
+              <!-- Síndico -->
+              <button type="button" class="btn-clean-action hidden" id="btnCleanAdminAviso" data-window="windowNotices">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-megaphone"/></svg>
+                <span>Publicar Comunicado</span>
+              </button>
+              <button type="button" class="btn-clean-action hidden" id="btnCleanAdminUnidade" data-window="windowUnits">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-users"/></svg>
+                <span>Cadastrar Unidade</span>
+              </button>
+            </div>
+          </header>
+ 
+          <!-- Card de Retomada de Vaga (Direito de Preferência / Anti-sabotagem) -->
+          <div id="overviewRecoveryBanner" class="recovery-offer-banner hidden" role="region" aria-label="Direito de Preferência de Reserva">
+            <div class="recovery-offer-icon" aria-hidden="true">
+              <svg class="ico"><use href="#i-zap"/></svg>
+            </div>
+            <div class="recovery-offer-content">
+              <span class="recovery-offer-badge">Vaga Liberada &bull; Direito de Preferência</span>
+              <h3 class="recovery-offer-title" id="overviewRecoveryTitle">A data que você desejava está liberada!</h3>
+              <p class="recovery-offer-desc" id="overviewRecoveryDesc">Um morador cancelou a reserva concorrente. Como você estava na fila de espera, a data foi reservada com exclusividade para você pelas próximas 24 horas.</p>
+              <div class="recovery-offer-meta" id="overviewRecoveryMeta"></div>
+            </div>
+            <div class="recovery-offer-actions">
+              <button type="button" class="btn-recovery-accept" id="btnOverviewAcceptOffer">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                <span>Confirmar Minha Vaga</span>
+              </button>
+              <button type="button" class="btn-recovery-decline" id="btnOverviewDeclineOffer">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-close"/></svg>
+                <span>Dispensar Vaga</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- PAINEL DO DIA MODULAR (SEM CLICHÊS DE IA)    -->
+          <!-- ========================================== -->
+          <div id="dailyDashboardView" class="daily-dashboard-view">
+
+            <!-- 1. PAINEL DO MORADOR -->
+            <div id="moradorDailyPanel" class="daily-role-panel">
+              <!-- Alerta de Encomenda na Guarita -->
+              <div id="moradorDeliveryAlert" class="daily-alert-card delivery-highlight" role="region" aria-label="Status de encomendas">
+                <div class="daily-alert-icon" aria-hidden="true">
+                  <svg class="ico ico-lg"><use href="#i-package"/></svg>
+                </div>
+                <div class="daily-alert-content">
+                  <div class="daily-alert-kicker">Central de Entregas</div>
+                  <h3 id="moradorDeliveryTitle" class="daily-alert-title">Verificando encomendas...</h3>
+                  <p id="moradorDeliveryDesc" class="daily-alert-text">Consulte a portaria para retirar suas correspondências e pacotes.</p>
+                  <div id="moradorDeliveryItems" class="daily-delivery-items-preview"></div>
+                </div>
+                <div class="daily-alert-action">
+                  <button type="button" class="btn-daily-primary" data-window="windowDeliveries">
+                    <span>Ver Minhas Encomendas</span>
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grade Dupla: Próxima Reserva & Último Comunicado -->
+              <div class="daily-duo-grid">
+                <!-- Próxima Reserva Confirmada -->
+                <article class="daily-card" id="moradorReservationCard">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-calendar"/></svg></div>
+                      <h4>Sua Próxima Reserva</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowReservations">Ver todas</button>
+                  </div>
+                  <div class="daily-card-body" id="moradorReservationBody">
+                    <p class="daily-placeholder-text">Consultando agendamentos...</p>
+                  </div>
+                </article>
+
+                <!-- Último Comunicado da Administração -->
+                <article class="daily-card" id="moradorNoticeCard">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-megaphone"/></svg></div>
+                      <h4>Comunicado Recente</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowNotices">Mural completo</button>
+                  </div>
+                  <div class="daily-card-body" id="moradorNoticeBody">
+                    <p class="daily-placeholder-text">Consultando mural oficial...</p>
+                  </div>
+                </article>
+              </div>
+
+              <!-- 3 Botões de Ação Rápida Grandes e Táteis -->
+              <div class="daily-quick-actions" role="group" aria-label="Ações rápidas para condôminos">
+                <button type="button" class="btn-big-action" data-window="windowReservations">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-calendar"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Agendar Espaço</strong>
+                  </div>
+                </button>
+
+                <button type="button" class="btn-big-action" data-window="windowVisitors">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-user-check"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Liberar Visitante</strong>
+                  </div>
+                </button>
+
+                <button type="button" class="btn-big-action" data-window="windowTickets">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-alert-circle"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Abrir Ocorrência</strong>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. PAINEL DA PORTARIA (OPERAÇÃO ÁGIL 24H) -->
+            <div id="portariaDailyPanel" class="daily-role-panel hidden">
+              <!-- Barra de Busca Rápida de Apartamento e Morador -->
+              <div class="portaria-fast-search-card">
+                <div class="portaria-fast-search-header">
+                  <div class="fast-search-title">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-search"/></svg>
+                    <span>Localização Rápida de Apartamentos &amp; Moradores</span>
+                  </div>
+                  <span class="fast-search-hint">Atendimento imediato na guarita</span>
+                </div>
+                <div class="portaria-fast-search-input-wrap">
+                  <input type="text" id="inputPortariaFastSearch" class="portaria-search-field" placeholder="Digite o número do apartamento (ex: 102) ou o nome do morador..." aria-label="Buscar morador ou apartamento" />
+                  <button type="button" id="btnPortariaFastSearchClear" class="btn-clear-search hidden" title="Limpar busca">&times;</button>
+                </div>
+                <div id="portariaFastSearchResults" class="portaria-fast-search-results hidden"></div>
+              </div>
+
+              <!-- Visitantes Esperados Hoje -->
+              <div class="daily-card portaria-today-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-user-check"/></svg></div>
+                    <h4>Visitantes e Prestadores Esperados para Hoje</h4>
+                  </div>
+                  <div class="daily-card-actions">
+                    <button type="button" class="btn-daily-sm-action" data-window="windowVisitors">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+                      <span>Novo Visitante</span>
+                    </button>
+                    <button type="button" class="daily-link" data-window="windowVisitors">Ver todos</button>
+                  </div>
+                </div>
+                <div class="daily-card-body">
+                  <div id="portariaTodayGuestsFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Carregando visitantes de hoje...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Encomendas na Guarita Aguardando Baixa -->
+              <div class="daily-card portaria-packages-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-package"/></svg></div>
+                    <h4>Encomendas Pendentes de Retirada</h4>
+                  </div>
+                  <div class="daily-card-actions">
+                    <button type="button" class="btn-daily-sm-action" data-window="windowDeliveries">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+                      <span>Nova Encomenda</span>
+                    </button>
+                    <button type="button" class="daily-link" data-window="windowDeliveries">Gerenciar todas</button>
+                  </div>
+                </div>
+                <div class="daily-card-body">
+                  <div id="portariaPendingPackagesFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Carregando encomendas na guarita...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. PAINEL DO SÍNDICO / ADMIN -->
+            <div id="sindicoDailyPanel" class="daily-role-panel hidden">
+              <!-- Chamados de Moradores em Aberto -->
+              <div class="daily-card sindico-tickets-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-alert-circle"/></svg></div>
+                    <h4>Ocorrências e Chamados Aguardando Parecer do Síndico</h4>
+                  </div>
+                  <button type="button" class="daily-link" data-window="windowTickets">Livro de ocorrências &rarr;</button>
+                </div>
+                <div class="daily-card-body">
+                  <div id="sindicoPendingTicketsFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Verificando chamados pendentes...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grade Dupla: Lazer nos Próximos Dias & Atalhos Administrativos -->
+              <div class="daily-duo-grid">
+                <!-- Ocupação das Áreas Comuns -->
+                <article class="daily-card">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-calendar"/></svg></div>
+                      <h4>Eventos Agendados nas Áreas Comuns</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowReservations">Ver calendário</button>
+                  </div>
+                  <div class="daily-card-body" id="sindicoAgendaFeed">
+                    <p class="daily-placeholder-text">Consultando reservas...</p>
+                  </div>
+                </article>
+
+                <!-- Atalhos Executivos do Síndico -->
+                <article class="daily-card">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-shield"/></svg></div>
+                      <h4>Ações Administrativas Diretas</h4>
+                    </div>
+                  </div>
+                  <div class="daily-card-body">
+                    <div class="sindico-shortcuts-list">
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowNotices">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-megaphone"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Publicar Comunicado</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowUnits">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-users"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Unidades e Moradores</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowAudit">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-clipboard"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Auditoria e Logs</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowSettings">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-settings"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Configurações</strong>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BLOCO DE COMPATIBILIDADE RETROATIVA (OCULTO - PRESERVA IDs) -->
+          <div class="hidden" aria-hidden="true" style="display:none !important;">
+            <span id="statMoradores">0</span>
+            <span id="statAcessos">0</span>
+            <span id="statEncomendasMorador">0</span>
+            <span id="statReservas">0</span>
+            <span id="statAvisos">0</span>
+            <div id="overviewNoticesList"></div>
+            <div id="overviewAgendaList"></div>
+            <div id="overviewDeliveriesList"></div>
+            <div id="cardStatMoradores"></div>
+            <div id="cardStatAcessos"></div>
+            <div id="cardStatEncomendas"></div>
+            <div id="cardStatReservas"></div>
+            <div id="cardStatAvisos"></div>
+          </div>
+
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 2: UNIDADES E MORADORES             -->
+        <!-- ========================================== -->
+        <section id="windowUnits" class="workspace-view workspace-window hidden" aria-labelledby="windowUnitsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Unidades e moradores</span>
+                  </nav>
+                  <h3 id="windowUnitsTitle" class="window-title">Apartamentos e moradores</h3>
+                  <p class="window-sub">Cadastro de unidades condominiais e moradores responsáveis (exclusivo do síndico)</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="adminUnitActions" class="window-toolbar">
+                <button id="btnToggleNewUnitForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Novo apartamento
+                </button>
+              </div>
+
+              <form id="formNewUnit" class="form-mini hidden">
+                <h4>Cadastrar nova unidade</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="inputBloco">Bloco</label>
+                    <input type="text" id="inputBloco" placeholder="Ex: Bloco C" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputNumero">Número</label>
+                    <input type="text" id="inputNumero" placeholder="Ex: 301" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputAndar">Andar</label>
+                    <input type="number" id="inputAndar" placeholder="Ex: 3" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Salvar unidade</button>
+                  <button type="button" id="btnCancelNewUnit" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Bloco / Apto</th>
+                      <th>Andar</th>
+                      <th>Morador responsável</th>
+                      <th>Contato</th>
+                      <th>Status</th>
+                      <th>Ações de Morador</th>
+                    </tr>
+                  </thead>
+                  <tbody id="unitsTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando unidades...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Formulário Modal/Mini para Cadastrar e Vincular Morador na Unidade -->
+              <form id="formAssignResident" class="form-mini hidden" style="margin-top: 20px;">
+                <div class="section-title-split">
+                  <h4 id="formAssignResidentTitle">Cadastrar morador para a unidade</h4>
+                  <button type="button" id="btnCancelAssignResident" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <p class="muted" id="formAssignResidentSub">Informe os dados cadastrais do morador para gerar o login de acesso.</p>
+                <input type="hidden" id="assignTargetUnitId" />
+
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputResidentNome">Nome completo do morador</label>
+                    <input type="text" id="inputResidentNome" placeholder="Ex: Roberto da Silva" required />
+                  </div>
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputResidentEmail">E-mail de acesso (Login)</label>
+                    <input type="email" id="inputResidentEmail" placeholder="morador@email.com" required />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="inputResidentTelefone">Telefone / WhatsApp</label>
+                    <input type="tel" id="inputResidentTelefone" placeholder="(11) 98765-4321" />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputResidentSenha">Senha inicial de acesso</label>
+                    <input type="text" id="inputResidentSenha" value="Morador@123" required />
+                  </div>
+                </div>
+
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar e Criar Acesso</button>
+                  <button type="button" id="btnCancelAssignResident2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 3: ENCOMENDAS                       -->
+        <!-- ========================================== -->
+        <section id="windowDeliveries" class="workspace-view workspace-window hidden" aria-labelledby="windowDeliveriesTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-package"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Encomendas</span>
+                  </nav>
+                  <h3 id="windowDeliveriesTitle" class="window-title">Controle de encomendas</h3>
+                  <p id="windowDeliveriesSub" class="window-sub">Pacotes recebidos na portaria do condomínio</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="staffDeliveryActions" class="window-toolbar">
+                <button id="btnToggleNewDeliveryForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Registrar chegada de pacote
+                </button>
+              </div>
+
+              <form id="formNewDelivery" class="form-mini hidden">
+                <h4>Registrar recebimento de pacote na guarita</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="selectDeliveryUnit">Apartamento de destino</label>
+                    <select id="selectDeliveryUnit" required>
+                      <option value="">Carregando apartamentos...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputDeliveryDesc">Descrição do pacote</label>
+                    <input type="text" id="inputDeliveryDesc" placeholder="Ex: Caixa Mercado Livre / Envelope" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputDeliveryTracking">Código de rastreio (opcional)</label>
+                    <input type="text" id="inputDeliveryTracking" placeholder="Ex: BR123456789" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar recebimento</button>
+                  <button type="button" id="btnCancelNewDelivery" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Apartamento</th>
+                      <th>Descrição</th>
+                      <th>Rastreio</th>
+                      <th>Chegada</th>
+                      <th>Status</th>
+                      <th id="thDeliveryActions">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="deliveriesTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando encomendas...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 4: RESERVAS DE ÁREAS COMUNS         -->
+        <!-- ========================================== -->
+        <section id="windowReservations" class="workspace-view workspace-window hidden" aria-labelledby="windowReservationsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Reservas</span>
+                  </nav>
+                  <h3 id="windowReservationsTitle" class="window-title">Reservas de espaços comuns</h3>
+                  <p id="windowReservationsSub" class="window-sub">Agendamento de churrasqueira, salão de festas e quadra</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Banner de Retomada na tela de Reservas -->
+              <div id="reservationsRecoveryBanner" class="recovery-offer-banner hidden" role="region" aria-label="Oferta de vaga liberada">
+                <div class="recovery-offer-icon" aria-hidden="true">
+                  <svg class="ico"><use href="#i-zap"/></svg>
+                </div>
+                <div class="recovery-offer-content">
+                  <span class="recovery-offer-badge">Vaga Liberada &bull; Direito de Preferência</span>
+                  <h3 class="recovery-offer-title" id="resRecoveryTitle">A data pretendida está disponível com exclusividade!</h3>
+                  <p class="recovery-offer-desc" id="resRecoveryDesc">Você possui preferência de 24 horas para garantir esta reserva após a desistência da reserva anterior.</p>
+                  <div class="recovery-offer-meta" id="resRecoveryMeta"></div>
+                </div>
+                <div class="recovery-offer-actions">
+                  <button type="button" class="btn-recovery-accept" id="btnResAcceptOffer">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>Confirmar Minha Vaga</span>
+                  </button>
+                  <button type="button" class="btn-recovery-decline" id="btnResDeclineOffer">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-close"/></svg>
+                    <span>Dispensar Vaga</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="residentReservationToolbar" class="window-toolbar window-toolbar-split">
+                <button id="btnToggleNewReservationForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Nova solicitação de reserva
+                </button>
+              </div>
+
+              <!-- Calendário Visual Interativo de Reservas e Disponibilidade -->
+              <div id="reservationsCalendarSection" class="calendar-reservation-wrapper">
+                <div class="calendar-controls-bar">
+                  <div class="calendar-filter-group">
+                    <label for="calendarAreaFilter"><strong>Espaço:</strong></label>
+                    <select id="calendarAreaFilter" class="select-calendar-area">
+                      <option value="">Todos os Espaços</option>
+                    </select>
+                  </div>
+                  
+                  <div class="calendar-nav-group">
+                    <button type="button" id="btnCalPrevMonth" class="btn-cal-nav" title="Mês anterior" aria-label="Mês anterior">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                    </button>
+                    <span id="calCurrentMonthLabel" class="calendar-month-heading">Outubro 2026</span>
+                    <button type="button" id="btnCalNextMonth" class="btn-cal-nav" title="Próximo mês" aria-label="Próximo mês">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+                    </button>
+                    <button type="button" id="btnCalToday" class="btn-cal-today">Hoje</button>
+                  </div>
+
+                  <div class="calendar-legend">
+                    <span class="legend-item"><span class="legend-dot status-free"></span> Livre</span>
+                    <span class="legend-item"><span class="legend-dot status-standby"></span> Standby</span>
+                    <span class="legend-item"><span class="legend-dot status-booked"></span> Confirmada</span>
+                    <span class="legend-item"><span class="legend-dot status-mine"></span> Minha Reserva</span>
+                  </div>
+                </div>
+
+                <div class="calendar-grid-container">
+                  <div class="calendar-weekdays">
+                    <span><span class="day-full">Dom</span><span class="day-short">D</span></span>
+                    <span><span class="day-full">Seg</span><span class="day-short">S</span></span>
+                    <span><span class="day-full">Ter</span><span class="day-short">T</span></span>
+                    <span><span class="day-full">Qua</span><span class="day-short">Q</span></span>
+                    <span><span class="day-full">Qui</span><span class="day-short">Q</span></span>
+                    <span><span class="day-full">Sex</span><span class="day-short">S</span></span>
+                    <span><span class="day-full">Sáb</span><span class="day-short">S</span></span>
+                  </div>
+                  <div id="reservationsCalendarGrid" class="calendar-days-grid">
+                    <!-- Gerado dinamicamente via JS -->
+                  </div>
+                </div>
+                <p class="calendar-click-tip">
+                  <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+                  <span>Dica: Clique em qualquer dia para abrir o agendamento rápido com horários e checagem de prioridade.</span>
+                </p>
+              </div>
+
+              <form id="formNewReservation" class="form-mini hidden">
+                <h4>Agendar espaço de lazer</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="selectReservationArea">Área comum</label>
+                    <select id="selectReservationArea" required>
+                      <option value="">Carregando áreas...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputReservationDate">Data pretendida</label>
+                    <input type="date" id="inputReservationDate" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputReservationTimeStart">Horário de início</label>
+                    <input type="time" id="inputReservationTimeStart" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputReservationTimeEnd">Horário de término</label>
+                    <input type="time" id="inputReservationTimeEnd" required />
+                  </div>
+                </div>
+
+                <!-- Banner dinâmico com as regras operacionais da área selecionada -->
+                <div id="areaRulesHint" class="area-rules-hint hidden">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>
+                  <span id="areaRulesHintText">Regras de funcionamento</span>
+                </div>
+
+                <!-- Card dinâmico de verificação de prioridade -->
+                <div id="reservationPriorityNotice" class="reservation-priority-notice hidden">
+                  <div class="priority-notice-icon" id="priorityNoticeIcon">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-zap"/></svg>
+                  </div>
+                  <div class="priority-notice-content">
+                    <strong id="priorityNoticeTitle">Checando disponibilidade e prioridade...</strong>
+                    <p id="priorityNoticeDesc"></p>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputReservationObs">Observações / finalidade</label>
+                    <input type="text" id="inputReservationObs" placeholder="Ex: Almoço em família" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar reserva</button>
+                  <button type="button" id="btnCancelNewReservation" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Espaço comum</th>
+                      <th>Data e Horário</th>
+                      <th>Solicitante / Apartamento</th>
+                      <th>Status</th>
+                      <th>Controle de chaves</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reservationsTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando reservas...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 5: MURAL DE AVISOS                  -->
+        <!-- ========================================== -->
+        <section id="windowNotices" class="workspace-view workspace-window hidden" aria-labelledby="windowNoticesTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-megaphone"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Mural de avisos</span>
+                  </nav>
+                  <h3 id="windowNoticesTitle" class="window-title">Mural de avisos e comunicados</h3>
+                  <p class="window-sub">Informativos oficiais da administração para todos os moradores</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="adminNoticeToolbar" class="window-toolbar">
+                <button id="btnToggleNewNoticeForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Publicar novo comunicado
+                </button>
+              </div>
+
+              <div id="residentNoticeHelp" class="privacy-note hidden" style="margin-bottom: 16px;">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+                <span>Este mural exibe comunicados emitidos pela administração. Para relatar barulho, vazamentos ou manutenções, acesse o módulo de <strong>Ocorrências</strong>.</span>
+              </div>
+
+              <form id="formNewNotice" class="form-mini hidden">
+                <h4>Novo comunicado oficial</h4>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputNoticeTitle">Título do comunicado</label>
+                    <input type="text" id="inputNoticeTitle" placeholder="Ex: Manutenção preventiva dos elevadores" minlength="3" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectNoticeCategory">Categoria</label>
+                    <select id="selectNoticeCategory" required>
+                      <option value="GERAL">Geral</option>
+                      <option value="MANUTENCAO">Manutenção</option>
+                      <option value="URGENTE">Urgente</option>
+                      <option value="ASSEMBLEIA">Assembleia</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputNoticeMessage">Mensagem completa</label>
+                    <textarea id="inputNoticeMessage" rows="4" placeholder="Escreva o comunicado detalhado para os moradores..." minlength="5" required></textarea>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputNoticeLink">Link da reunião online ou vídeo (Google Meet, Zoom, YouTube, Teams...)</label>
+                    <input type="url" id="inputNoticeLink" placeholder="Ex: https://meet.google.com/xyz-abcd-efg ou https://youtube.com/..." />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Publicar para todos</button>
+                  <button type="button" id="btnCancelNewNotice" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div id="noticesContainer" class="notices-grid">
+                <p class="table-empty">Carregando comunicados...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 6: AUDITORIA E SEGURANÇA            -->
+        <!-- ========================================== -->
+        <section id="windowAudit" class="workspace-view workspace-window hidden" aria-labelledby="windowAuditTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Auditoria</span>
+                  </nav>
+                  <h3 id="windowAuditTitle" class="window-title">Auditoria e logs de segurança</h3>
+                  <p class="window-sub">Rastreabilidade de acessos, eventos de segurança e conformidade LGPD</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div class="info-box-audit">
+                <strong>Painel de Rastreabilidade e Conformidade (LGPD).</strong>
+                Todas as tentativas de autenticação e operações críticas são registradas de forma imutável com data/hora, endereço de rede e identificação do dispositivo, garantindo total transparência, prevenção a acessos não autorizados e conformidade com as diretrizes de segurança da informação.
+              </div>
+
+              <div class="window-toolbar window-toolbar-split">
+                <div class="audit-counter">Registros capturados: <span id="auditCount">0</span></div>
+                <button id="btnRefreshAudit" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Atualizar logs
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Data / Hora</th>
+                      <th>E-mail informado</th>
+                      <th>Endereço IP</th>
+                      <th>Navegador</th>
+                      <th>Resultado</th>
+                      <th>Origem / Módulo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando logs de auditoria...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 7: LIVRO DE OCORRÊNCIAS E CHAMADOS  -->
+        <!-- ========================================== -->
+        <section id="windowTickets" class="workspace-view workspace-window hidden" aria-labelledby="windowTicketsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Ocorrências</span>
+                  </nav>
+                  <h3 id="windowTicketsTitle" class="window-title">Livro de ocorrências e chamados</h3>
+                  <p id="windowTicketsSub" class="window-sub">Registro de solicitações, barulho e manutenções com resposta oficial do síndico</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button id="btnNewTicketToggle" type="button" class="btn-primary">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+                  <span>Abrir ocorrência</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Formulário retrátil para novo chamado -->
+              <form id="formNewTicket" class="form-mini hidden" style="margin-bottom: 20px;">
+                <div class="section-title-split">
+                  <h4>Registrar novo chamado / ocorrência</h4>
+                  <button type="button" id="btnCancelTicket" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputTicketTitulo">Título da ocorrência</label>
+                    <input type="text" id="inputTicketTitulo" placeholder="Ex: Barulho excessivo no andar superior" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectTicketCategoria">Categoria</label>
+                    <select id="selectTicketCategoria" required>
+                      <option value="BARULHO">Barulho / Perturbação</option>
+                      <option value="MANUTENCAO">Manutenção predial</option>
+                      <option value="VAZAMENTO">Vazamento / Hidráulica</option>
+                      <option value="SEGURANCA">Segurança condominial</option>
+                      <option value="OUTROS">Outros assuntos</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group-mini">
+                  <label for="inputTicketDescricao">Descrição detalhada</label>
+                  <textarea id="inputTicketDescricao" rows="3" placeholder="Descreva os fatos, datas, horários e detalhes pertinentes..." required></textarea>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Enviar ao síndico</button>
+                  <button type="button" id="btnCancelTicket2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <!-- Barra de filtros -->
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label for="filterTicketStatus">Status:</label>
+                  <select id="filterTicketStatus">
+                    <option value="">Todos os status</option>
+                    <option value="ABERTO">Em aberto</option>
+                    <option value="EM_ANALISE">Em análise</option>
+                    <option value="CONCLUIDO">Concluídos</option>
+                    <option value="CANCELADO">Cancelados</option>
+                  </select>
+                </div>
+                <button id="btnRefreshTickets" type="button" class="btn-secondary-sm" title="Atualizar lista">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                  <span>Atualizar</span>
+                </button>
+              </div>
+
+              <!-- Tabela de ocorrências -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Assunto</th>
+                      <th>Data</th>
+                      <th>Unidade / Solicitante</th>
+                      <th>Categoria</th>
+                      <th>Status</th>
+                      <th>Parecer do Síndico</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ticketsTableBody">
+                    <tr><td colspan="7" class="table-empty">Carregando ocorrências...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 8: CONTROLE DE PORTARIA & VISITANTES-->
+        <!-- ========================================== -->
+        <section id="windowVisitors" class="workspace-view workspace-window hidden" aria-labelledby="windowVisitorsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-user-check"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Controle de portaria</span>
+                  </nav>
+                  <h3 id="windowVisitorsTitle" class="window-title">Controle de portaria e visitantes</h3>
+                  <p id="windowVisitorsSub" class="window-sub">Liberação prévia de convidados, prestadores de serviço e registro de entrada/saída</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button id="btnNewVisitorToggle" type="button" class="btn-primary">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+                  <span id="btnNewVisitorLabel">Autorizar visitante</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Seção Proeminente da Portaria: Convidados dos Eventos de Hoje -->
+              <div id="todayGuestsSection" class="today-guests-card">
+                <div class="today-guests-card-header">
+                  <div class="today-badge-icon">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-calendar"/></svg>
+                  </div>
+                  <div class="today-guests-titles">
+                    <h4>Convidados de Eventos de Hoje</h4>
+                    <p class="muted">Lista unificada em tempo real para a guarita liberar entrada e registrar saída com 1 clique.</p>
+                  </div>
+                  <button type="button" id="btnRefreshTodayGuests" class="btn-secondary-sm" title="Recarregar convidados de hoje">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                    <span>Atualizar Convidados</span>
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Nome do Convidado</th>
+                        <th>Destino / Evento</th>
+                        <th>Horário Previsto</th>
+                        <th>Status Portaria</th>
+                        <th>Ações na Guarita</th>
+                      </tr>
+                    </thead>
+                    <tbody id="todayGuestsTableBody">
+                      <tr><td colspan="5" class="table-empty">Nenhum evento com lista de convidados para hoje.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Formulário retrátil para autorização / cadastro de visitante avulso -->
+              <form id="formNewVisitor" class="form-mini hidden" style="margin-bottom: 20px;">
+                <div class="section-title-split">
+                  <h4 id="formNewVisitorTitle">Autorizar visitante ou prestador de serviço</h4>
+                  <button type="button" id="btnCancelVisitor" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputVisitorNome">Nome completo do visitante</label>
+                    <input type="text" id="inputVisitorNome" placeholder="Ex: Lucas Ferreira dos Santos" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputVisitorDoc">Documento (RG / CPF)</label>
+                    <input type="text" id="inputVisitorDoc" placeholder="Opcional ou conferido na entrada" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini" id="groupVisitorUnit">
+                    <label for="selectVisitorUnit">Unidade de destino</label>
+                    <select id="selectVisitorUnit" required>
+                      <option value="">Carregando apartamentos...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectVisitorTipo">Tipo de acesso</label>
+                    <select id="selectVisitorTipo" required>
+                      <option value="VISITANTE">Visitante / Convidado</option>
+                      <option value="PRESTADOR_SERVICO">Prestador de serviço / Manutenção</option>
+                      <option value="DELIVERY">Entregador / Delivery</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputVisitorData">Data prevista</label>
+                    <input type="date" id="inputVisitorData" required />
+                  </div>
+                </div>
+                <div class="form-group-mini">
+                  <label for="inputVisitorObs">Observações / Empresa (se aplicável)</label>
+                  <input type="text" id="inputVisitorObs" placeholder="Ex: Técnico da internet, convidado de aniversário..." />
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Salvar autorização</button>
+                  <button type="button" id="btnCancelVisitor2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <!-- Barra de filtros -->
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label for="filterVisitorStatus">Status:</label>
+                  <select id="filterVisitorStatus">
+                    <option value="">Todos</option>
+                    <option value="AGUARDANDO">Aguardando chegada</option>
+                    <option value="NO_LOCAL">Presentes no condomínio</option>
+                    <option value="FINALIZADO">Saída registrada</option>
+                    <option value="CANCELADO">Cancelados</option>
+                  </select>
+                </div>
+                <button id="btnRefreshVisitors" type="button" class="btn-secondary-sm" title="Atualizar lista">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                  <span>Atualizar</span>
+                </button>
+              </div>
+
+              <!-- Tabela de visitantes -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Visitante</th>
+                      <th>Data Prevista</th>
+                      <th>Destino</th>
+                      <th>Documento</th>
+                      <th>Tipo</th>
+                      <th>Status</th>
+                      <th>Entrada</th>
+                      <th>Saída</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="visitorsTableBody">
+                    <tr><td colspan="9" class="table-empty">Carregando registros de portaria...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- JANELA 8: CONFIGURAÇÕES GERAIS (SÍNDICO)   -->
+        <!-- ========================================== -->
+        <section id="windowSettings" class="workspace-view workspace-window hidden" aria-labelledby="windowSettingsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Configurações</span>
+                  </nav>
+                  <h3 id="windowSettingsTitle" class="window-title">Configurações Gerais do Condomínio</h3>
+                  <p class="window-sub">Identidade modular, governança anti-sabotagem e notificações por e-mail</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <form id="formCondoSettings" class="settings-form">
+                <div class="settings-grid">
+                  
+                  <!-- Bloco 1: Identidade Institucional (White-label) -->
+                  <div class="settings-card">
+                    <div class="settings-card-header">
+                      <div class="settings-card-icon"><svg class="ico ico-sm"><use href="#i-building"/></svg></div>
+                      <div>
+                        <h4>Identidade &amp; Comunicação</h4>
+                        <p>Personalize os dados oficiais do condomínio visíveis em todo o sistema e convites digitais.</p>
+                      </div>
+                    </div>
+                    <div class="settings-fields">
+                      <div class="form-group-mini">
+                        <label for="setCondoNome">Nome Oficial do Condomínio</label>
+                        <input type="text" id="setCondoNome" placeholder="Ex: Residencial Bela Vista" required />
+                      </div>
+                      <div class="form-group-mini">
+                        <label for="setCondoEndereco">Endereço Completo</label>
+                        <input type="text" id="setCondoEndereco" placeholder="Ex: Av. Central, 1200 - Bairro das Flores" />
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group-mini">
+                          <label for="setCondoTelefone">Telefone / Guarita 24h</label>
+                          <input type="text" id="setCondoTelefone" placeholder="Ex: (11) 98765-4321 ou Ramal 100" />
+                        </div>
+                        <div class="form-group-mini">
+                          <label for="setCondoEmail">E-mail Institucional</label>
+                          <input type="email" id="setCondoEmail" placeholder="Ex: administracao@condominio.com" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bloco 2: Regras de Governança & Anti-Sabotagem -->
+                  <div class="settings-card">
+                    <div class="settings-card-header">
+                      <div class="settings-card-icon"><svg class="ico ico-sm"><use href="#i-shield"/></svg></div>
+                      <div>
+                        <h4>Regras de Reserva &amp; Governança Justa</h4>
+                        <p>Parâmetros contra fraudes, proteção ao morador em espera e garantia de rotatividade.</p>
+                      </div>
+                    </div>
+                    <div class="settings-fields">
+                      <div class="form-row">
+                        <div class="form-group-mini">
+                          <label for="setIntervaloDias">Carência de Prioridade (Dias)</label>
+                          <input type="number" id="setIntervaloDias" min="1" max="365" value="30" required title="Período em que o morador fica em baixa prioridade após agendar" />
+                          <small class="muted">Ex: 30 dias para garantir rotatividade equilibrada</small>
+                        </div>
+                        <div class="form-group-mini">
+                          <label for="setPrazoStandby">Congelamento do Standby (Horas)</label>
+                          <input type="number" id="setPrazoStandby" min="1" max="168" value="48" required title="Faltando menos horas que isso, ninguém mais desbanca o morador" />
+                          <small class="muted">Ex: 48h antes do evento vira definitiva</small>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group-mini">
+                          <label for="setPrazoRetomada">Direito de Preferência na Retomada (Horas)</label>
+                          <input type="number" id="setPrazoRetomada" min="1" max="72" value="24" required title="Tempo para o vizinho desbancado aceitar a vaga liberada" />
+                          <small class="muted">Tempo para o vizinho recuperar a vaga com 1 clique</small>
+                        </div>
+                        <div class="form-group-mini">
+                          <label for="setDiasPenalidadeQueima">Penalidade por Queima de Prioridade (Dias)</label>
+                          <input type="number" id="setDiasPenalidadeQueima" min="1" max="365" value="30" required title="Período de penalidade caso o morador desbanque um vizinho e cancele" />
+                          <small class="muted">Dias em baixa prioridade ao queimar vaga</small>
+                        </div>
+                      </div>
+                      <div class="checkbox-option-box">
+                        <label class="checkbox-label" for="setQueimaPrioridade">
+                          <input type="checkbox" id="setQueimaPrioridade" checked />
+                          <div class="checkbox-label-content">
+                            <strong>Mecanismo Anti-Sabotagem (Queima de Prioridade)</strong>
+                            <p>Se um morador prioritário desbancar um vizinho em standby e cancelar em seguida, o sistema consome sua carência de 30 dias imediatamente e devolve a vaga prioritária ao morador original.</p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bloco 3: Notificações & E-mails Automáticos -->
+                  <div class="settings-card">
+                    <div class="settings-card-header">
+                      <div class="settings-card-icon"><svg class="ico ico-sm"><use href="#i-mail"/></svg></div>
+                      <div>
+                        <h4>Notificações &amp; Comunicação Ativa</h4>
+                        <p>Disparo automático de avisos por e-mail e preparação para notificações push no celular.</p>
+                      </div>
+                    </div>
+                    <div class="settings-fields">
+                      <div class="smtp-status-box">
+                        <div class="smtp-status-indicator">
+                          <span class="status-indicator-dot online"></span>
+                          <strong>Servidor de E-mail Conectado (Gmail SMTP)</strong>
+                        </div>
+                        <p>Remetente ativo: <code class="font-mono">sistema.academico.pim@gmail.com</code> &bull; Envio seguro com autenticação criptografada TLS.</p>
+                      </div>
+
+                      <div class="checkbox-option-box">
+                        <label class="checkbox-label" for="setEnviarEmailAtivo">
+                          <input type="checkbox" id="setEnviarEmailAtivo" checked />
+                          <div class="checkbox-label-content">
+                            <strong>Disparar Notificações e Convites por E-mail</strong>
+                            <p>Envia avisos automáticos de vaga liberada, convites digitais de eventos para convidados e alertas aos moradores.</p>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div class="mobile-push-preview-box">
+                        <div class="push-preview-header">
+                          <svg class="ico ico-xs"><use href="#i-zap"/></svg>
+                          <strong>Módulo Mobile &bull; Notificações Push</strong>
+                        </div>
+                        <p class="muted">O sistema está arquitetado de forma desacoplada via serviço unificado de mensageria. Quando o aplicativo mobile (Android/iOS) for publicado, as notificações de tela serão entregues instantaneamente no smartphone do morador.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="settings-footer-actions">
+                  <button type="submit" id="btnSaveCondoSettings" class="btn-primary">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>Salvar Configurações do Condomínio</span>
+                  </button>
+                  <button type="button" id="btnCancelCondoSettings" class="btn-secondary">Restaurar Valores</button>
+                </div>
+              </form>
+
+              <!-- Bloco 4 do Síndico: Gerenciamento Modular dos Espaços Comuns e Regras -->
+              <div id="adminAreasSection" class="settings-card" style="margin-top: 2rem;">
+                <div class="settings-card-header">
+                  <div class="settings-card-icon"><svg class="ico ico-sm"><use href="#i-calendar"/></svg></div>
+                  <div style="flex:1;">
+                    <h4>Espaços Comuns &amp; Horários de Funcionamento</h4>
+                    <p>Cadastre novos ambientes de lazer, defina horários de abertura e fechamento, limites de permanência e regras de carência.</p>
+                  </div>
+                  <button type="button" id="btnToggleNewAreaForm" class="btn-primary-sm">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Adicionar novo espaço
+                  </button>
+                </div>
+
+                <!-- Formulário de cadastro de nova área comum -->
+                <form id="formNewArea" class="form-mini hidden" style="margin-top: 14px;">
+                  <h5>Cadastrar novo espaço de lazer</h5>
+                  <div class="form-row">
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaNome">Nome do espaço</label>
+                      <input type="text" id="inputNewAreaNome" placeholder="Ex: Espaço Gourmet" required />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaCapacidade">Capacidade (pessoas)</label>
+                      <input type="number" id="inputNewAreaCapacidade" min="1" value="20" required />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaTaxa">Taxa de limpeza (R$)</label>
+                      <input type="number" id="inputNewAreaTaxa" step="0.01" min="0" value="0.00" />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaHoraIni">Abre às:</label>
+                      <input type="time" id="inputNewAreaHoraIni" value="08:00" required />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaHoraFim">Fecha às:</label>
+                      <input type="time" id="inputNewAreaHoraFim" value="22:00" required />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaMaxHoras">Duração máxima (horas):</label>
+                      <input type="number" id="inputNewAreaMaxHoras" min="1" max="24" value="4" required />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaIntervalo">Intervalo de prioridade (dias):</label>
+                      <input type="number" id="inputNewAreaIntervalo" min="1" max="365" value="30" required title="Período de carência entre reservas prioritárias do mesmo morador" />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaMaxAtivas">Limite de reservas ativas:</label>
+                      <input type="number" id="inputNewAreaMaxAtivas" min="1" max="10" value="2" required title="Quantidade máxima de reservas simultâneas ativas por morador" />
+                    </div>
+                    <div class="form-group-mini">
+                      <label for="inputNewAreaPrazoStandby">Corte do standby (horas antes):</label>
+                      <input type="number" id="inputNewAreaPrazoStandby" min="1" max="168" value="48" required title="Faltando essa quantidade de horas, o standby torna-se definitivo" />
+                    </div>
+                  </div>
+                  <div class="form-mini-actions">
+                    <button type="submit" class="btn-primary-sm">Salvar novo espaço</button>
+                    <button type="button" id="btnCancelNewArea" class="btn-secondary-sm">Cancelar</button>
+                  </div>
+                </form>
+
+                <div id="areasCardsList" class="areas-management-grid" style="margin-top: 1rem;">
+                  <p class="muted">Carregando áreas...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Lista de Convidados da Reserva & Convite Digital -->
+  <div id="modalGuestsList" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guestsModalTitle">
+    <div class="custom-dialog-card modal-guests-card">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon">
+          <svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="guestsModalTitle" class="custom-dialog-title">Lista de Convidados do Evento</h3>
+          <p id="guestsModalSub" class="custom-dialog-message">Espaço: <strong id="guestAreaName">--</strong> &bull; Data: <span id="guestReservationDate">--</span></p>
+        </div>
+        <button id="btnGuestsCloseX" type="button" class="btn-dialog-close" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <div class="guests-summary-bar">
+        <div class="guests-summary-item">
+          <span>Total cadastrados:</span>
+          <strong id="guestCountTotal">0</strong>
+        </div>
+        <div class="guests-summary-item">
+          <span>Entradas na portaria:</span>
+          <strong id="guestCountEntered" class="text-success">0</strong>
+        </div>
+        <div class="guests-summary-item">
+          <span>Convites digitais enviados:</span>
+          <strong id="guestCountInvited" class="text-primary">0</strong>
+        </div>
+      </div>
+
+      <!-- Aviso de Privacidade e Permissões -->
+      <div id="guestNonOwnerNotice" class="privacy-notice-badge hidden" style="margin: 0.75rem 0; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); background: var(--bg-subtle); border: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-shield"/></svg>
+        <span><strong>Modo de Leitura:</strong> Apenas o morador titular da reserva pode adicionar, alterar ou reenviar convites desta lista.</span>
+      </div>
+
+      <!-- Formulário para adicionar convidado -->
+      <form id="formAddGuest" class="guest-add-form">
+        <input type="hidden" id="guestTargetReservationId" />
+        <div class="form-row">
+          <div class="form-group-mini">
+            <label for="inputGuestNome">Nome completo do convidado *</label>
+            <input type="text" id="inputGuestNome" placeholder="Ex: Mariana Silva" required />
+          </div>
+          <div class="form-group-mini">
+            <label for="inputGuestDoc">Documento (RG / CPF) (Opcional)</label>
+            <input type="text" id="inputGuestDoc" placeholder="Opcional para entrada rápida" />
+          </div>
+          <div class="form-group-mini">
+            <label for="inputGuestEmail">E-mail para convite digital</label>
+            <input type="email" id="inputGuestEmail" placeholder="convidado@email.com (opcional)" />
+          </div>
+        </div>
+
+        <div class="guest-form-controls">
+          <label class="checkbox-label" for="chkGuestSendInvite">
+            <input type="checkbox" id="chkGuestSendInvite" />
+            <span>Enviar convite digital institucional por e-mail para este convidado</span>
+          </label>
+          <button type="submit" id="btnAddGuestSubmit" class="btn-primary-sm">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+            <span>Adicionar à Lista</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Tabela de Convidados -->
+      <div class="table-responsive modal-guests-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome Completo</th>
+              <th>Documento</th>
+              <th>E-mail</th>
+              <th>Convite Digital</th>
+              <th>Entrada na Portaria</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="guestsTableBody">
+            <tr><td colspan="6" class="table-empty">Nenhum convidado cadastrado até o momento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="custom-dialog-footer">
+        <button id="btnCloseGuestsModal" type="button" class="btn-dialog-secondary">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Parecer e Resposta do Síndico para Ocorrência -->
+  <div id="modalReplyTicket" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="replyTicketTitle">
+    <div class="custom-dialog-card" style="max-width: 520px;">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon">
+          <svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="replyTicketTitle" class="custom-dialog-title">Parecer da Administração</h3>
+          <p id="replyTicketSub" class="custom-dialog-message">Insira o parecer oficial do síndico para o condômino.</p>
+        </div>
+        <button id="btnCancelReplyTicketX" type="button" class="btn-dialog-close" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <form id="formReplyTicket" style="margin-top: 14px;">
+        <input type="hidden" id="replyTargetTicketId" />
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="selectReplyStatus">Novo status do chamado</label>
+          <select id="selectReplyStatus" required>
+            <option value="CONCLUIDO">Concluído / Resolvido</option>
+            <option value="EM_ANALISE">Em análise / Providências em andamento</option>
+          </select>
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 16px;">
+          <label for="inputReplyParecer">Parecer oficial do síndico</label>
+          <textarea id="inputReplyParecer" rows="4" placeholder="Descreva as medidas tomadas pela administração..." required></textarea>
+        </div>
+
+        <div class="custom-dialog-footer" style="padding: 0;">
+          <button id="btnCancelReplyTicket" type="button" class="btn-dialog-secondary">Cancelar</button>
+          <button type="submit" class="btn-dialog-primary">Registrar Parecer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notificações (toast) -->
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- Diálogo Modal Customizado (Substitui confirm/prompt do navegador) -->
+  <div id="customDialogOverlay" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="custom-dialog-card">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon" id="dialogIcon">
+          <svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="dialogTitle" class="custom-dialog-title">Confirmação</h3>
+          <p id="dialogMessage" class="custom-dialog-message">Mensagem do diálogo</p>
+        </div>
+        <button id="btnDialogCloseX" type="button" class="btn-dialog-close" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <div id="dialogInputWrapper" class="custom-dialog-body hidden">
+        <label id="dialogInputLabel" for="dialogInput" class="custom-dialog-label">Informe o dado:</label>
+        <input type="text" id="dialogInput" class="custom-dialog-input" placeholder="Digite aqui..." autocomplete="off" />
+      </div>
+
+      <div class="custom-dialog-footer">
+        <button id="btnDialogCancel" type="button" class="btn-dialog-secondary">Cancelar</button>
+        <button id="btnDialogConfirm" type="button" class="btn-dialog-primary">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Bloqueante: Troca Obrigatória de Senha (Primeiro Acesso) -->
+  <div id="modalForceChangePassword" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="forceChangePwTitle">
+    <div class="custom-dialog-card" style="max-width: 480px;">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon danger">
+          <svg class="ico" aria-hidden="true"><use href="#i-key"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="forceChangePwTitle" class="custom-dialog-title">Primeiro Acesso - Troca de Senha Obrigatória</h3>
+          <p class="custom-dialog-message">Por diretrizes de segurança, você deve substituir a senha temporária por uma nova senha pessoal antes de acessar o sistema.</p>
+        </div>
+      </div>
+
+      <form id="formForceChangePassword" style="margin-top: 16px;">
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="inputForcePwCurrent">Senha temporária atual</label>
+          <input type="password" id="inputForcePwCurrent" placeholder="Digite a senha recebida" required autocomplete="current-password" />
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="inputForcePwNew">Nova senha pessoal (mínimo 6 caracteres)</label>
+          <input type="password" id="inputForcePwNew" placeholder="Crie sua nova senha" minlength="6" required autocomplete="new-password" />
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 16px;">
+          <label for="inputForcePwConfirm">Confirme a nova senha</label>
+          <input type="password" id="inputForcePwConfirm" placeholder="Repita a nova senha" minlength="6" required autocomplete="new-password" />
+        </div>
+
+        <div id="forcePwError" class="alert-box error hidden" style="margin-bottom: 14px; font-size: 0.85rem;"></div>
+
+        <div class="custom-dialog-footer" style="padding: 0; margin-top: 14px;">
+          <button id="btnForcePwLogout" type="button" class="btn-dialog-secondary">Sair do sistema</button>
+          <button id="btnForcePwSubmit" type="submit" class="btn-dialog-primary">Gravar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BARRA DE NAVEGAÇÃO INFERIOR PARA DISPOSITIVOS MÓVEIS -->
+  <!-- ========================================== -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav hidden" aria-label="Navegação rápida no celular">
+    <button type="button" class="m-nav-btn active" data-window="windowOverview" id="mNavHome">
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-grid"/></svg>
+      <span>Início</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-window="windowReservations" id="mNavReservations">
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-calendar"/></svg>
+      <span>Reservas</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-window="windowDeliveries" id="mNavDeliveries">
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-package"/></svg>
+      <span>Entregas</span>
+    </button>
+    <button type="button" class="m-nav-btn" id="mNavOpenMenu">
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-menu"/></svg>
+      <span>Menu</span>
+    </button>
+  </nav>
+
+  <script src="app.js?v=6"></script>
+</body>
+</html>
