@@ -1,0 +1,24 @@
+<div id="customDialogOverlay" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="custom-dialog-card">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon" id="dialogIcon">
+          <svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="dialogTitle" class="custom-dialog-title">Confirmação</h3>
+          <p id="dialogMessage" class="custom-dialog-message">Mensagem do diálogo</p>
+        </div>
+        <button id="btnDialogCloseX" type="button" class="btn-dialog-close" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <div id="dialogInputWrapper" class="custom-dialog-body hidden">
+        <label id="dialogInputLabel" for="dialogInput" class="custom-dialog-label">Informe o dado:</label>
+        <input type="text" id="dialogInput" class="custom-dialog-input" placeholder="Digite aqui..." autocomplete="off" />
+      </div>
+
+      <div class="custom-dialog-footer">
+        <button id="btnDialogCancel" type="button" class="btn-dialog-secondary">Cancelar</button>
+        <button id="btnDialogConfirm" type="button" class="btn-dialog-primary">Confirmar</button>
+      </div>
+    </div>
+  </div>

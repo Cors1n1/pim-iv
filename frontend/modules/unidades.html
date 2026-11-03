@@ -1,0 +1,120 @@
+<section id="windowUnits" class="workspace-view workspace-window hidden" aria-labelledby="windowUnitsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Unidades e moradores</span>
+                  </nav>
+                  <h3 id="windowUnitsTitle" class="window-title">Apartamentos e moradores</h3>
+                  <p class="window-sub">Cadastro de unidades condominiais e moradores responsáveis (exclusivo do síndico)</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="adminUnitActions" class="window-toolbar">
+                <button id="btnToggleNewUnitForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Novo apartamento
+                </button>
+                <button id="btnToggleBatchUnitsForm" type="button" class="btn-primary-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-zap"/></svg>Gerar andares em lote
+                </button>
+              </div>
+
+              <!-- Formulário de Criação Avulsa -->
+              <form id="formNewUnit" class="form-mini hidden">
+                <h4>Cadastrar nova unidade avulsa</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="inputBloco">Bloco / Torre</label>
+                    <input type="text" id="inputBloco" placeholder="Ex: Bloco A" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputNumero">Número do Apartamento</label>
+                    <input type="text" id="inputNumero" placeholder="Ex: 101" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputAndar">Andar</label>
+                    <input type="number" id="inputAndar" placeholder="Ex: 1" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Salvar unidade</button>
+                  <button type="button" id="btnCancelNewUnit" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <!-- Formulário Inteligente de Geração em Lote -->
+              <form id="formBatchUnits" class="form-mini hidden" style="border: 1px solid #bfdbfe; background: #f8fafc;">
+                <div class="section-title-split">
+                  <h4>⚡ Gerador Inteligente de Andares e Unidades</h4>
+                  <button type="button" id="btnCancelBatchUnits" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <p class="muted">Gere toda a estrutura de andares e apartamentos do condomínio em segundos.</p>
+                
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="inputBatchBloco">Bloco / Torre</label>
+                    <input type="text" id="inputBatchBloco" value="Bloco A" placeholder="Ex: Bloco A" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputBatchAndarIni">Andar Inicial</label>
+                    <input type="number" id="inputBatchAndarIni" value="1" min="0" max="100" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputBatchAndarFim">Andar Final</label>
+                    <input type="number" id="inputBatchAndarFim" value="10" min="1" max="100" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputBatchAptosPorAndar">Aptos por Andar</label>
+                    <input type="number" id="inputBatchAptosPorAndar" value="4" min="1" max="30" required />
+                  </div>
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputBatchFormato">Padrão de Numeração</label>
+                    <select id="inputBatchFormato">
+                      <option value="CENTENA">Padrão Centena (101, 102... / 201, 202...)</option>
+                      <option value="DEZENA">Padrão Dezena (11, 12, 13, 14... / 21, 22...)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="batchPreviewBox" style="margin: 12px 0; padding: 12px 16px; background: #eff6ff; border-radius: 8px; border: 1px solid #dbeafe; font-size: 13px; color: #1e40af;">
+                  <span id="batchPreviewText">Carregando estimativa...</span>
+                </div>
+
+                <div class="form-mini-actions">
+                  <button type="submit" id="btnSubmitBatchUnits" class="btn-primary-sm">Criar todas as unidades</button>
+                  <button type="button" id="btnCancelBatchUnits2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Bloco / Apto</th>
+                      <th>Andar</th>
+                      <th>Morador responsável</th>
+                      <th>Contato</th>
+                      <th>Status Cadastro</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="unitsTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando unidades...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

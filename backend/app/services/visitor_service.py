@@ -64,7 +64,11 @@ class VisitorService:
             if date_filter:
                 visitors = [v for v in visitors if v.data_prevista == date_filter]
         else:
-            visitors = await self.visitor_repo.list_all(status_filter, date_filter)
+            visitors = await self.visitor_repo.list_all(
+                condominio_id=current_user.condominio_id,
+                status_filter=status_filter,
+                date_filter=date_filter
+            )
 
         return [self._to_response(v, current_user) for v in visitors]
 
@@ -84,46 +88,66 @@ class VisitorService:
                     detail="Você só pode autorizar visitantes para o seu próprio apartamento."
                 )
             target_unit_id = current_user.unidade_id
-        else:
+        elif current_user.tipo_usuario in ("SINDICO", "ADMIN", "SUBSINDICO"):
+            if not current_user.unidade_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="O registro de visitantes na portaria é exclusivo dos porteiros."
+                )
+            if target_unit_id is not None and target_unit_id != current_user.unidade_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Síndicos só podem autorizar visitantes para a sua própria residência. O registro geral na guarita é exclusivo da portaria."
+                )
+            target_unit_id = current_user.unidade_id
+        elif current_user.tipo_usuario == "PORTARIA":
             if not target_unit_id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Selecione a unidade de destino do visitante."
                 )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Apenas porteiros e condôminos podem registrar ou autorizar visitantes."
+            )
 
-        unit = await self.unit_repo.get_by_id(target_unit_id)
+        unit = await self.unit_repo.get_by_id(target_unit_id, condominio_id=current_user.condominio_id)
         if not unit or not unit.ativo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Unidade de destino não encontrada ou inativa."
+                detail="Unidade de destino não encontrada ou pertence a outro condomínio."
             )
 
+        from app.core.security import sanitize_text
+
         new_visitor = Visitor(
+            condominio_id=current_user.condominio_id,
             unidade_id=target_unit_id,
             autorizado_por_id=current_user.id,
-            nome=data.nome.strip(),
+            nome=sanitize_text(data.nome),
             documento=data.documento.strip() if data.documento else None,
             tipo=data.tipo,
             data_prevista=data.data_prevista,
             status="AGUARDANDO",
-            observacoes=data.observacoes.strip() if data.observacoes else None
+            observacoes=sanitize_text(data.observacoes) if data.observacoes else None
         )
         created = await self.visitor_repo.create(new_visitor)
-        reloaded = await self.visitor_repo.get_by_id(created.id)
+        reloaded = await self.visitor_repo.get_by_id(created.id, condominio_id=current_user.condominio_id)
         assert reloaded is not None
         return self._to_response(reloaded, current_user)
 
     async def register_entry(self, current_user: User, visitor_id: int, data: Optional[VisitorEntry] = None) -> VisitorResponse:
         """Portaria registra a chegada / entrada do visitante no condomínio."""
-        if current_user.tipo_usuario not in ("PORTARIA", "ADMIN", "SINDICO"):
+        if current_user.tipo_usuario != "PORTARIA":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Apenas funcionários da portaria ou administração podem registrar entrada de visitantes."
+                detail="Apenas funcionários da portaria podem registrar a entrada de visitantes."
             )
 
-        visitor = await self.visitor_repo.get_by_id(visitor_id)
+        visitor = await self.visitor_repo.get_by_id(visitor_id, condominio_id=current_user.condominio_id)
         if not visitor:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado ou pertence a outro condomínio.")
 
         if visitor.status == "NO_LOCAL":
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Este visitante já consta como presente no condomínio.")
@@ -146,15 +170,15 @@ class VisitorService:
 
     async def register_exit(self, current_user: User, visitor_id: int) -> VisitorResponse:
         """Portaria registra a saída do visitante do condomínio."""
-        if current_user.tipo_usuario not in ("PORTARIA", "ADMIN", "SINDICO"):
+        if current_user.tipo_usuario != "PORTARIA":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Apenas funcionários da portaria ou administração podem registrar saída de visitantes."
+                detail="Apenas funcionários da portaria podem registrar a saída de visitantes."
             )
 
-        visitor = await self.visitor_repo.get_by_id(visitor_id)
+        visitor = await self.visitor_repo.get_by_id(visitor_id, condominio_id=current_user.condominio_id)
         if not visitor:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado ou pertence a outro condomínio.")
 
         if visitor.status != "NO_LOCAL":
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="O visitante não consta como presente no condomínio.")
@@ -168,14 +192,14 @@ class VisitorService:
 
     async def cancel_visitor(self, current_user: User, visitor_id: int) -> VisitorResponse:
         """Cancela uma autorização de visita."""
-        visitor = await self.visitor_repo.get_by_id(visitor_id)
+        visitor = await self.visitor_repo.get_by_id(visitor_id, condominio_id=current_user.condominio_id)
         if not visitor:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de visitante não encontrado ou pertence a outro condomínio.")
 
-        if current_user.tipo_usuario == "MORADOR" and visitor.unidade_id != current_user.unidade_id:
+        if current_user.tipo_usuario in ("MORADOR", "SINDICO", "ADMIN", "SUBSINDICO") and visitor.unidade_id != current_user.unidade_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Você não tem permissão para cancelar autorizações de outra unidade."
+                detail="Você só pode cancelar autorizações de visitantes da sua própria unidade."
             )
 
         if visitor.status in ("NO_LOCAL", "FINALIZADO"):

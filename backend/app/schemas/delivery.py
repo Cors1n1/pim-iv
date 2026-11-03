@@ -34,3 +34,15 @@ class DeliveryResponse(BaseModel):
     criado_em: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DeliveryBatchDeliver(BaseModel):
+    delivery_ids: Optional[list[int]] = Field(None, description="Lista de IDs de encomendas para dar baixa em lote")
+    unidade_id: Optional[int] = Field(None, description="Se fornecido, dá baixa em todas as encomendas pendentes desta unidade")
+    retirado_por: Optional[str] = Field(None, max_length=150, description="Nome de quem retirou as encomendas na portaria")
+
+
+class DeliveryBatchDeliverResponse(BaseModel):
+    delivered_count: int
+    deliveries: list[DeliveryResponse]
+

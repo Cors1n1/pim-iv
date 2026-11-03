@@ -1,0 +1,552 @@
+<section id="windowSettings" class="workspace-view workspace-window hidden" aria-labelledby="windowSettingsTitle">
+  <div class="window-frame">
+    <header class="window-header">
+      <div class="window-title-group">
+        <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></div>
+        <div>
+          <nav class="window-breadcrumb">
+            <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+            <span class="breadcrumb-sep">&rsaquo;</span>
+            <span class="breadcrumb-current">Configurações</span>
+          </nav>
+          <h3 id="windowSettingsTitle" class="window-title">Configurações do Condomínio</h3>
+          <p class="window-sub">Identidade visual, governança e regras operacionais</p>
+        </div>
+      </div>
+      <div class="window-actions">
+        <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+          <span>Voltar</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="window-body">
+      <!-- Navegação em Abas (Segmented Navigation) -->
+      <nav class="settings-tab-nav" role="tablist" aria-label="Seções de configurações">
+        <button type="button" class="btn-settings-tab active" data-tab="tabSettingsTheme" role="tab" aria-selected="true" id="tabBtnTheme">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-grid"/></svg>
+          <span>Identidade Visual</span>
+        </button>
+        <button type="button" class="btn-settings-tab" data-tab="tabSettingsInstitutional" role="tab" aria-selected="false" id="tabBtnInst">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-building"/></svg>
+          <span>Dados do Condomínio</span>
+        </button>
+        <button type="button" class="btn-settings-tab" data-tab="tabSettingsGovernance" role="tab" aria-selected="false" id="tabBtnGov">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+          <span>Regras de Reserva</span>
+        </button>
+        <button type="button" class="btn-settings-tab" data-tab="tabSettingsAreas" role="tab" aria-selected="false" id="tabBtnAreas">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-calendar"/></svg>
+          <span>Espaços Comuns</span>
+        </button>
+      </nav>
+
+      <!-- Formulário Geral de Configurações (Abas 1 a 4) -->
+      <form id="formCondoSettings" class="settings-form" novalidate>
+        
+        <!-- ============================================================
+             ABA 1: IDENTIDADE VISUAL & PALETA
+             ============================================================ -->
+        <div id="tabSettingsTheme" class="settings-tab-pane active" role="tabpanel" aria-labelledby="tabBtnTheme">
+          <div class="settings-single-card">
+            
+            <!-- Cabeçalho dos 10 Temas Curados -->
+            <div class="settings-card-intro" style="margin-bottom: 1.25rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-color);">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main);">
+                    Temas Oficiais Curados
+                  </h4>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
+                    10 combinações profissionais com harmonia cromática e legibilidade garantida
+                  </p>
+                </div>
+                <span class="preview-live-tag" id="currentActiveThemeName" style="font-weight: 600;">Azul Executivo</span>
+              </div>
+            </div>
+
+            <!-- Grid dos 10 Temas Oficiais -->
+            <div class="theme-curated-grid" id="themeCuratedGrid" role="radiogroup" aria-label="Temas oficiais curados">
+              <!-- 1. Azul Executivo -->
+              <button type="button" class="btn-theme-card active" data-theme-id="azul-executivo"
+                      data-primary="#2563eb" data-secondary="#1d4ed8" data-sidebar="#0f172a" data-bg="#f8fafc"
+                      data-name="Azul Executivo" role="radio" aria-checked="true">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #0f172a;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"></span>
+                  <span class="swatch-bg" style="background: #f8fafc;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Azul Executivo</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Corporativo &amp; Confiável</span>
+                </div>
+              </button>
+
+              <!-- 2. Esmeralda Nobre -->
+              <button type="button" class="btn-theme-card" data-theme-id="esmeralda-nobre"
+                      data-primary="#059669" data-secondary="#047857" data-sidebar="#064e3b" data-bg="#f4fbf7"
+                      data-name="Esmeralda Nobre" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #064e3b;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #059669, #047857);"></span>
+                  <span class="swatch-bg" style="background: #f4fbf7;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Esmeralda Nobre</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Sustentável &amp; Residencial</span>
+                </div>
+              </button>
+
+              <!-- 3. Roxo Imperial -->
+              <button type="button" class="btn-theme-card" data-theme-id="roxo-imperial"
+                      data-primary="#7c3aed" data-secondary="#6d28d9" data-sidebar="#2e1065" data-bg="#faf5ff"
+                      data-name="Roxo Imperial" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #2e1065;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);"></span>
+                  <span class="swatch-bg" style="background: #faf5ff;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Roxo Imperial</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Luxuoso &amp; Exclusivo</span>
+                </div>
+              </button>
+
+              <!-- 4. Safira & Ciano -->
+              <button type="button" class="btn-theme-card" data-theme-id="safira-ciano"
+                      data-primary="#0891b2" data-secondary="#0e7490" data-sidebar="#164e63" data-bg="#f0fdfa"
+                      data-name="Safira &amp; Ciano" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #164e63;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #0891b2, #0e7490);"></span>
+                  <span class="swatch-bg" style="background: #f0fdfa;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Safira &amp; Ciano</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Moderno &amp; Tecnológico</span>
+                </div>
+              </button>
+
+              <!-- 5. Vinho Merlot -->
+              <button type="button" class="btn-theme-card" data-theme-id="vinho-merlot"
+                      data-primary="#be123c" data-secondary="#9f1239" data-sidebar="#4c0519" data-bg="#fff1f2"
+                      data-name="Vinho Merlot" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #4c0519;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #be123c, #9f1239);"></span>
+                  <span class="swatch-bg" style="background: #fff1f2;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Vinho Merlot</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Clássico &amp; Acolhedor</span>
+                </div>
+              </button>
+
+              <!-- 6. Âmbar Nobre -->
+              <button type="button" class="btn-theme-card" data-theme-id="ambar-nobre"
+                      data-primary="#d97706" data-secondary="#b45309" data-sidebar="#451a03" data-bg="#fffbeb"
+                      data-name="Âmbar Nobre" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #451a03;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #d97706, #b45309);"></span>
+                  <span class="swatch-bg" style="background: #fffbeb;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Âmbar Nobre</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Solar &amp; Aconchegante</span>
+                </div>
+              </button>
+
+              <!-- 7. Índigo Noturno -->
+              <button type="button" class="btn-theme-card" data-theme-id="indigo-noturno"
+                      data-primary="#4f46e5" data-secondary="#4338ca" data-sidebar="#1e1b4b" data-bg="#f5f3ff"
+                      data-name="Índigo Noturno" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #1e1b4b;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #4f46e5, #4338ca);"></span>
+                  <span class="swatch-bg" style="background: #f5f3ff;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Índigo Noturno</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Sereno &amp; Elegante</span>
+                </div>
+              </button>
+
+              <!-- 8. Terracota Contemporâneo -->
+              <button type="button" class="btn-theme-card" data-theme-id="terracota"
+                      data-primary="#ea580c" data-secondary="#c2410c" data-sidebar="#431407" data-bg="#fff7ed"
+                      data-name="Terracota Contemporâneo" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #431407;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #ea580c, #c2410c);"></span>
+                  <span class="swatch-bg" style="background: #fff7ed;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Terracota Contemporâneo</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Criativo &amp; Expressivo</span>
+                </div>
+              </button>
+
+              <!-- 9. Grafite Urbano -->
+              <button type="button" class="btn-theme-card" data-theme-id="grafite-urbano"
+                      data-primary="#475569" data-secondary="#334155" data-sidebar="#18181b" data-bg="#f1f5f9"
+                      data-name="Grafite Urbano" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #18181b;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #475569, #334155);"></span>
+                  <span class="swatch-bg" style="background: #f1f5f9;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Grafite Urbano</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Industrial &amp; Minimalista</span>
+                </div>
+              </button>
+
+              <!-- 10. Ônix & Platina -->
+              <button type="button" class="btn-theme-card" data-theme-id="onix-platina"
+                      data-primary="#0f172a" data-secondary="#1e293b" data-sidebar="#020617" data-bg="#f8fafc"
+                      data-name="Ônix &amp; Platina" role="radio" aria-checked="false">
+                <div class="theme-swatch-bar">
+                  <span class="swatch-shell" style="background: #020617;"></span>
+                  <span class="swatch-accent" style="background: linear-gradient(135deg, #0f172a, #1e293b);"></span>
+                  <span class="swatch-bg" style="background: #f8fafc;"></span>
+                </div>
+                <div class="theme-card-info">
+                  <div class="theme-card-title-row">
+                    <strong>Ônix &amp; Platina</strong>
+                    <span class="theme-check-badge">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    </span>
+                  </div>
+                  <span class="theme-card-desc">Monocromático Premium</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Inputs ocultos para sincronização e persistência de dados -->
+            <input type="hidden" id="setCondoCorPrimaria" name="cor_primaria" value="#2563eb" />
+            <input type="hidden" id="setCondoCorSecundaria" name="cor_secundaria" value="#1d4ed8" />
+            <input type="hidden" id="setCondoCorSidebar" name="cor_sidebar" value="#0f172a" />
+            <input type="hidden" id="setCondoCorFundo" name="cor_fundo" value="AUTO" />
+
+            <!-- Simulador Interativo do Sistema -->
+            <div class="theme-preview-card" id="themePreviewCard">
+              <div class="theme-preview-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <svg class="ico ico-sm" aria-hidden="true" style="color: var(--primary-accent);"><use href="#i-grid"/></svg>
+                  <span style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;">Simulador ao Vivo do Sistema</span>
+                  <span class="preview-live-tag">Tempo Real</span>
+                </div>
+
+                <!-- Seletor de Modo no Simulador -->
+                <div class="preview-mode-switch" role="group" aria-label="Modo de visualização do simulador">
+                  <button type="button" class="btn-prev-mode active" data-mode="auto" id="btnPrevModeAuto" title="Acompanhar tema ativo do sistema">
+                    <span>Sistema</span>
+                  </button>
+                  <button type="button" class="btn-prev-mode" data-mode="light" id="btnPrevModeLight" title="Simular Modo Claro">
+                    <span>☀️ Claro</span>
+                  </button>
+                  <button type="button" class="btn-prev-mode" data-mode="dark" id="btnPrevModeDark" title="Simular Modo Escuro">
+                    <span>🌙 Escuro</span>
+                  </button>
+                  <button type="button" class="btn-prev-mode" data-mode="contrast" id="btnPrevModeContrast" title="Simular Alto Contraste">
+                    <span>⚡ Contraste</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Janela Miniatura do Sistema (Mini App Frame) -->
+              <div class="mini-app-frame" id="themePreviewStage" data-mode="auto">
+                <div class="mini-app-titlebar">
+                  <div class="mini-app-traffic-lights">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                  </div>
+                  <div class="mini-app-title-text" id="prevMiniTitleText">Residencial Bela Vista • Portal SGC</div>
+                  <div class="mini-app-badge-pill" id="prevMiniEnvBadge">Modo Claro</div>
+                </div>
+
+                <div class="mini-app-layout">
+                  <!-- Mini Barra Lateral -->
+                  <aside class="mini-sidebar" id="prevMiniShell">
+                    <div class="mini-sidebar-header">
+                      <div class="mini-brand-icon" id="prevMiniShellIcon">SGC</div>
+                      <div class="mini-brand-info">
+                        <strong id="prevMiniCondoName">Bela Vista</strong>
+                        <span>Portal Síndico</span>
+                      </div>
+                    </div>
+                    <nav class="mini-sidebar-nav">
+                      <div class="mini-nav-link active" id="prevMiniNav">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-grid"/></svg>
+                        <span>Visão geral</span>
+                      </div>
+                      <div class="mini-nav-link">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+                        <span>Reservas</span>
+                      </div>
+                      <div class="mini-nav-link">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-users"/></svg>
+                        <span>Moradores</span>
+                      </div>
+                      <div class="mini-nav-link">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-settings"/></svg>
+                        <span>Configurações</span>
+                      </div>
+                    </nav>
+                    <div class="mini-sidebar-footer">
+                      <div class="mini-user-avatar">CS</div>
+                      <span>Carlos Síndico</span>
+                    </div>
+                  </aside>
+
+                  <!-- Mini Conteúdo Principal -->
+                  <main class="mini-content-stage">
+                    <div class="mini-topbar" id="prevMiniTopbar">
+                      <span style="font-size: 0.72rem; font-weight: 600;">Painel Administrativo</span>
+                      <span class="mini-status-chip" id="prevMiniBadge">Portaria 24h</span>
+                    </div>
+
+                    <div class="mini-content-grid">
+                      <div class="mini-metric-card" id="prevMiniMetricCard">
+                        <span class="mini-metric-title">Áreas Comuns</span>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 0.25rem;">
+                          <strong class="mini-metric-value">4 Espaços</strong>
+                          <span class="mini-pill-highlight" id="prevMiniPill">Ativo</span>
+                        </div>
+                      </div>
+
+                      <div class="mini-metric-card" id="prevMiniActionCard">
+                        <span class="mini-metric-title">Ação Rápida</span>
+                        <button type="button" class="mini-cta-btn" id="prevMiniBtn">
+                          <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+                          <span>Nova Reserva</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="mini-banner-alert" id="prevMiniModal">
+                      <div style="display: flex; align-items: center; gap: 0.45rem;">
+                        <svg class="ico ico-xs" aria-hidden="true" style="color: var(--primary-accent);"><use href="#i-shield"/></svg>
+                        <span>Reserva do Salão confirmada para sábado</span>
+                      </div>
+                      <span class="mini-alert-ok">OK</span>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ============================================================
+             ABA 2: DADOS DO CONDOMÍNIO
+             ============================================================ -->
+        <div id="tabSettingsInstitutional" class="settings-tab-pane" role="tabpanel" aria-labelledby="tabBtnInst">
+          <div class="settings-single-card">
+            <div class="settings-fields">
+              <div class="form-group-mini">
+                <label for="setCondoNome">Nome Oficial do Condomínio</label>
+                <input type="text" id="setCondoNome" placeholder="Ex: Residencial Bela Vista" />
+              </div>
+
+              <div class="form-group-mini" style="margin-top: 1rem;">
+                <label for="setCondoEndereco">Endereço Completo</label>
+                <input type="text" id="setCondoEndereco" placeholder="Ex: Av. Central, 1200 - Bairro das Flores - São Paulo/SP" />
+              </div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group-mini">
+                  <label for="setCondoTelefone">Telefone / Portaria</label>
+                  <input type="text" id="setCondoTelefone" placeholder="(11) 98765-4321 ou Ramal 100" />
+                </div>
+                <div class="form-group-mini">
+                  <label for="setCondoEmail">E-mail de Contato</label>
+                  <input type="email" id="setCondoEmail" placeholder="administracao@condominio.com" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             ABA 3: REGRAS DE RESERVA
+             ============================================================ -->
+        <div id="tabSettingsGovernance" class="settings-tab-pane" role="tabpanel" aria-labelledby="tabBtnGov">
+          <div class="settings-single-card">
+            <div class="settings-fields">
+              <div class="form-row">
+                <div class="form-group-mini">
+                  <label for="setIntervaloDias">Carência de Prioridade (Dias)</label>
+                  <input type="number" id="setIntervaloDias" min="1" max="365" value="30" />
+                </div>
+                <div class="form-group-mini">
+                  <label for="setPrazoStandby">Corte do Standby (Horas)</label>
+                  <input type="number" id="setPrazoStandby" min="1" max="168" value="48" />
+                </div>
+              </div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group-mini">
+                  <label for="setPrazoRetomada">Janela de Retomada (Horas)</label>
+                  <input type="number" id="setPrazoRetomada" min="1" max="72" value="24" />
+                </div>
+                <div class="form-group-mini">
+                  <label for="setDiasPenalidadeQueima">Penalidade por Cancelamento (Dias)</label>
+                  <input type="number" id="setDiasPenalidadeQueima" min="1" max="365" value="30" />
+                </div>
+              </div>
+
+              <div class="checkbox-option-box" style="margin-top: 1.25rem;">
+                <label class="checkbox-label" for="setQueimaPrioridade">
+                  <input type="checkbox" id="setQueimaPrioridade" checked />
+                  <div class="checkbox-label-content">
+                    <strong>Penalizar cancelamento abusivo de vaga prioritária</strong>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Se um morador prioritário desbancar outro e cancelar em seguida, entra em carência imediata.</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" id="setEnviarEmailAtivo" value="true" />
+
+        <!-- Barra Fixa de Ações (Salvar / Restaurar) -->
+        <div class="settings-footer-actions">
+          <button type="button" id="btnSaveCondoSettings" class="btn-primary">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>
+            <span>Salvar Configurações</span>
+          </button>
+          <button type="button" id="btnCancelCondoSettings" class="btn-secondary">Restaurar</button>
+        </div>
+
+      </form>
+
+      <!-- ============================================================
+           ABA 5: ESPAÇOS COMUNS (FORA DO FORM PRINCIPAL PARA NÃO CONFLITAR)
+           ============================================================ -->
+      <div id="tabSettingsAreas" class="settings-tab-pane" role="tabpanel" aria-labelledby="tabBtnAreas">
+        <div class="settings-single-card">
+          <div class="settings-card-intro" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <svg class="ico ico-sm" aria-hidden="true" style="color: var(--primary-accent);"><use href="#i-calendar"/></svg>
+                <span>Espaços Comuns &amp; Horários</span>
+              </h4>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">Cadastre áreas de lazer e defina horários de funcionamento</p>
+            </div>
+            <button type="button" id="btnToggleNewAreaForm" class="btn-primary-sm">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+              <span>Novo Espaço</span>
+            </button>
+          </div>
+
+          <!-- Formulário Independente de cadastro de nova área comum -->
+          <form id="formNewArea" class="form-mini hidden" style="margin-top: 14px;">
+            <h5>Cadastrar novo espaço de lazer</h5>
+            <div class="form-row">
+              <div class="form-group-mini">
+                <label for="inputNewAreaNome">Nome do espaço</label>
+                <input type="text" id="inputNewAreaNome" placeholder="Ex: Espaço Gourmet" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaCapacidade">Capacidade (pessoas)</label>
+                <input type="number" id="inputNewAreaCapacidade" min="1" value="20" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaTaxa">Taxa de limpeza (R$)</label>
+                <input type="number" id="inputNewAreaTaxa" step="0.01" min="0" value="0.00" />
+              </div>
+            </div>
+            <div class="form-row" style="margin-top: 0.75rem;">
+              <div class="form-group-mini">
+                <label for="inputNewAreaHoraIni">Abre às:</label>
+                <input type="time" id="inputNewAreaHoraIni" value="08:00" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaHoraFim">Fecha às:</label>
+                <input type="time" id="inputNewAreaHoraFim" value="22:00" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaMaxHoras">Duração máx. (h):</label>
+                <input type="number" id="inputNewAreaMaxHoras" min="1" max="24" value="4" required />
+              </div>
+            </div>
+            <div class="form-row" style="margin-top: 0.75rem;">
+              <div class="form-group-mini">
+                <label for="inputNewAreaIntervalo">Carência (dias):</label>
+                <input type="number" id="inputNewAreaIntervalo" min="1" max="365" value="30" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaMaxAtivas">Limite ativas:</label>
+                <input type="number" id="inputNewAreaMaxAtivas" min="1" max="10" value="2" required />
+              </div>
+              <div class="form-group-mini">
+                <label for="inputNewAreaPrazoStandby">Corte standby (h):</label>
+                <input type="number" id="inputNewAreaPrazoStandby" min="1" max="168" value="48" required />
+              </div>
+            </div>
+            <div class="form-mini-actions" style="margin-top: 1rem;">
+              <button type="submit" class="btn-primary-sm">Salvar Espaço</button>
+              <button type="button" id="btnCancelNewArea" class="btn-secondary-sm">Cancelar</button>
+            </div>
+          </form>
+
+          <div id="areasCardsList" class="areas-management-grid" style="margin-top: 1.25rem;">
+            <p class="muted">Carregando áreas...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

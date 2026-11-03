@@ -1,0 +1,76 @@
+<section id="windowNotices" class="workspace-view workspace-window hidden" aria-labelledby="windowNoticesTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-megaphone"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Mural de avisos</span>
+                  </nav>
+                  <h3 id="windowNoticesTitle" class="window-title">Mural de avisos e comunicados</h3>
+                  <p class="window-sub">Informativos oficiais da administração para todos os moradores</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="adminNoticeToolbar" class="window-toolbar">
+                <button id="btnToggleNewNoticeForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Publicar novo comunicado
+                </button>
+              </div>
+
+              <div id="residentNoticeHelp" class="privacy-note hidden" style="margin-bottom: 16px;">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+                <span>Este mural exibe comunicados emitidos pela administração. Para relatar barulho, vazamentos ou manutenções, acesse o módulo de <strong>Ocorrências</strong>.</span>
+              </div>
+
+              <form id="formNewNotice" class="form-mini hidden">
+                <h4>Novo comunicado oficial</h4>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputNoticeTitle">Título do comunicado</label>
+                    <input type="text" id="inputNoticeTitle" placeholder="Ex: Manutenção preventiva dos elevadores" minlength="3" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectNoticeCategory">Categoria</label>
+                    <select id="selectNoticeCategory" required>
+                      <option value="GERAL">Geral</option>
+                      <option value="MANUTENCAO">Manutenção</option>
+                      <option value="URGENTE">Urgente</option>
+                      <option value="ASSEMBLEIA">Assembleia</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputNoticeMessage">Mensagem completa</label>
+                    <textarea id="inputNoticeMessage" rows="4" placeholder="Escreva o comunicado detalhado para os moradores..." minlength="5" required></textarea>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputNoticeLink">Link da reunião online ou vídeo (Google Meet, Zoom, YouTube, Teams...)</label>
+                    <input type="url" id="inputNoticeLink" placeholder="Ex: https://meet.google.com/xyz-abcd-efg ou https://youtube.com/..." />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Publicar para todos</button>
+                  <button type="button" id="btnCancelNewNotice" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div id="noticesContainer" class="notices-grid">
+                <p class="table-empty">Carregando comunicados...</p>
+              </div>
+            </div>
+          </div>
+        </section>

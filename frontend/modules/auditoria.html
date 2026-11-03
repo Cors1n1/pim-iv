@@ -1,0 +1,56 @@
+<section id="windowAudit" class="workspace-view workspace-window hidden" aria-labelledby="windowAuditTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Auditoria</span>
+                  </nav>
+                  <h3 id="windowAuditTitle" class="window-title">Auditoria e logs de segurança</h3>
+                  <p class="window-sub">Rastreabilidade de acessos, eventos de segurança e conformidade LGPD</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div class="info-box-audit">
+                <strong>Painel de Rastreabilidade e Conformidade (LGPD).</strong>
+                Todas as tentativas de autenticação e operações críticas são registradas de forma imutável com data/hora, endereço de rede e identificação do dispositivo, garantindo total transparência, prevenção a acessos não autorizados e conformidade com as diretrizes de segurança da informação.
+              </div>
+
+              <div class="window-toolbar window-toolbar-split">
+                <div class="audit-counter">Registros capturados: <span id="auditCount">0</span></div>
+                <button id="btnRefreshAudit" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Atualizar logs
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Data / Hora</th>
+                      <th>E-mail informado</th>
+                      <th>Endereço IP</th>
+                      <th>Navegador</th>
+                      <th>Resultado</th>
+                      <th>Origem / Módulo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando logs de auditoria...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

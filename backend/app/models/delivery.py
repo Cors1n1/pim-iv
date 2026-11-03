@@ -8,6 +8,7 @@ class Delivery(Base):
     __tablename__ = "encomendas"
 
     id = Column(Integer, primary_key=True, index=True)
+    condominio_id = Column(Integer, ForeignKey("condominios.id", ondelete="RESTRICT"), nullable=False, default=1, index=True)
     unidade_id = Column(Integer, ForeignKey("unidades.id", ondelete="CASCADE"), nullable=False, index=True)
     descricao = Column(String(255), nullable=False)
     codigo_rastreio = Column(String(100), nullable=True)
@@ -19,5 +20,6 @@ class Delivery(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     atualizado_em = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    condominio = relationship("Condominio", back_populates="encomendas")
     unidade = relationship("Unit", backref="encomendas")
     porteiro = relationship("User", foreign_keys=[porteiro_recebedor_id])

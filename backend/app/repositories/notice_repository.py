@@ -10,23 +10,29 @@ class NoticeRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_all(self) -> List[Notice]:
-        """Retorna todos os comunicados ordenados pelos mais recentes."""
+    async def list_all(self, condominio_id: Optional[int] = None, apenas_ativos: bool = True) -> List[Notice]:
+        """Retorna todos os comunicados do condomínio ordenados pelos mais recentes."""
         stmt = (
             select(Notice)
             .options(joinedload(Notice.autor))
             .order_by(Notice.criado_em.desc())
         )
+        if apenas_ativos:
+            stmt = stmt.where(Notice.ativo.is_(True))
+        if condominio_id is not None:
+            stmt = stmt.where(Notice.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_id(self, notice_id: int) -> Optional[Notice]:
-        """Busca um aviso específico por ID."""
+    async def get_by_id(self, notice_id: int, condominio_id: Optional[int] = None) -> Optional[Notice]:
+        """Busca um aviso específico por ID e valida condomínio."""
         stmt = (
             select(Notice)
             .options(joinedload(Notice.autor))
             .where(Notice.id == notice_id)
         )
+        if condominio_id is not None:
+            stmt = stmt.where(Notice.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 

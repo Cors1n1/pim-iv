@@ -193,3 +193,227 @@ class EmailService:
         """
         html = cls.get_base_template(title, content, condo_name)
         return await cls.send_email_async(to_email, f"Atualização de Reserva: {area_name} em {date_str}", html, condo_name)
+
+    @classmethod
+    async def send_sindico_activation_email(
+        cls,
+        to_email: str,
+        sindico_nome: str,
+        condo_nome: str,
+        condo_slug: str,
+        activation_url: str,
+        senha_provisoria: Optional[str] = None
+    ) -> bool:
+        """Dispara convite oficial de onboarding com link seguro e exclusivo de ativação para o novo síndico."""
+        title = f"Bem-vindo ao CondoHub - Convite de Ativação de Síndico"
+
+        content = f"""
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 22px; font-weight: 800;">Olá, {sindico_nome}!</h2>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Você foi cadastrado na plataforma <strong>CondoHub</strong> para assumir a governança e gestão digital do seu condomínio.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Para garantir sua total autonomia e privacidade (LGPD), clique no botão abaixo para <strong>definir sua senha definitiva pessoal</strong> e concluir a ativação do ambiente do condomínio.
+        </p>
+
+        <div style="background-color: #f0f7ff; border: 1px solid #bfdbfe; padding: 24px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+          <p style="margin: 0 0 14px 0; font-size: 14px; color: #1e40af; font-weight: 600;">
+            Seu e-mail cadastrado: <strong>{to_email}</strong>
+          </p>
+          <div style="margin-top: 10px;">
+            <a href="{activation_url}" style="display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(37,99,235,0.25);">
+              Definir Senha e Ativar Portal &rarr;
+            </a>
+          </div>
+          <p style="margin: 16px 0 0 0; font-size: 12px; color: #64748b;">
+            Ou acesse diretamente pelo link seguro:<br/>
+            <a href="{activation_url}" style="color: #2563eb; word-break: break-all; font-size: 12px;">{activation_url}</a>
+          </p>
+        </div>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+          <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45;">
+            <strong>Segurança da Informação:</strong> Este link é exclusivo para a sua conta, de <strong>uso único</strong> e expira em 7 dias. Assim que você cadastrar sua senha definitiva, este link será desativado automaticamente.
+          </p>
+        </div>
+        """
+        html = cls.get_base_template(title, content, condo_nome or "CondoHub")
+        return await cls.send_email_async(to_email, f"Convite de Ativação de Síndico: CondoHub", html, "CondoHub Operações")
+
+    @classmethod
+    async def send_administradora_activation_email(
+        cls,
+        to_email: str,
+        gestor_nome: str,
+        condo_nome: str,
+        condo_slug: str,
+        activation_url: str
+    ) -> bool:
+        """Dispara convite oficial de onboarding com link seguro e exclusivo para a Administradora parceira."""
+        title = f"Bem-vindo ao CondoHub - Ativação da Administradora"
+
+        content = f"""
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 22px; font-weight: 800;">Olá, {gestor_nome}!</h2>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Sua administradora foi associada à gestão corporativa do condomínio <strong>{condo_nome}</strong> na plataforma <strong>CondoHub</strong> sob modelo de <strong>Gestão Compartilhada</strong>.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Como gestor administrativo credenciado, você terá autonomia total para cadastrar apartamentos, cadastrar condôminos, gerenciar encomendas e emitir comunicados em conjunto com o corpo diretivo do condomínio.
+        </p>
+
+        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 24px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+          <p style="margin: 0 0 14px 0; font-size: 14px; color: #166534; font-weight: 600;">
+            E-mail institucional da administradora: <strong>{to_email}</strong>
+          </p>
+          <div style="margin-top: 10px;">
+            <a href="{activation_url}" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(5,150,105,0.25);">
+              Definir Senha e Acessar Gestão &rarr;
+            </a>
+          </div>
+          <p style="margin: 16px 0 0 0; font-size: 12px; color: #64748b;">
+            Ou acesse diretamente pelo link seguro:<br/>
+            <a href="{activation_url}" style="color: #059669; word-break: break-all; font-size: 12px;">{activation_url}</a>
+          </p>
+        </div>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #10b981; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+          <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45;">
+            <strong>Segurança da Informação:</strong> Este link é exclusivo para a sua conta de Administradora, de <strong>uso único</strong> e expira em 7 dias. O síndico titular também possui acesso independente ao mesmo condomínio.
+          </p>
+        </div>
+        """
+        html = cls.get_base_template(title, content, condo_nome or "CondoHub")
+        return await cls.send_email_async(to_email, f"Convite de Ativação - Administradora: {condo_nome}", html, "CondoHub Operações")
+
+    @classmethod
+    async def send_subsindico_activation_email(
+        cls,
+        to_email: str,
+        subsindico_nome: str,
+        condo_nome: str,
+        condo_slug: str,
+        activation_url: str
+    ) -> bool:
+        """Dispara convite oficial de onboarding com link seguro e exclusivo para o Subsíndico(a)."""
+        title = f"Bem-vindo ao CondoHub - Ativação de Subsíndico(a)"
+
+        content = f"""
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 22px; font-weight: 800;">Olá, {subsindico_nome}!</h2>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Você foi cadastrado como <strong>Subsíndico(a)</strong> no condomínio <strong>{condo_nome}</strong> na plataforma <strong>CondoHub</strong>.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Como membro ativo do corpo diretivo de governança, você tem acesso aos módulos operacionais do condomínio, ocorrências, comunicados e reservas.
+        </p>
+
+        <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; padding: 24px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+          <p style="margin: 0 0 14px 0; font-size: 14px; color: #6d28d9; font-weight: 600;">
+            Seu e-mail institucional: <strong>{to_email}</strong>
+          </p>
+          <div style="margin-top: 10px;">
+            <a href="{activation_url}" style="display: inline-block; background: #7c3aed; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(124,58,237,0.25);">
+              Definir Senha e Ativar Acesso &rarr;
+            </a>
+          </div>
+          <p style="margin: 16px 0 0 0; font-size: 12px; color: #64748b;">
+            Ou acesse diretamente pelo link seguro:<br/>
+            <a href="{activation_url}" style="color: #7c3aed; word-break: break-all; font-size: 12px;">{activation_url}</a>
+          </p>
+        </div>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #7c3aed; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+          <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45;">
+            <strong>Segurança da Informação:</strong> Este link é exclusivo para a sua conta, de <strong>uso único</strong> e expira em 7 dias. Após cadastrar sua senha pessoal, você poderá entrar no portal a qualquer momento.
+          </p>
+        </div>
+        """
+        html = cls.get_base_template(title, content, condo_nome or "CondoHub")
+        return await cls.send_email_async(to_email, f"Convite de Ativação - Subsíndico(a): {condo_nome}", html, "CondoHub Operações")
+
+    @classmethod
+    async def send_resident_invitation(
+        cls,
+        to_email: str,
+        resident_name: str,
+        condo_nome: str,
+        unit_desc: str,
+        activation_url: str,
+        tipo_usuario: str = "MORADOR"
+    ) -> bool:
+        """Dispara convite digital de ativação de morador ou membro da portaria."""
+        role_label = "Morador" if tipo_usuario == "MORADOR" else "Portaria"
+        title = f"Convite para o Portal - {condo_nome}"
+
+        content = f"""
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 22px; font-weight: 800;">Olá, {resident_name}!</h2>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          A administração do <strong>{condo_nome}</strong> cadastrou o seu acesso como <strong>{role_label}</strong> ({unit_desc}).
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Para ativar sua conta, definir sua senha pessoal e ter acesso ao portal de encomendas, reservas de áreas comuns e comunicados, clique no botão abaixo:
+        </p>
+
+        <div style="background-color: #f0f7ff; border: 1px solid #bfdbfe; padding: 24px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+          <p style="margin: 0 0 14px 0; font-size: 14px; color: #1e40af; font-weight: 600;">
+            E-mail cadastrado: <strong>{to_email}</strong>
+          </p>
+          <div style="margin-top: 10px;">
+            <a href="{activation_url}" style="display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(37,99,235,0.25);">
+              Definir Minha Senha e Acessar &rarr;
+            </a>
+          </div>
+          <p style="margin: 16px 0 0 0; font-size: 12px; color: #64748b;">
+            Ou acesse diretamente pelo link seguro:<br/>
+            <a href="{activation_url}" style="color: #2563eb; word-break: break-all; font-size: 12px;">{activation_url}</a>
+          </p>
+        </div>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+          <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45;">
+            <strong>Acesso Seguro:</strong> Este convite é pessoal e intransferível. Após a definição da sua senha, o link é invalidado automaticamente.
+          </p>
+        </div>
+        """
+        html = cls.get_base_template(title, content, condo_nome or "CondoHub")
+        return await cls.send_email_async(to_email, f"Convite de Acesso - {condo_nome}", html, condo_nome)
+
+    @classmethod
+    async def send_delivery_alert(
+        cls,
+        to_email: str,
+        resident_name: str,
+        condo_nome: str,
+        unit_desc: str,
+        package_desc: str,
+        tracking_code: Optional[str] = None
+    ) -> bool:
+        """Dispara aviso ao morador de que uma nova encomenda chegou na portaria."""
+        title = f"Nova Encomenda na Portaria - {condo_nome}"
+        tracking_line = f"<p style='margin: 0 0 8px 0; font-size: 14px;'><strong>Código/Rastreio:</strong> {tracking_code}</p>" if tracking_code else ""
+
+        content = f"""
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 22px; font-weight: 800;">Olá, {resident_name}!</h2>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.5; color: #334155;">
+          Uma nova encomenda destinada à sua unidade (<strong>{unit_desc}</strong>) foi recebida e registrada na portaria do <strong>{condo_nome}</strong>.
+        </p>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 16px 20px; border-radius: 6px; margin-bottom: 24px;">
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Pacote:</strong> {package_desc}</p>
+          {tracking_line}
+          <p style="margin: 0; font-size: 14px; color: #64748b;">Status: <strong>Aguardando Retirada</strong></p>
+        </div>
+
+        <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 14px 18px; border-radius: 8px; margin-bottom: 16px;">
+          <strong style="color: #1e40af; font-size: 14px;">Como retirar:</strong>
+          <p style="margin: 4px 0 0 0; color: #1e3a8a; font-size: 13px; line-height: 1.4;">
+            Dirija-se à guarita do condomínio e informe o seu apartamento para que a equipe da portaria realize a baixa da entrega.
+          </p>
+        </div>
+        """
+        html = cls.get_base_template(title, content, condo_nome or "CondoHub")
+        return await cls.send_email_async(to_email, f"📦 Encomenda Recebida na Portaria - {condo_nome}", html, condo_nome)
+
+
+
+
+

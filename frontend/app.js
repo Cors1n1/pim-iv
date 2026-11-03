@@ -34,16 +34,30 @@ function getStoredUser() {
   }
 }
 
-const isAdminRole = (user) => !!user && (user.tipo_usuario === "ADMIN" || user.tipo_usuario === "SINDICO");
+const isAdminRole = (user) => !!user && (user.tipo_usuario === "ADMIN" || user.tipo_usuario === "SINDICO" || user.tipo_usuario === "DIRETORIA" || user.tipo_usuario === "SUPERADMIN");
 
 /** Notificação não bloqueante (substitui alert) - com animações suaves e ícones SVG. */
 function showToast(message, type = "info") {
   const region = $("toastRegion");
   if (!region) return;
-  const iconName = type === "error" ? "close" : (type === "success" ? "check" : "shield");
+
+  const t = (type || "info").toLowerCase();
+  let normalizedType = "info";
+  if (t === "success" || t === "sucesso") normalizedType = "success";
+  else if (t === "error" || t === "erro" || t === "danger") normalizedType = "error";
+  else if (t === "warning" || t === "aviso" || t === "warn") normalizedType = "warning";
+
+  const iconMap = {
+    error: "alert-circle",
+    success: "check",
+    warning: "alert-circle",
+    info: "shield"
+  };
+  const iconName = iconMap[normalizedType] || "shield";
+
   const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.setAttribute("role", type === "error" ? "alert" : "status");
+  toast.className = `toast ${normalizedType}`;
+  toast.setAttribute("role", normalizedType === "error" ? "alert" : "status");
   toast.innerHTML = `${icon(iconName, "ico")}<span>${escapeHtml(message)}</span>`;
   region.appendChild(toast);
   setTimeout(() => {
@@ -227,11 +241,14 @@ function showCustomPrompt({
 }
 
 /** Converte o campo "detail" da API (string ou lista de validação) em texto legível. */
-function formatApiDetail(detail) {
+function formatApiDetail(detail, status) {
   if (Array.isArray(detail)) {
-    return detail.map((d) => d.msg || "Dado inválido").join("; ");
+    return detail.map((d) => (d.msg || "Dado inválido").replace(/^Value error, /, "")).join("; ");
   }
-  return typeof detail === "string" ? detail : "Erro ao processar a requisição.";
+  if (typeof detail === "string") return detail;
+  return status
+    ? `Não foi possível concluir a operação (erro ${status}). Tente novamente em instantes.`
+    : "Erro ao processar a requisição.";
 }
 
 /** Cliente HTTP autenticado. Encerra a sessão automaticamente em caso de 401. */
@@ -258,7 +275,7 @@ async function api(path, { method = "GET", body } = {}) {
     throw new Error("Sessão expirada.");
   }
   if (!response.ok) {
-    throw new Error(formatApiDetail(data && data.detail));
+    throw new Error(formatApiDetail(data && data.detail, response.status));
   }
   return data;
 }
@@ -284,20 +301,69 @@ const btnTextSize = $("btnTextSize");
 // ==========================================
 // 2. INICIALIZAÇÃO E SESSÃO
 // ==========================================
-document.addEventListener("DOMContentLoaded", () => {
+function getCondoSlugFromUrl() {
+  const match = window.location.pathname.match(/\/c\/([a-zA-Z0-9_-]+)/);
+  if (match) return match[1];
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("slug") || localStorage.getItem("sgc_condo_slug") || null;
+}
+
+function bootstrapApp() {
+  try {
+    const cached = localStorage.getItem("sgc_active_theme");
+    if (cached) {
+      const t = JSON.parse(cached);
+      applySystemTheme(t.primary, t.secondary, t.sidebar, t.bg);
+    }
+  } catch (e) {}
+
   loadCondoSettings();
   checkExistingSession();
   setupEventListeners();
   setupMobileDrawer();
   enableTableSorting();
-});
+  initPwaInstallation();
+}
 
-function checkExistingSession() {
+async function checkExistingSession() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const impersonateToken = urlParams.get("impersonate_token");
+  if (impersonateToken) {
+    localStorage.setItem("sgc_token", impersonateToken);
+    urlParams.delete("impersonate_token");
+    const newQuery = urlParams.toString() ? `?${urlParams.toString()}` : "";
+    window.history.replaceState({}, document.title, window.location.pathname + newQuery + window.location.hash);
+  }
+
   const token = localStorage.getItem("sgc_token");
-  const user = getStoredUser();
+  let user = getStoredUser();
+
+  // 1. Renderização Instantânea (Zero Delay): se já temos token e usuário (ex: impersonate da diretoria), abre o painel direto!
   if (token && user) {
     showDashboard(user);
+  }
+
+  // 2. Validação e atualização assíncrona do perfil de usuário
+  if (token) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        user = await res.json();
+        localStorage.setItem("sgc_user", JSON.stringify(user));
+        showDashboard(user);
+      } else if (res.status === 401 || res.status === 403) {
+        logout("Sua sessão expirou ou foi encerrada pela administração.");
+      }
+    } catch (err) {
+      console.warn("Validação de sessão em background:", err);
+      if (!user) {
+        logout();
+      }
+    }
   } else {
+    document.documentElement.classList.remove("is-preauth");
     document.body.classList.remove("is-logged-in");
     localStorage.removeItem("sgc_token");
     localStorage.removeItem("sgc_user");
@@ -332,7 +398,33 @@ function setupAccessibilityPrefs() {
 
   const apply = () => {
     document.body.classList.toggle("dark-mode", prefs.dark);
+    document.documentElement.classList.toggle("dark-mode", prefs.dark);
+
+    try {
+      const savedTheme = JSON.parse(localStorage.getItem("sgc_active_theme") || "{}");
+      const darkPal = getDarkPaletteFor(savedTheme.primary, savedTheme.sidebar);
+      const navBg = prefs.dark ? darkPal.navDark : (savedTheme.sidebar || "#0f172a");
+
+      document.querySelectorAll(".top-bar, .sidebar, .sidebar-brand, .mobile-bottom-nav").forEach((el) => {
+        el.style.backgroundColor = navBg;
+      });
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", navBg);
+
+      if (prefs.dark) {
+        document.documentElement.style.removeProperty("--bg-page");
+        document.body.style.removeProperty("--bg-page");
+      } else {
+        if (savedTheme.bg && savedTheme.bg !== "AUTO") {
+          document.documentElement.style.setProperty("--bg-page", savedTheme.bg);
+          document.body.style.setProperty("--bg-page", savedTheme.bg);
+        }
+      }
+    } catch (e) {}
+
     document.body.classList.toggle("high-contrast", prefs.contrast);
+    document.documentElement.classList.toggle("high-contrast", prefs.contrast);
     FONT_LEVEL_NAMES.forEach((_, i) => document.documentElement.classList.toggle(`fs-${i}`, i === prefs.font && i > 0));
     btnDark.setAttribute("aria-pressed", String(prefs.dark));
     btnContrast.setAttribute("aria-pressed", String(prefs.contrast));
@@ -342,6 +434,9 @@ function setupAccessibilityPrefs() {
     btnFontDown.disabled = prefs.font === 0;
     btnTextSize.disabled = prefs.font === FONT_LEVEL_NAMES.length - 1;
     localStorage.setItem("sgc_prefs", JSON.stringify(prefs));
+    if (typeof renderSimulatorState === "function") {
+      renderSimulatorState();
+    }
   };
 
   btnDark.addEventListener("click", () => { prefs.dark = !prefs.dark; apply(); });
@@ -415,11 +510,11 @@ function setupEventListeners() {
   // Listener para troca obrigatória de senha no primeiro login
   const formForcePw = $("formForceChangePassword");
   if (formForcePw) {
-    formForcePw.addEventListener("submit", handleForceChangePasswordSubmit);
+    formForcePw?.addEventListener("submit", handleForceChangePasswordSubmit);
   }
   const btnForceLogout = $("btnForcePwLogout");
   if (btnForceLogout) {
-    btnForceLogout.addEventListener("click", () => {
+    btnForceLogout?.addEventListener("click", () => {
       closeForceChangePasswordModal();
       logout("Sessão finalizada. Entre com sua senha temporária para redefini-la.");
     });
@@ -428,15 +523,22 @@ function setupEventListeners() {
   // Formulário de Configurações do Condomínio (Síndico)
   const formSettings = $("formCondoSettings");
   if (formSettings) {
-    formSettings.addEventListener("submit", handleSaveCondoSettings);
+    formSettings?.addEventListener("submit", handleSaveCondoSettings);
+  }
+  const btnSaveSettings = $("btnSaveCondoSettings");
+  if (btnSaveSettings) {
+    btnSaveSettings?.addEventListener("click", handleSaveCondoSettings);
   }
   const btnCancelSettings = $("btnCancelCondoSettings");
   if (btnCancelSettings) {
-    btnCancelSettings.addEventListener("click", () => {
+    btnCancelSettings?.addEventListener("click", () => {
       loadCondoSettingsForm();
       showToast("Configurações restauradas para os valores salvos no servidor.", "info");
     });
   }
+  setupSettingsTabs();
+  setupThemeCuratedPicker();
+  setupOverviewRefreshButton();
 
   // Modal de Convidados da Reserva
   const btnCloseGuestsX = $("btnGuestsCloseX");
@@ -444,25 +546,51 @@ function setupEventListeners() {
   const modalGuests = $("modalGuestsList");
   const closeGuests = () => {
     if (modalGuests) modalGuests.classList.add("hidden");
-    document.body.classList.remove("modal-open");
+    const otherModals = Array.from(document.querySelectorAll(".custom-dialog-overlay:not(.hidden)"));
+    if (otherModals.length === 0) {
+      document.body.classList.remove("modal-open");
+    }
   };
   if (btnCloseGuestsX) btnCloseGuestsX.addEventListener("click", closeGuests);
   if (btnCloseGuests) btnCloseGuests.addEventListener("click", closeGuests);
   if (modalGuests) {
-    modalGuests.addEventListener("click", (e) => {
+    modalGuests?.addEventListener("click", (e) => {
       if (e.target === modalGuests) closeGuests();
     });
   }
 
   const formAddGuest = $("formAddGuest");
   if (formAddGuest) {
-    formAddGuest.addEventListener("submit", handleAddGuestSubmit);
+    formAddGuest?.addEventListener("submit", handleAddGuestSubmit);
+  }
+  const btnCancelAddGuest = $("btnCancelAddGuest");
+  if (btnCancelAddGuest) {
+    btnCancelAddGuest.addEventListener("click", () => {
+      formAddGuest?.classList.add("hidden");
+    });
   }
 
   const btnRefreshTodayGuests = $("btnRefreshTodayGuests");
   if (btnRefreshTodayGuests) {
     btnRefreshTodayGuests.addEventListener("click", loadTodayGuests);
   }
+
+  // Modal: Reservas do Dia Específico
+  $("btnDayReservationsCloseX")?.addEventListener("click", closeDayReservationsModal);
+  $("btnDayReservationsClose")?.addEventListener("click", closeDayReservationsModal);
+  $("modalDayReservations")?.addEventListener("click", (e) => {
+    if (e.target === $("modalDayReservations")) closeDayReservationsModal();
+  });
+  $("btnDayResNewReservation")?.addEventListener("click", () => {
+    if (typeof startReservationForDate === "function") {
+      startReservationForDate(currentSelectedCalendarDate);
+    }
+  });
+  $("btnDayResNewReservationTop")?.addEventListener("click", () => {
+    if (typeof startReservationForDate === "function") {
+      startReservationForDate(currentSelectedCalendarDate);
+    }
+  });
 }
 
 // ==========================================
@@ -519,9 +647,15 @@ function navigateToWindow(targetWindowId) {
   });
 
   // Atualiza destaque na barra de navegação móvel
+  const activeColor = document.documentElement.style.getPropertyValue("--primary-accent") || "#2563eb";
   document.querySelectorAll(".m-nav-btn").forEach((item) => {
     const isTarget = item.dataset.window === targetWindowId;
     item.classList.toggle("active", isTarget);
+    if (isTarget) {
+      item.style.color = activeColor;
+    } else {
+      item.style.color = "";
+    }
   });
 
   closeMobileDrawer();
@@ -581,10 +715,17 @@ async function handleLoginSubmit(e) {
 
   setLoading(true);
   try {
+    const slug = getCondoSlugFromUrl();
+    const bodyPayload = { email, senha };
+    if (slug) bodyPayload.condo_slug = slug;
+
+    const headers = { "Content-Type": "application/json" };
+    if (slug) headers["X-Condo-Slug"] = slug;
+
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, senha }),
+      headers,
+      body: JSON.stringify(bodyPayload),
     });
     const data = await response.json();
 
@@ -701,9 +842,13 @@ async function handleForceChangePasswordSubmit(e) {
 // 5. DASHBOARD E CONTROLE DE ACESSO (RBAC + LGPD)
 // ==========================================
 function showDashboard(user) {
-  userNameEl.textContent = user.nome;
-  userRoleBadgeEl.textContent = user.tipo_usuario;
-  userAvatarEl.textContent = user.nome.charAt(0).toUpperCase();
+  if (!user) return;
+  const uName = $("userName") || userNameEl;
+  const uRole = $("userRoleBadge") || userRoleBadgeEl;
+  const uAvatar = $("userAvatar") || userAvatarEl;
+  if (uName) uName.textContent = user.nome;
+  if (uRole) uRole.textContent = user.tipo_usuario;
+  if (uAvatar) uAvatar.textContent = (user.nome || "U").charAt(0).toUpperCase();
 
   const pageDate = $("pageDate");
   if (pageDate) {
@@ -714,8 +859,10 @@ function showDashboard(user) {
 
   applyRoleBasedAccess(user);
   hideAlert();
-  loginSection.classList.add("hidden");
-  dashboardSection.classList.remove("hidden");
+  const lSec = $("loginSection") || loginSection;
+  const dSec = $("dashboardSection") || dashboardSection;
+  if (lSec) lSec.classList.add("hidden");
+  if (dSec) dSec.classList.remove("hidden");
   document.body.classList.add("is-logged-in");
   const mobileNav = $("mobileBottomNav");
   if (mobileNav) mobileNav.classList.remove("hidden");
@@ -772,6 +919,8 @@ navDeliveries: "Minhas encomendas",
 },
 };
 ROLE_CONFIG.SINDICO = ROLE_CONFIG.ADMIN;
+ROLE_CONFIG.DIRETORIA = ROLE_CONFIG.ADMIN;
+ROLE_CONFIG.SUPERADMIN = ROLE_CONFIG.ADMIN;
 
 const ALL_MODULES = ["Units", "Deliveries", "Reservations", "Notices", "Tickets", "Visitors", "Audit"];
 const ALL_STATS = ["Moradores", "Acessos", "Encomendas", "Reservas", "Avisos"];
@@ -853,7 +1002,7 @@ function applyRoleBasedAccess(user) {
   if (greetingEl) {
     if (isMorador) {
       const firstName = (user.nome || "Condômino").split(" ")[0];
-      greetingEl.textContent = `Olá, ${firstName}`;
+      greetingEl.textContent = `${greetingByHour()}, ${firstName}`;
     } else if (isPortaria) {
       greetingEl.textContent = "Painel da Portaria";
     } else {
@@ -974,6 +1123,10 @@ async function loadQuickStatsForRole(user) {
     renderSindicoDaily(user, reservations);
   }
 
+  // Resumo numérico + alertas de pendências (por perfil)
+  renderOverviewKpis(user, { notices, deliveries, reservations }).catch(() => {});
+
+  patchOverviewRefreshHooks();
   checkActiveSlotOffers(user);
 }
 
@@ -1011,7 +1164,7 @@ function renderMoradorDaily(user, notices, deliveries, reservations) {
   // 2. Próxima Reserva
   const resBody = $("moradorReservationBody");
   if (resBody) {
-    const hojeStr = new Date().toISOString().split("T")[0];
+    const hojeStr = todayLocalISO();
     const minhasFuturas = (reservations || [])
       .filter((r) => r.is_mine && r.status === "CONFIRMADA" && (!r.data_reserva || r.data_reserva >= hojeStr))
       .sort((a, b) => (a.data_reserva || "").localeCompare(b.data_reserva || ""));
@@ -1160,40 +1313,68 @@ function initPortariaFastSearch() {
 async function renderPortariaDaily(user, deliveries, reservations) {
   initPortariaFastSearch();
 
-  // 1. Visitantes Esperados Hoje
+  // 1. Visitantes pré-autorizados + convidados de eventos esperados hoje
   const guestsFeed = $("portariaTodayGuestsFeed");
   if (guestsFeed) {
     try {
-      const guests = await api("/api/visitors/today").catch(() => []);
-      if (!guests || !guests.length) {
-        guestsFeed.innerHTML = `
-          <p class="daily-placeholder-text">Nenhum visitante pré-autorizado para hoje até o momento.</p>`;
-      } else {
-        guestsFeed.innerHTML = guests.slice(0, 5).map((g) => {
-          const nome = escapeHtml(g.nome || "Visitante");
-          const destino = escapeHtml(g.unidade_desc || "Condomínio");
-          const tipo = escapeHtml(g.tipo || "VISITANTE");
-          const entradaRegistrada = !!g.entrada_em;
-          const saidaRegistrada = !!g.saida_em;
+      const [visitors, eventGuests] = await Promise.all([
+        api(`/api/visitors?data_prevista=${todayLocalISO()}`).catch(() => []),
+        api("/api/guests/today").catch(() => []),
+      ]);
 
-          let btnAcao = "";
-          if (!entradaRegistrada) {
-            btnAcao = `<button type="button" class="daily-feed-btn entry" onclick="handleVisitorEntry(${g.id}, '${nome}')">${icon("check", "ico ico-xs")} Registrar Entrada</button>`;
-          } else if (!saidaRegistrada) {
-            btnAcao = `<button type="button" class="daily-feed-btn exit" onclick="handleVisitorExit(${g.id}, '${nome}')">${icon("arrow", "ico ico-xs")} Registrar Saída</button>`;
-          } else {
-            btnAcao = `<span class="badge-status entregue" style="font-size:0.75rem;">Finalizado</span>`;
-          }
-
-          return `
+      const rows = [];
+      (visitors || [])
+        .filter((v) => v.status === "AGUARDANDO" || v.status === "NO_LOCAL")
+        .forEach((v) => {
+          const nome = escapeHtml(v.nome || "Visitante");
+          const noLocal = v.status === "NO_LOCAL";
+          const btn = noLocal
+            ? `<button type="button" class="daily-feed-btn exit" onclick="handleVisitorExit(${Number(v.id)}, '${nome}')">${icon("arrow", "ico ico-xs")} Registrar Saída</button>`
+            : `<button type="button" class="daily-feed-btn entry" onclick="handleVisitorEntry(${Number(v.id)}, '${nome}')">${icon("check", "ico ico-xs")} Registrar Entrada</button>`;
+          rows.push({
+            noLocal,
+            html: `
             <div class="daily-feed-row">
               <div class="daily-feed-info">
                 <strong>${nome}</strong>
-                <span>Destino: ${destino} &bull; Tipo: ${tipo}</span>
+                <span>Destino: ${escapeHtml(v.unidade_desc || "Condomínio")} &bull; ${escapeHtml(String(v.tipo || "VISITANTE").replace(/_/g, " "))}</span>
               </div>
-              <div style="flex-shrink:0;">${btnAcao}</div>
-            </div>`;
-        }).join("");
+              <div style="flex-shrink:0;">${btn}</div>
+            </div>`,
+          });
+        });
+
+      (eventGuests || [])
+        .filter((g) => !g.saida_registrada)
+        .forEach((g) => {
+          const nome = escapeHtml(g.nome_completo || "Convidado");
+          const noLocal = !!g.entrada_registrada;
+          const btn = noLocal
+            ? `<button type="button" class="daily-feed-btn exit" onclick="handleTodayGuestCheckout(${Number(g.id)}, '${nome}')">${icon("arrow", "ico ico-xs")} Registrar Saída</button>`
+            : `<button type="button" class="daily-feed-btn entry" onclick="handleTodayGuestCheckin(${Number(g.id)}, '${nome}')">${icon("check", "ico ico-xs")} Registrar Entrada</button>`;
+          const horario = g.hora_inicio ? ` &bull; ${escapeHtml(g.hora_inicio.slice(0, 5))}` : "";
+          rows.push({
+            noLocal,
+            html: `
+            <div class="daily-feed-row">
+              <div class="daily-feed-info">
+                <strong>${nome}</strong>
+                <span>Evento: ${escapeHtml(g.area_nome || "Espaço Comum")}${horario} &bull; Apto ${escapeHtml(g.bloco || "")}-${escapeHtml(g.numero || "")}</span>
+              </div>
+              <div style="flex-shrink:0;">${btn}</div>
+            </div>`,
+          });
+        });
+
+      // Quem ainda vai entrar aparece primeiro; quem já está no local, depois
+      rows.sort((a, b) => Number(a.noLocal) - Number(b.noLocal));
+
+      if (!rows.length) {
+        guestsFeed.innerHTML = `
+          <p class="daily-placeholder-text">Nenhum visitante ou convidado pendente para hoje.</p>`;
+      } else {
+        const extra = rows.length > 6 ? `<button type="button" class="daily-link" data-window="windowVisitors">Ver mais ${rows.length - 6} na portaria &rarr;</button>` : "";
+        guestsFeed.innerHTML = rows.slice(0, 6).map((r) => r.html).join("") + extra;
       }
     } catch {
       guestsFeed.innerHTML = `<p class="daily-placeholder-text">Erro ao carregar visitantes de hoje.</p>`;
@@ -1208,15 +1389,17 @@ async function renderPortariaDaily(user, deliveries, reservations) {
       packagesFeed.innerHTML = `<p class="daily-placeholder-text">Nenhuma encomenda pendente de retirada na guarita.</p>`;
     } else {
       packagesFeed.innerHTML = pendentes.slice(0, 4).map((p) => {
-        const dest = escapeHtml(p.destinatario || "Morador");
-        const unid = p.unidade_desc ? escapeHtml(p.unidade_desc) : "";
+        const dest = escapeHtml(p.descricao || "Encomenda");
+        const unid = p.unidade ? `Bloco ${escapeHtml(p.unidade.bloco)} - Apto ${escapeHtml(p.unidade.numero)}` : "";
+        const dias = daysSince(p.data_chegada || p.criado_em);
+        const espera = dias >= 1 ? ` &bull; há ${dias} dia${dias > 1 ? "s" : ""}` : " &bull; chegou hoje";
         const rastreio = p.codigo_rastreio ? ` &bull; Cód: ${escapeHtml(p.codigo_rastreio)}` : "";
 
         return `
           <div class="daily-feed-row">
             <div class="daily-feed-info">
               <strong>${dest}</strong>
-              <span>${unid}${rastreio}</span>
+              <span>${unid}${espera}${rastreio}</span>
             </div>
             <div style="flex-shrink:0;">
               <button type="button" class="daily-feed-btn deliver" onclick="handleDeliverPackage(${p.id})">
@@ -1274,7 +1457,7 @@ async function renderSindicoDaily(user, reservations) {
   // 2. Ocupação de Áreas Comuns
   const agendaFeed = $("sindicoAgendaFeed");
   if (agendaFeed) {
-    const hojeStr = new Date().toISOString().split("T")[0];
+    const hojeStr = todayLocalISO();
     const proximas = (reservations || [])
       .filter((r) => r.status === "CONFIRMADA" && (!r.data_reserva || r.data_reserva >= hojeStr))
       .sort((a, b) => (a.data_reserva || "").localeCompare(b.data_reserva || ""));
@@ -1309,6 +1492,171 @@ async function renderSindicoDaily(user, reservations) {
 
 
 // ----------------------------------------------------
+// 5.4 RESUMO NUMÉRICO E ALERTAS DA VISÃO GERAL
+// ----------------------------------------------------
+function todayLocalISO() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function greetingByHour() {
+  const h = new Date().getHours();
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+function daysSince(iso) {
+  if (!iso) return 0;
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return 0;
+  return Math.max(0, Math.floor((Date.now() - t) / 86400000));
+}
+
+async function renderOverviewKpis(user, ctx) {
+  const strip = $("overviewKpiStrip");
+  const alertsBox = $("overviewAlerts");
+  if (!strip || !user) return;
+
+  const isMorador = user.tipo_usuario === "MORADOR";
+  const isPortaria = user.tipo_usuario === "PORTARIA";
+  const isAdmin = isAdminRole(user);
+  const hoje = todayLocalISO();
+
+  const deliveries = ctx.deliveries || [];
+  const reservations = ctx.reservations || [];
+  const notices = ctx.notices || [];
+  const pendentes = deliveries.filter((d) => d.status === "AGUARDANDO_RETIRADA");
+  const confirmadas = reservations.filter((r) => r.status === "CONFIRMADA" && (!r.data_reserva || r.data_reserva >= hoje));
+  const reservasHoje = reservations.filter((r) => r.status === "CONFIRMADA" && r.data_reserva === hoje);
+
+  const cards = [];
+  const alerts = [];
+  const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+  if (isMorador) {
+    const tickets = await api("/api/tickets").catch(() => []);
+    const abertos = (tickets || []).filter((t) => t.status === "ABERTO" || t.status === "EM_ANALISE");
+    const emAnalise = (tickets || []).filter((t) => t.status === "EM_ANALISE");
+    const minhas = confirmadas
+      .filter((r) => r.is_mine)
+      .sort((a, b) => (a.data_reserva || "").localeCompare(b.data_reserva || ""));
+    const prox = minhas[0];
+    const proxTxt = prox && prox.data_reserva ? prox.data_reserva.split("-").reverse().slice(0, 2).join("/") : "—";
+
+    cards.push(
+      { icon: "package", value: pendentes.length, label: "Encomendas na portaria", win: "windowDeliveries" },
+      { icon: "calendar", value: proxTxt, label: "Próxima reserva", win: "windowReservations" },
+      { icon: "megaphone", value: notices.length, label: "Avisos no mural", win: "windowNotices" },
+      { icon: "alert-circle", value: abertos.length, label: "Meus chamados abertos", win: "windowTickets" },
+    );
+    if (pendentes.length) alerts.push({ text: `${plural(pendentes.length, "encomenda aguarda", "encomendas aguardam")} retirada na portaria`, win: "windowDeliveries" });
+    if (emAnalise.length) alerts.push({ text: `${plural(emAnalise.length, "chamado seu está", "chamados seus estão")} em análise pelo síndico`, win: "windowTickets" });
+    if (prox && prox.data_reserva === hoje) alerts.push({ text: "Você tem uma reserva confirmada para hoje", win: "windowReservations" });
+  } else if (isPortaria) {
+    const [visitors, eventGuests] = await Promise.all([
+      api(`/api/visitors?data_prevista=${hoje}`).catch(() => []),
+      api("/api/guests/today").catch(() => []),
+    ]);
+    const vis = visitors || [];
+    const gst = eventGuests || [];
+    const esperados = vis.filter((v) => v.status === "AGUARDANDO").length + gst.filter((g) => !g.entrada_registrada).length;
+    const presentes = vis.filter((v) => v.status === "NO_LOCAL").length + gst.filter((g) => g.entrada_registrada && !g.saida_registrada).length;
+    const paradas = pendentes.filter((p) => daysSince(p.data_chegada || p.criado_em) >= 3);
+
+    cards.push(
+      { icon: "package", value: pendentes.length, label: "Encomendas pendentes", win: "windowDeliveries" },
+      { icon: "user-check", value: esperados, label: "Esperados hoje", win: "windowVisitors" },
+      { icon: "users", value: presentes, label: "Presentes agora", win: "windowVisitors" },
+      { icon: "calendar", value: reservasHoje.length, label: "Eventos hoje", win: "windowReservations" },
+    );
+    if (paradas.length) alerts.push({ text: `${plural(paradas.length, "encomenda parada", "encomendas paradas")} há 3 dias ou mais na portaria`, win: "windowDeliveries" });
+    if (presentes > 0) alerts.push({ text: `${plural(presentes, "pessoa está", "pessoas estão")} no condomínio aguardando registro de saída`, win: "windowVisitors" });
+  } else if (isAdmin) {
+    const [tickets, units] = await Promise.all([
+      api("/api/tickets").catch(() => []),
+      api("/api/units").catch(() => []),
+    ]);
+    const abertos = (tickets || []).filter((t) => t.status === "ABERTO" || t.status === "EM_ANALISE");
+    const antigos = abertos.filter((t) => daysSince(t.criado_em) >= 2);
+    const ocupadas = (units || []).filter((u) => u.morador_responsavel).length;
+    const paradas = pendentes.filter((p) => daysSince(p.data_chegada || p.criado_em) >= 5);
+
+    cards.push(
+      { icon: "users", value: `${ocupadas}/${(units || []).length}`, label: "Unidades ocupadas", win: "windowUnits" },
+      { icon: "alert-circle", value: abertos.length, label: "Chamados em aberto", win: "windowTickets" },
+      { icon: "calendar", value: confirmadas.length, label: "Reservas confirmadas", win: "windowReservations" },
+      { icon: "package", value: pendentes.length, label: "Encomendas na portaria", win: "windowDeliveries" },
+    );
+    if (antigos.length) alerts.push({ text: `${plural(antigos.length, "chamado sem resposta", "chamados sem resposta")} há 2 dias ou mais`, win: "windowTickets" });
+    if (paradas.length) alerts.push({ text: `${plural(paradas.length, "encomenda parada", "encomendas paradas")} há 5 dias ou mais na portaria`, win: "windowDeliveries" });
+    if (reservasHoje.length) alerts.push({ text: `${plural(reservasHoje.length, "evento agendado", "eventos agendados")} para hoje nas áreas comuns`, win: "windowReservations" });
+  }
+
+  strip.innerHTML = cards.map((c) => `
+    <button type="button" class="ov-kpi" data-ov-win="${c.win}">
+      <span class="ov-kpi-icon" aria-hidden="true">${icon(c.icon, "ico ico-sm")}</span>
+      <span class="ov-kpi-text">
+        <strong class="ov-kpi-value">${escapeHtml(String(c.value))}</strong>
+        <span class="ov-kpi-label">${escapeHtml(c.label)}</span>
+      </span>
+    </button>`).join("");
+
+  if (alertsBox) {
+    alertsBox.innerHTML = alerts.map((a) => `
+      <button type="button" class="ov-alert" data-ov-win="${a.win}">
+        ${icon("alert-circle", "ico ico-xs")}
+        <span>${escapeHtml(a.text)}</span>
+        ${icon("arrow", "ico ico-xs")}
+      </button>`).join("");
+    alertsBox.classList.toggle("hidden", !alerts.length);
+  }
+
+  document.querySelectorAll("#overviewKpiStrip [data-ov-win], #overviewAlerts [data-ov-win]").forEach((el) => {
+    el.onclick = () => navigateToWindow(el.dataset.ovWin);
+  });
+}
+
+// Atualiza a Visão Geral após ações feitas direto nela (entrada/saída de visitantes e convidados)
+let overviewHooksPatched = false;
+function patchOverviewRefreshHooks() {
+  if (overviewHooksPatched) return;
+  overviewHooksPatched = true;
+  ["handleVisitorEntry", "handleVisitorExit", "handleTodayGuestCheckin", "handleTodayGuestCheckout"].forEach((name) => {
+    const original = window[name];
+    if (typeof original !== "function") return;
+    window[name] = async function (...args) {
+      const result = await original.apply(this, args);
+      if (currentActiveWindow === "windowOverview") {
+        const u = getStoredUser();
+        if (u) loadQuickStatsForRole(u);
+      }
+      return result;
+    };
+  });
+}
+
+function setupOverviewRefreshButton() {
+  const btn = $("btnOverviewRefresh");
+  if (!btn || btn.dataset.bound) return;
+  btn.dataset.bound = "1";
+  btn.addEventListener("click", async () => {
+    const u = getStoredUser();
+    if (!u) return;
+    btn.disabled = true;
+    btn.classList.add("is-loading");
+    try {
+      await loadQuickStatsForRole(u);
+      showToast("Dados atualizados.", "info");
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+    }
+  });
+}
+
+// ----------------------------------------------------
 // 5.5 GAVETA LATERAL E NAVEGAÇÃO MÓVEL (OFF-CANVAS)
 // ----------------------------------------------------
 window.closeMobileDrawer = function () {
@@ -1326,6 +1674,9 @@ function setupMobileDrawer() {
     if (sidebar) sidebar.classList.toggle("mobile-open");
     document.body.classList.toggle("drawer-open");
   };
+
+  const btnCloseDrawer = $("btnCloseMobileDrawer");
+  if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", window.closeMobileDrawer);
 
   if (btnToggle) btnToggle.addEventListener("click", toggle);
   if (btnMenuBottom) btnMenuBottom.addEventListener("click", toggle);
@@ -1379,16 +1730,16 @@ function renderOverviewDeliveries(deliveries, user) {
 const unitsTableBody = $("unitsTableBody");
 const formNewUnit = $("formNewUnit");
 
-$("btnToggleNewUnitForm").addEventListener("click", () => {
+$("btnToggleNewUnitForm")?.addEventListener("click", () => {
   formNewUnit.classList.toggle("hidden");
   if (!formNewUnit.classList.contains("hidden")) {
     formNewUnit.scrollIntoView({ behavior: "smooth", block: "start" });
     $("inputBloco").focus();
   }
 });
-$("btnCancelNewUnit").addEventListener("click", () => formNewUnit.classList.add("hidden"));
+$("btnCancelNewUnit")?.addEventListener("click", () => formNewUnit.classList.add("hidden"));
 
-formNewUnit.addEventListener("submit", async (e) => {
+formNewUnit?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const bloco = $("inputBloco").value.trim();
   const numero = $("inputNumero").value.trim();
@@ -1404,6 +1755,98 @@ formNewUnit.addEventListener("submit", async (e) => {
     loadQuickStatsForRole(getStoredUser());
   } catch (err) {
     showToast(err.message, "error");
+  }
+});
+
+// --- Gerador inteligente de andares e unidades em lote ---
+const formBatchUnits = $("formBatchUnits");
+
+function closeBatchUnitsForm() {
+  formBatchUnits?.classList.add("hidden");
+}
+
+function readBatchUnitsInputs() {
+  return {
+    bloco: $("inputBatchBloco").value.trim(),
+    andar_inicial: parseInt($("inputBatchAndarIni").value, 10),
+    andar_final: parseInt($("inputBatchAndarFim").value, 10),
+    aptos_por_andar: parseInt($("inputBatchAptosPorAndar").value, 10),
+    formato_numeracao: $("inputBatchFormato").value || "CENTENA",
+  };
+}
+
+function updateBatchUnitsPreview() {
+  const previewEl = $("batchPreviewText");
+  if (!previewEl) return;
+  const { bloco, andar_inicial: ini, andar_final: fim, aptos_por_andar: aptos, formato_numeracao: fmt } = readBatchUnitsInputs();
+  if (!bloco || [ini, fim, aptos].some((n) => Number.isNaN(n))) {
+    previewEl.textContent = "Preencha todos os campos para ver a estimativa.";
+    return;
+  }
+  if (fim < ini) {
+    previewEl.textContent = "O andar final deve ser maior ou igual ao andar inicial.";
+    return;
+  }
+  const andares = fim - ini + 1;
+  const sample = (andar, idx) => (fmt === "DEZENA" ? `${andar}${idx}` : `${andar}${String(idx).padStart(2, "0")}`);
+  const lastIdx = Math.min(aptos, 3);
+  const exemplo = Array.from({ length: lastIdx }, (_, i) => sample(ini, i + 1)).join(", ");
+  previewEl.textContent = `Serão geradas ${andares * aptos} unidades em ${bloco} (${andares} andar${andares > 1 ? "es" : ""} × ${aptos} apto${aptos > 1 ? "s" : ""}). Exemplo: ${exemplo}${aptos > lastIdx ? "..." : ""}. Unidades já existentes serão ignoradas.`;
+}
+
+$("btnToggleBatchUnitsForm")?.addEventListener("click", () => {
+  formNewUnit?.classList.add("hidden");
+  formBatchUnits?.classList.toggle("hidden");
+  if (formBatchUnits && !formBatchUnits.classList.contains("hidden")) {
+    updateBatchUnitsPreview();
+    formBatchUnits.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+});
+$("btnCancelBatchUnits")?.addEventListener("click", closeBatchUnitsForm);
+$("btnCancelBatchUnits2")?.addEventListener("click", closeBatchUnitsForm);
+$("btnToggleNewUnitForm")?.addEventListener("click", () => formBatchUnits?.classList.add("hidden"));
+
+["inputBatchBloco", "inputBatchAndarIni", "inputBatchAndarFim", "inputBatchAptosPorAndar", "inputBatchFormato"].forEach((id) => {
+  $(id)?.addEventListener("input", updateBatchUnitsPreview);
+  $(id)?.addEventListener("change", updateBatchUnitsPreview);
+});
+
+formBatchUnits?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payload = readBatchUnitsInputs();
+  if (!payload.bloco || [payload.andar_inicial, payload.andar_final, payload.aptos_por_andar].some((n) => Number.isNaN(n))) {
+    showToast("Preencha todos os campos do gerador.", "error");
+    return;
+  }
+  if (payload.andar_final < payload.andar_inicial) {
+    showToast("O andar final deve ser maior ou igual ao andar inicial.", "error");
+    return;
+  }
+
+  const btn = $("btnSubmitBatchUnits");
+  const originalLabel = btn ? btn.textContent : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Gerando unidades...";
+  }
+  try {
+    const res = await api("/api/units/batch", { method: "POST", body: payload });
+    const criados = res?.total_criados ?? 0;
+    const duplicados = res?.total_duplicados ?? 0;
+    showToast(
+      `${criados} unidade(s) criada(s)${duplicados ? ` • ${duplicados} já existia(m) e foi(ram) ignorada(s)` : ""}.`,
+      criados ? "success" : "info"
+    );
+    closeBatchUnitsForm();
+    loadUnits();
+    loadQuickStatsForRole(getStoredUser());
+  } catch (err) {
+    showToast(err.message, "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 });
 
@@ -1487,10 +1930,10 @@ function closeAssignResidentModal() {
   $("inputResidentSenha").value = "Morador@123";
 }
 
-$("btnCancelAssignResident").addEventListener("click", closeAssignResidentModal);
-$("btnCancelAssignResident2").addEventListener("click", closeAssignResidentModal);
+$("btnCancelAssignResident")?.addEventListener("click", closeAssignResidentModal);
+$("btnCancelAssignResident2")?.addEventListener("click", closeAssignResidentModal);
 
-formAssignResident.addEventListener("submit", async (e) => {
+formAssignResident?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const unitId = parseInt(assignTargetUnitId.value, 10);
   const nome = $("inputResidentNome").value.trim();
@@ -1567,9 +2010,9 @@ const deliveriesTableBody = $("deliveriesTableBody");
 const formNewDelivery = $("formNewDelivery");
 const selectDeliveryUnit = $("selectDeliveryUnit");
 
-$("btnCancelNewDelivery").addEventListener("click", () => formNewDelivery.classList.add("hidden"));
+$("btnCancelNewDelivery")?.addEventListener("click", () => formNewDelivery.classList.add("hidden"));
 
-$("btnToggleNewDeliveryForm").addEventListener("click", async () => {
+$("btnToggleNewDeliveryForm")?.addEventListener("click", async () => {
   formNewDelivery.classList.toggle("hidden");
   if (!formNewDelivery.classList.contains("hidden")) {
     await populateDeliveryUnitsSelect();
@@ -1599,7 +2042,7 @@ async function populateDeliveryUnitsSelect() {
   }
 }
 
-formNewDelivery.addEventListener("submit", async (e) => {
+formNewDelivery?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const unidadeId = parseInt(selectDeliveryUnit.value, 10);
   const descricao = $("inputDeliveryDesc").value.trim();
@@ -1726,9 +2169,9 @@ let cachedCommonAreas = [];
 let cachedAllReservations = [];
 let calendarCurrentDate = new Date();
 
-$("btnCancelNewReservation").addEventListener("click", () => formNewReservation.classList.add("hidden"));
+$("btnCancelNewReservation")?.addEventListener("click", () => formNewReservation.classList.add("hidden"));
 
-$("btnToggleNewReservationForm").addEventListener("click", async () => {
+$("btnToggleNewReservationForm")?.addEventListener("click", async () => {
   formNewReservation.classList.toggle("hidden");
   if (!formNewReservation.classList.contains("hidden")) {
     const today = new Date().toISOString().split("T")[0];
@@ -1748,25 +2191,25 @@ const btnCalToday = $("btnCalToday");
 const calendarAreaFilter = $("calendarAreaFilter");
 
 if (btnCalPrevMonth) {
-  btnCalPrevMonth.addEventListener("click", () => {
+  btnCalPrevMonth?.addEventListener("click", () => {
     calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1);
     renderReservationsCalendar();
   });
 }
 if (btnCalNextMonth) {
-  btnCalNextMonth.addEventListener("click", () => {
+  btnCalNextMonth?.addEventListener("click", () => {
     calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1);
     renderReservationsCalendar();
   });
 }
 if (btnCalToday) {
-  btnCalToday.addEventListener("click", () => {
+  btnCalToday?.addEventListener("click", () => {
     calendarCurrentDate = new Date();
     renderReservationsCalendar();
   });
 }
 if (calendarAreaFilter) {
-  calendarAreaFilter.addEventListener("change", () => {
+  calendarAreaFilter?.addEventListener("change", () => {
     renderReservationsCalendar();
   });
 }
@@ -1918,31 +2361,220 @@ function renderReservationsCalendar() {
   grid.innerHTML = cellsHtml;
 }
 
-window.handleCalendarDayClick = function (dateStr) {
+let currentSelectedCalendarDate = null;
+
+window.startReservationForDate = async function (dateStr, areaId = null) {
+  closeDayReservationsModal();
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  if (dateStr < todayStr) {
+  if (dateStr && dateStr < todayStr) {
     showToast("Não é possível solicitar reservas para datas retroativas.", "warning");
     return;
   }
-
   const form = $("formNewReservation");
   if (!form) return;
+
+  // Garante que o select de áreas esteja carregado
+  await populateReservationAreasSelect();
+
   form.classList.remove("hidden");
+  if (dateStr) {
+    const inputDate = $("inputReservationDate");
+    if (inputDate) {
+      inputDate.value = dateStr;
+      inputDate.min = todayStr;
+    }
+  }
 
-  $("inputReservationDate").value = dateStr;
-
-  const calArea = $("calendarAreaFilter");
-  if (calArea && calArea.value) {
-    $("selectReservationArea").value = calArea.value;
+  const selectArea = $("selectReservationArea");
+  if (selectArea) {
+    if (areaId) {
+      selectArea.value = String(areaId);
+    } else {
+      const calArea = $("calendarAreaFilter");
+      if (calArea && calArea.value) {
+        selectArea.value = calArea.value;
+      }
+    }
+    selectArea.dispatchEvent(new Event("change"));
   }
 
   if (!$("inputReservationTimeStart").value) $("inputReservationTimeStart").value = "10:00";
   if (!$("inputReservationTimeEnd").value) $("inputReservationTimeEnd").value = "16:00";
-
   checkReservationPriorityNotice();
   form.scrollIntoView({ behavior: "smooth", block: "start" });
 };
+
+window.openDayReservationsModal = async function (dateStr) {
+  currentSelectedCalendarDate = dateStr;
+  const modal = $("modalDayReservations");
+  if (!modal) return;
+
+  const parts = dateStr.split("-");
+  const ano = parseInt(parts[0], 10);
+  const mes = parseInt(parts[1], 10);
+  const dia = parseInt(parts[2], 10);
+  const dateObj = new Date(ano, mes - 1, dia);
+  const dataFmt = dateObj.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+
+  const titleEl = $("dayReservationsTitle");
+  const subEl = $("dayReservationsSubtitle");
+  if (titleEl) titleEl.textContent = `Reservas do Dia: ${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}`;
+  if (subEl) subEl.textContent = dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1);
+
+  // Garante que cachedCommonAreas esteja carregado para saber quais áreas estão livres
+  if (!cachedCommonAreas || !cachedCommonAreas.length) {
+    await populateReservationAreasSelect();
+  }
+
+  // Filtra as reservas desse dia específico
+  const dayReservas = (cachedAllReservations || []).filter((r) => {
+    return r.data_reserva === dateStr && r.status !== "CANCELADA" && r.status !== "DESBANCADA";
+  });
+
+  const totalEl = $("dayResCountTotal");
+  const confEl = $("dayResCountConfirmed");
+  const stdEl = $("dayResCountStandby");
+  if (totalEl) totalEl.textContent = dayReservas.length;
+  if (confEl) confEl.textContent = dayReservas.filter((r) => r.status === "CONFIRMADA" || r.status === "EM_USO" || r.status === "CONCLUIDA").length;
+  if (stdEl) stdEl.textContent = dayReservas.filter((r) => r.status === "BAIXA_PRIORIDADE").length;
+
+  const btnTop = $("btnDayResNewReservationTop");
+  if (btnTop) {
+    btnTop.innerHTML = `${icon("plus", "ico ico-xs")} <span>Agendar no Dia ${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}</span>`;
+  }
+
+  const listContainer = $("dayReservationsListContainer");
+  const emptyState = $("dayReservationsEmptyState");
+  const user = getStoredUser();
+  const isAdmin = isAdminRole(user);
+  const isPortaria = user && user.tipo_usuario === "PORTARIA";
+
+  // Identifica áreas que já têm agendamento nesse dia
+  const bookedAreaIds = new Set(dayReservas.map((r) => r.area_comum_id));
+  const activeAreas = (cachedCommonAreas || []).filter((a) => a.ativo !== false);
+  const availableAreas = activeAreas.filter((a) => !bookedAreaIds.has(a.id));
+
+  let htmlContent = "";
+
+  // 1. Bloco de Espaços Disponíveis para Agendar
+  if (availableAreas.length > 0) {
+    htmlContent += `
+      <div class="day-res-section-title">
+        ${icon("check", "ico ico-xs text-success")}
+        <span>Espaços Disponíveis para Agendar neste Dia (${availableAreas.length})</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+    `;
+    availableAreas.forEach((area) => {
+      const taxaStr = area.taxa_limpeza > 0 ? `Taxa R$ ${Number(area.taxa_limpeza).toFixed(2)}` : "Uso Gratuito";
+      const capStr = `Capacidade até ${area.capacidade_pessoas} pessoas`;
+      htmlContent += `
+        <div class="day-avail-area-card">
+          <div class="day-avail-area-info">
+            <strong class="day-avail-area-name">
+              ${icon("building", "ico ico-xs")}
+              <span>${escapeHtml(area.nome)}</span>
+            </strong>
+            <span class="day-avail-area-meta">${escapeHtml(capStr)} &bull; ${escapeHtml(taxaStr)}</span>
+          </div>
+          <button type="button" class="btn-avail-area-book" onclick="startReservationForDate('${dateStr}', ${area.id})" title="Reservar ${escapeHtml(area.nome)} neste dia">
+            ${icon("plus", "ico ico-xs")} <span>Reservar</span>
+          </button>
+        </div>
+      `;
+    });
+    htmlContent += `</div>`;
+  }
+
+  // 2. Bloco de Reservas Já Registradas neste Dia
+  if (dayReservas.length > 0) {
+    htmlContent += `
+      <div class="day-res-section-title">
+        ${icon("calendar", "ico ico-xs")}
+        <span>Agendamentos Já Registrados neste Dia (${dayReservas.length})</span>
+      </div>
+    `;
+    dayReservas.forEach((r) => {
+      const hIni = r.hora_inicio ? r.hora_inicio.substring(0, 5) : "--:--";
+      const hFim = r.hora_fim ? r.hora_fim.substring(0, 5) : "--:--";
+      const isMine = Boolean(r.is_mine || (user && r.usuario_id && r.usuario_id === user.id));
+      const canManageGuests = isMine || isAdmin || isPortaria;
+      const areaNameStr = r.area_nome || r.area_comum_nome || "Espaço Comum";
+      
+      let moradorDisplay = "Morador (LGPD)";
+      if (isAdmin || isPortaria || isMine) {
+        moradorDisplay = r.morador_nome || r.usuario_nome || (isMine ? "Minha Reserva" : "Condômino");
+        if (r.unidade_desc || r.unidade_info) moradorDisplay += ` (${r.unidade_desc || r.unidade_info})`;
+      }
+
+      const isConfirmada = r.status === "CONFIRMADA" || r.status === "EM_USO" || r.status === "CONCLUIDA";
+      const badge = isConfirmada
+        ? `<span class="badge-status ocupado">${icon("check")} Confirmada</span>`
+        : `<span class="badge-status standby">${icon("clock")} Standby</span>`;
+
+      htmlContent += `
+        <div class="day-reservation-item-card">
+          <div class="day-res-item-header">
+            <strong class="day-res-area-name">${escapeHtml(areaNameStr)}</strong>
+            ${badge}
+          </div>
+          <div class="day-res-item-meta">
+            <span>${icon("clock", "ico ico-xs")} ${hIni} às ${hFim}</span>
+            <span>&bull;</span>
+            <span>${icon("user", "ico ico-xs")} ${escapeHtml(moradorDisplay)}</span>
+          </div>
+          <div class="day-res-item-actions">
+            ${canManageGuests ? `
+              <button type="button" class="btn-daily-sm-action" onclick="openGuestsFromDayModal(${r.id}, '${escapeJsString(areaNameStr)}', '${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}', ${isMine ? 'true' : 'false'})">
+                ${icon("users", "ico ico-xs")} <span>Lista de Convidados</span>
+              </button>
+            ` : ""}
+            <button type="button" class="btn-daily-sm-action" style="margin-left: 0.5rem;" onclick="startReservationForDate('${dateStr}', ${r.area_comum_id})" title="Tentar outro horário ou entrar na fila deste espaço">
+              ${icon("plus", "ico ico-xs")} <span>Disputar / Outro Horário</span>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  if (listContainer) {
+    listContainer.innerHTML = htmlContent;
+    listContainer.classList.remove("hidden");
+  }
+
+  if (!dayReservas.length && !availableAreas.length) {
+    if (emptyState) emptyState.classList.remove("hidden");
+  } else {
+    if (emptyState) emptyState.classList.add("hidden");
+  }
+
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+};
+
+window.closeDayReservationsModal = function () {
+  const modal = $("modalDayReservations");
+  if (modal) modal.classList.add("hidden");
+  document.body.classList.remove("modal-open");
+};
+
+window.openGuestsFromDayModal = function (reservationId, areaNome, dataFmt, isMine) {
+  // Fecha a janela de reservas do dia para evitar sobreposição de modais
+  closeDayReservationsModal();
+  openGuestsModal(reservationId, areaNome, dataFmt, isMine);
+};
+
+window.handleCalendarDayClick = function (dateStr) {
+  openDayReservationsModal(dateStr);
+};
+
 
 // Atualiza a dica visual com horário de abertura e limite de horas da área selecionada
 async function checkReservationPriorityNotice() {
@@ -1977,7 +2609,7 @@ async function checkReservationPriorityNotice() {
   }
 }
 
-selectReservationArea.addEventListener("change", () => {
+selectReservationArea?.addEventListener("change", () => {
   const areaId = parseInt(selectReservationArea.value, 10);
   const area = cachedCommonAreas.find((a) => a.id === areaId);
   if (!area) {
@@ -2000,7 +2632,7 @@ selectReservationArea.addEventListener("change", () => {
   checkReservationPriorityNotice();
 });
 
-inputReservationDate.addEventListener("change", () => {
+inputReservationDate?.addEventListener("change", () => {
   checkReservationPriorityNotice();
 });
 
@@ -2010,7 +2642,7 @@ const formNewArea = $("formNewArea");
 const btnCancelNewArea = $("btnCancelNewArea");
 
 if (btnToggleNewAreaForm) {
-  btnToggleNewAreaForm.addEventListener("click", () => {
+  btnToggleNewAreaForm?.addEventListener("click", () => {
     formNewArea.classList.toggle("hidden");
     if (!formNewArea.classList.contains("hidden")) {
       formNewArea.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2019,14 +2651,14 @@ if (btnToggleNewAreaForm) {
   });
 }
 if (btnCancelNewArea) {
-  btnCancelNewArea.addEventListener("click", () => {
+  btnCancelNewArea?.addEventListener("click", () => {
     formNewArea.classList.add("hidden");
     formNewArea.reset();
   });
 }
 
 if (formNewArea) {
-  formNewArea.addEventListener("submit", async (e) => {
+  formNewArea?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const nome = $("inputNewAreaNome").value.trim();
     const capacidade = parseInt($("inputNewAreaCapacidade").value, 10);
@@ -2208,7 +2840,7 @@ window.handleSaveAreaRules = async function (areaId) {
   }
 };
 
-formNewReservation.addEventListener("submit", async (e) => {
+formNewReservation?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const areaId = parseInt(selectReservationArea.value, 10);
   const dataReserva = inputReservationDate.value;
@@ -2462,14 +3094,14 @@ const CATEGORY_LABEL = {
   GERAL: "Geral",
 };
 
-$("btnToggleNewNoticeForm").addEventListener("click", () => {
+$("btnToggleNewNoticeForm")?.addEventListener("click", () => {
   formNewNotice.classList.toggle("hidden");
   if (!formNewNotice.classList.contains("hidden")) {
     formNewNotice.scrollIntoView({ behavior: "smooth", block: "start" });
     $("inputNoticeTitle").focus();
   }
 });
-$("btnCancelNewNotice").addEventListener("click", () => {
+$("btnCancelNewNotice")?.addEventListener("click", () => {
   formNewNotice.classList.add("hidden");
   formNewNotice.reset();
 });
@@ -2482,7 +3114,7 @@ function formatMessageWithLinks(text) {
   });
 }
 
-formNewNotice.addEventListener("submit", async (e) => {
+formNewNotice?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const titulo = $("inputNoticeTitle").value.trim();
   const categoria = $("selectNoticeCategory").value;
@@ -2637,7 +3269,7 @@ window.handleDeleteNotice = async function (noticeId) {
 // ==========================================
 const auditTableBody = $("auditTableBody");
 
-$("btnRefreshAudit").addEventListener("click", loadAuditLogs);
+$("btnRefreshAudit")?.addEventListener("click", loadAuditLogs);
 
 async function loadAuditLogs() {
   auditTableBody.innerHTML = `<tr><td colspan="6" class="table-empty">Consultando registros de auditoria e segurança...</td></tr>`;
@@ -2687,7 +3319,7 @@ const modalReplyTicket = $("modalReplyTicket");
 const formReplyTicket = $("formReplyTicket");
 
 if (btnNewTicketToggle) {
-  btnNewTicketToggle.addEventListener("click", () => {
+  btnNewTicketToggle?.addEventListener("click", () => {
     formNewTicket.classList.toggle("hidden");
     if (!formNewTicket.classList.contains("hidden")) {
       formNewTicket.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2702,16 +3334,16 @@ if (btnCancelTicket) btnCancelTicket.addEventListener("click", () => formNewTick
 if (btnCancelTicket2) btnCancelTicket2.addEventListener("click", () => formNewTicket.classList.add("hidden"));
 
 if (filterTicketStatus) {
-  filterTicketStatus.addEventListener("change", loadTickets);
+  filterTicketStatus?.addEventListener("change", loadTickets);
 }
 
 const btnRefreshTickets = $("btnRefreshTickets");
 if (btnRefreshTickets) {
-  btnRefreshTickets.addEventListener("click", loadTickets);
+  btnRefreshTickets?.addEventListener("click", loadTickets);
 }
 
 if (formNewTicket) {
-  formNewTicket.addEventListener("submit", async (e) => {
+  formNewTicket?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const titulo = $("inputTicketTitulo").value.trim();
     const categoria = $("selectTicketCategoria").value;
@@ -2843,7 +3475,7 @@ if (btnCancelReplyTicket) btnCancelReplyTicket.addEventListener("click", closeRe
 if (btnCancelReplyTicketX) btnCancelReplyTicketX.addEventListener("click", closeReplyTicketModal);
 
 if (formReplyTicket) {
-  formReplyTicket.addEventListener("submit", async (e) => {
+  formReplyTicket?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const ticketId = parseInt($("replyTargetTicketId").value, 10);
     const status = $("selectReplyStatus").value;
@@ -2899,7 +3531,7 @@ const selectVisitorUnit = $("selectVisitorUnit");
 const filterVisitorStatus = $("filterVisitorStatus");
 
 if (btnNewVisitorToggle) {
-  btnNewVisitorToggle.addEventListener("click", async () => {
+  btnNewVisitorToggle?.addEventListener("click", async () => {
     formNewVisitor.classList.toggle("hidden");
     if (!formNewVisitor.classList.contains("hidden")) {
       await loadVisitorUnitsSelect();
@@ -2919,12 +3551,12 @@ if (btnCancelVisitor) btnCancelVisitor.addEventListener("click", () => formNewVi
 if (btnCancelVisitor2) btnCancelVisitor2.addEventListener("click", () => formNewVisitor.classList.add("hidden"));
 
 if (filterVisitorStatus) {
-  filterVisitorStatus.addEventListener("change", loadVisitors);
+  filterVisitorStatus?.addEventListener("change", loadVisitors);
 }
 
 const btnRefreshVisitors = $("btnRefreshVisitors");
 if (btnRefreshVisitors) {
-  btnRefreshVisitors.addEventListener("click", loadVisitors);
+  btnRefreshVisitors?.addEventListener("click", loadVisitors);
 }
 
 async function loadVisitorUnitsSelect() {
@@ -2957,7 +3589,7 @@ async function loadVisitorUnitsSelect() {
 }
 
 if (formNewVisitor) {
-  formNewVisitor.addEventListener("submit", async (e) => {
+  formNewVisitor?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const user = getStoredUser();
     const unidadeIdVal = selectVisitorUnit.value ? parseInt(selectVisitorUnit.value, 10) : (user ? user.unidade_id : null);
@@ -3344,9 +3976,32 @@ window.handleDeclineOffer = async function (reservationId) {
 // 14. LISTA DE CONVIDADOS DA RESERVA & CONVITE DIGITAL
 // ==========================================
 let currentGuestsReservationId = null;
+let currentGuestsAreaName = "";
+let currentGuestsDataFmt = "";
+let currentGuestsIsMine = false;
+let cachedReservationGuests = [];
+
+function getGuestInitials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 window.openGuestsModal = async function (reservationId, areaNome, dataFmt, isMine) {
+  if (typeof areaNome !== "string" || !areaNome) {
+    if (typeof areaNome === "boolean") isMine = areaNome;
+    areaNome = "Espaço Reservado";
+  }
+  if (typeof dataFmt !== "string" || !dataFmt) {
+    dataFmt = "Data do Evento";
+  }
+
   currentGuestsReservationId = reservationId;
+  currentGuestsAreaName = areaNome;
+  currentGuestsDataFmt = dataFmt;
+  currentGuestsIsMine = Boolean(isMine);
+
   const modal = $("modalGuestsList");
   if (!modal) return;
 
@@ -3357,7 +4012,8 @@ window.openGuestsModal = async function (reservationId, areaNome, dataFmt, isMin
   const formAdd = $("formAddGuest");
   const notice = $("guestNonOwnerNotice");
   if (formAdd) {
-    formAdd.classList.toggle("hidden", !isMine);
+    // Formulário fica recolhido atrás do botão "Adicionar convidado" (abre sozinho se a lista estiver vazia)
+    formAdd.classList.add("hidden");
     formAdd.reset();
   }
   if (notice) {
@@ -3365,6 +4021,46 @@ window.openGuestsModal = async function (reservationId, areaNome, dataFmt, isMin
   }
   if ($("chkGuestSendInvite")) {
     $("chkGuestSendInvite").checked = false;
+  }
+
+  // Reseta input de pesquisa
+  const inputSearch = $("inputSearchGuest");
+  const btnClear = $("btnClearGuestSearch");
+  if (inputSearch) inputSearch.value = "";
+  if (btnClear) btnClear.classList.add("hidden");
+
+  // Conecta eventos da toolbar
+  if (inputSearch && !inputSearch.dataset.bound) {
+    inputSearch.dataset.bound = "true";
+    inputSearch.addEventListener("input", filterGuestsTable);
+  }
+  if (btnClear && !btnClear.dataset.bound) {
+    btnClear.dataset.bound = "true";
+    btnClear.addEventListener("click", () => {
+      if (inputSearch) {
+        inputSearch.value = "";
+        inputSearch.focus();
+      }
+      filterGuestsTable();
+    });
+  }
+
+  // Botão "Adicionar convidado": exibe/oculta o formulário (apenas titular da reserva)
+  const btnToggleAdd = $("btnToggleAddGuest");
+  if (btnToggleAdd) {
+    btnToggleAdd.classList.toggle("hidden", !isMine);
+    if (!btnToggleAdd.dataset.bound) {
+      btnToggleAdd.dataset.bound = "true";
+      btnToggleAdd.addEventListener("click", () => {
+        const form = $("formAddGuest");
+        if (!form) return;
+        form.classList.toggle("hidden");
+        if (!form.classList.contains("hidden")) {
+          form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          $("inputGuestNome")?.focus();
+        }
+      });
+    }
   }
 
   modal.classList.remove("hidden");
@@ -3375,72 +4071,143 @@ window.openGuestsModal = async function (reservationId, areaNome, dataFmt, isMin
 async function loadReservationGuests(reservationId, isMine) {
   const tbody = $("guestsTableBody");
   if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="6" class="table-empty">Carregando lista de convidados...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="6" class="table-empty" style="padding:2rem; text-align:center;">Carregando lista de convidados...</td></tr>`;
 
   try {
     const guests = await api(`/api/guests/reservation/${reservationId}`);
-    const total = guests.length;
-    const entered = guests.filter((g) => g.entrada_registrada).length;
-    const invited = guests.filter((g) => g.convite_enviado).length;
+    cachedReservationGuests = guests || [];
 
-    $("guestCountTotal").textContent = total;
-    $("guestCountEntered").textContent = entered;
-    $("guestCountInvited").textContent = invited;
+    const total = cachedReservationGuests.length;
+    const entered = cachedReservationGuests.filter((g) => g.entrada_registrada).length;
+    const invited = cachedReservationGuests.filter((g) => g.convite_enviado).length;
 
-    if (!guests.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-empty">Nenhum convidado cadastrado até o momento.</td></tr>`;
-      return;
+    if ($("guestCountTotal")) $("guestCountTotal").textContent = total;
+    if ($("guestCountEntered")) $("guestCountEntered").textContent = entered;
+    if ($("guestCountInvited")) $("guestCountInvited").textContent = invited;
+
+    renderGuestsTable(cachedReservationGuests, isMine);
+    if (isMine && total === 0) {
+      $("formAddGuest")?.classList.remove("hidden");
     }
-
-    const user = getStoredUser();
-    const isStaff = isAdminRole(user) || (user && user.tipo_usuario === "PORTARIA");
-
-    tbody.innerHTML = guests.map((g) => {
-      let inviteBadge = `<span class="badge-guest-waiting">Não enviado</span>`;
-      if (g.convite_enviado) {
-        inviteBadge = `<span class="badge-guest-invite-sent">${icon("mail")}Enviado</span>`;
-      }
-
-      let entryStatus = `<span class="badge-guest-waiting">Aguardando</span>`;
-      if (g.saida_registrada) {
-        const outTime = g.saida_em ? new Date(g.saida_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
-        entryStatus = `<span class="badge-guest-exited">${icon("arrow")}Saída (${outTime})</span>`;
-      } else if (g.entrada_registrada) {
-        const entTime = g.entrada_em ? new Date(g.entrada_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
-        entryStatus = `<span class="badge-guest-entered">${icon("check")}Presente (${entTime})</span>`;
-      }
-
-      let acoes = [];
-      if (isStaff && !g.entrada_registrada) {
-        acoes.push(`<button type="button" class="btn-action-deliver" onclick="handleCheckinGuest(${Number(g.id)}, '${escapeHtml(g.nome_completo)}')">${icon("check")}Check-in</button>`);
-      }
-      if (g.email && isMine) {
-        acoes.push(`<button type="button" class="btn-action-guest" onclick="handleResendGuestInvite(${Number(g.id)})" title="Reenviar convite por e-mail">${icon("refresh")}</button>`);
-      }
-      if (isMine) {
-        acoes.push(`<button type="button" class="btn-action-danger" onclick="handleDeleteGuest(${Number(g.id)})" title="Remover da lista">${icon("trash")}</button>`);
-      }
-
-      const docStr = g.documento ? escapeHtml(g.documento) : `<span class="muted">(Não informado)</span>`;
-
-      return `
-        <tr>
-          <td data-label="Nome">
-            <strong>${escapeHtml(g.nome_completo)}</strong>
-            <small class="muted">${g.email ? escapeHtml(g.email) : docStr}</small>
-          </td>
-          <td data-label="Documento">${docStr}</td>
-          <td data-label="E-mail">${g.email ? escapeHtml(g.email) : '<span class="muted">-</span>'}</td>
-          <td data-label="Convite">${inviteBadge}</td>
-          <td data-label="Status">${entryStatus}</td>
-          <td data-label="Ações"><div style="display:flex; gap:0.35rem; align-items:center; flex-wrap:wrap;">${acoes.join(" ") || '<span class="muted">-</span>'}</div></td>
-        </tr>
-      `;
-    }).join("");
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="6" class="table-error">${escapeHtml(err.message)}</td></tr>`;
   }
 }
+
+function renderGuestsTable(guests, isMine) {
+  const tbody = $("guestsTableBody");
+  if (!tbody) return;
+
+  if (!guests.length) {
+    const isFiltered = cachedReservationGuests.length > 0;
+    if (isFiltered) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="padding: 0; border: none;">
+            <div class="guest-empty-state-wrap">
+              <div class="guest-empty-icon">${icon("search", "ico")}</div>
+              <h4>Nenhum convidado localizado</h4>
+              <p>Não encontramos nenhum convidado correspondente ao filtro informado.</p>
+            </div>
+          </td>
+        </tr>`;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="padding: 0; border: none;">
+            <div class="guest-empty-state-wrap">
+              <div class="guest-empty-icon">${icon("users", "ico")}</div>
+              <h4>Nenhum convidado cadastrado até o momento</h4>
+              <p>Adicione os nomes e documentos dos seus convidados no formulário acima. A portaria terá acesso instantâneo à lista para liberar o acesso no dia do evento.</p>
+            </div>
+          </td>
+        </tr>`;
+    }
+    return;
+  }
+
+  const user = getStoredUser();
+  const isStaff = isAdminRole(user) || (user && user.tipo_usuario === "PORTARIA");
+
+  tbody.innerHTML = guests.map((g) => {
+    const initials = getGuestInitials(g.nome_completo);
+
+    let inviteBadge = `<span class="badge-guest-pill pending">Não enviado</span>`;
+    if (g.convite_enviado) {
+      inviteBadge = `<span class="badge-guest-pill invited">${icon("mail", "ico ico-xs")} Enviado</span>`;
+    }
+
+    let entryStatus = `<span class="badge-guest-pill waiting">${icon("clock", "ico ico-xs")} Aguardando</span>`;
+    if (g.saida_registrada) {
+      const outTime = g.saida_em ? new Date(g.saida_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
+      entryStatus = `<span class="badge-guest-pill exited">${icon("arrow", "ico ico-xs")} Saída (${outTime})</span>`;
+    } else if (g.entrada_registrada) {
+      const entTime = g.entrada_em ? new Date(g.entrada_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
+      entryStatus = `<span class="badge-guest-pill entered">${icon("check", "ico ico-xs")} Presente (${entTime})</span>`;
+    }
+
+    let acoes = [];
+    if (isStaff && !g.entrada_registrada) {
+      acoes.push(`<button type="button" class="btn-guest-action checkin" onclick="handleCheckinGuest(${Number(g.id)}, '${escapeHtml(g.nome_completo)}')" title="Registrar entrada na portaria">${icon("check", "ico ico-xs")} Entrada</button>`);
+    } else if (isStaff && g.entrada_registrada && !g.saida_registrada) {
+      acoes.push(`<button type="button" class="btn-guest-action checkout" onclick="handleCheckoutGuest(${Number(g.id)}, '${escapeHtml(g.nome_completo)}')" title="Registrar saída na portaria">${icon("arrow", "ico ico-xs")} Saída</button>`);
+    }
+
+    if (g.email && isMine) {
+      acoes.push(`<button type="button" class="btn-guest-action resend" onclick="handleResendGuestInvite(${Number(g.id)})" title="Reenviar convite digital por e-mail">${icon("mail", "ico ico-xs")}</button>`);
+    }
+    if (isMine) {
+      acoes.push(`<button type="button" class="btn-guest-action delete" onclick="handleDeleteGuest(${Number(g.id)})" title="Remover convidado da lista">${icon("trash", "ico ico-xs")}</button>`);
+    }
+
+    const docStr = g.documento ? `<span class="guest-doc-pill">${escapeHtml(g.documento)}</span>` : `<span class="muted" style="font-size:0.78rem;">Não informado</span>`;
+    const emailStr = g.email ? `<span style="font-size:0.82rem; color:var(--text-muted);">${escapeHtml(g.email)}</span>` : `<span class="muted">-</span>`;
+
+    return `
+      <tr>
+        <td data-label="Convidado">
+          <div class="guest-name-cell">
+            <div class="guest-avatar-circle">${escapeHtml(initials)}</div>
+            <div>
+              <strong>${escapeHtml(g.nome_completo)}</strong>
+            </div>
+          </div>
+        </td>
+        <td data-label="Documento">${docStr}</td>
+        <td data-label="E-mail">${emailStr}</td>
+        <td data-label="Convite">${inviteBadge}</td>
+        <td data-label="Portaria">${entryStatus}</td>
+        <td data-label="Ações">
+          <div class="guest-action-btns-wrap">${acoes.join(" ") || '<span class="muted">-</span>'}</div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+window.filterGuestsTable = function () {
+  const input = $("inputSearchGuest");
+  const btnClear = $("btnClearGuestSearch");
+  const q = input ? input.value.trim().toLowerCase() : "";
+
+  if (btnClear) {
+    btnClear.classList.toggle("hidden", !q);
+  }
+
+  if (!q) {
+    renderGuestsTable(cachedReservationGuests, currentGuestsIsMine);
+    return;
+  }
+
+  const filtered = cachedReservationGuests.filter((g) => {
+    const nome = (g.nome_completo || "").toLowerCase();
+    const doc = (g.documento || "").toLowerCase();
+    const email = (g.email || "").toLowerCase();
+    return nome.includes(q) || doc.includes(q) || email.includes(q);
+  });
+
+  renderGuestsTable(filtered, currentGuestsIsMine);
+};
 
 async function handleAddGuestSubmit(e) {
   e.preventDefault();
@@ -3451,7 +4218,7 @@ async function handleAddGuestSubmit(e) {
   const email = $("inputGuestEmail").value.trim();
   const enviarConvite = $("chkGuestSendInvite") ? $("chkGuestSendInvite").checked && Boolean(email) : false;
   const btnSubmit = $("btnAddGuestSubmit");
-  const originalHtml = btnSubmit ? btnSubmit.innerHTML : "Adicionar à Lista";
+  const originalHtml = btnSubmit ? btnSubmit.innerHTML : "Adicionar Convidado";
 
   if (!nome) {
     showToast("Por favor, preencha o nome completo do convidado.", "error");
@@ -3500,7 +4267,19 @@ window.handleCheckinGuest = async function (guestId, nome) {
     await api(`/api/guests/${guestId}/checkin`, { method: "PUT" });
     showToast(`Entrada de "${nome}" liberada e registrada na portaria.`, "success");
     if (currentGuestsReservationId) {
-      loadReservationGuests(currentGuestsReservationId, true);
+      loadReservationGuests(currentGuestsReservationId, currentGuestsIsMine);
+    }
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+};
+
+window.handleCheckoutGuest = async function (guestId, nome) {
+  try {
+    await api(`/api/guests/${guestId}/checkout`, { method: "PUT" });
+    showToast(`Saída de "${nome}" registrada na portaria.`, "info");
+    if (currentGuestsReservationId) {
+      loadReservationGuests(currentGuestsReservationId, currentGuestsIsMine);
     }
   } catch (err) {
     showToast(err.message, "error");
@@ -3523,7 +4302,7 @@ window.handleDeleteGuest = async function (guestId) {
     await api(`/api/guests/${guestId}`, { method: "DELETE" });
     showToast("Convidado removido da lista.", "info");
     if (currentGuestsReservationId) {
-      loadReservationGuests(currentGuestsReservationId, true);
+      loadReservationGuests(currentGuestsReservationId, currentGuestsIsMine);
       loadReservations();
     }
   } catch (err) {
@@ -3536,7 +4315,7 @@ window.handleResendGuestInvite = async function (guestId) {
     await api(`/api/guests/${guestId}/send-invite`, { method: "POST" });
     showToast("Convite digital reenviado com sucesso por e-mail!", "success");
     if (currentGuestsReservationId) {
-      loadReservationGuests(currentGuestsReservationId, true);
+      loadReservationGuests(currentGuestsReservationId, currentGuestsIsMine);
     }
   } catch (err) {
     showToast(err.message, "error");
@@ -3555,15 +4334,319 @@ function computeCondoMonogram(name) {
   return name.substring(0, 3).toUpperCase();
 }
 
+function hexToHsl(hex) {
+  if (!hex || hex === "AUTO") return { h: 222, s: 47, l: 11 };
+  hex = hex.replace("#", "").trim();
+  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
+  if (hex.length !== 6) return { h: 222, s: 47, l: 11 };
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break;
+      case g: h = ((b - r) / d + 2) * 60; break;
+      case b: h = ((r - g) / d + 4) * 60; break;
+    }
+  }
+  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function getDarkPaletteFor(primary, sidebar) {
+  const pNorm = (primary || "").toLowerCase().trim();
+  const sNorm = (sidebar || "").toLowerCase().trim();
+
+  // 1. Esmeralda Nobre (Verde)
+  if (pNorm === "#059669" || sNorm === "#064e3b" || pNorm.includes("059669") || sNorm.includes("064e3b")) {
+    return {
+      bgPage: "#06150e",
+      bgCard: "#0d2419",
+      bgSubtle: "#122f21",
+      bgHover: "#193d2c",
+      bgInput: "#091c13",
+      border: "#184530",
+      borderSubtle: "#123324",
+      borderStrong: "#256647",
+      navDark: "#04110b",
+      primaryLight: "#6ee7b7",
+      primaryAccent: "#10b981",
+      focusRing: "#34d399"
+    };
+  }
+
+  // 2. Roxo Imperial
+  if (pNorm === "#7c3aed" || sNorm === "#2e1065") {
+    return {
+      bgPage: "#11071f",
+      bgCard: "#1e0f36",
+      bgSubtle: "#271447",
+      bgHover: "#351c5e",
+      bgInput: "#160b29",
+      border: "#3d1f6d",
+      borderSubtle: "#2d1650",
+      borderStrong: "#552c96",
+      navDark: "#0c0417",
+      primaryLight: "#d8b4fe",
+      primaryAccent: "#8b5cf6",
+      focusRing: "#a78bfa"
+    };
+  }
+
+  // 3. Safira & Ciano
+  if (pNorm === "#0891b2" || sNorm === "#164e63") {
+    return {
+      bgPage: "#06151a",
+      bgCard: "#0c232c",
+      bgSubtle: "#11303b",
+      bgHover: "#18404e",
+      bgInput: "#091b22",
+      border: "#1b4656",
+      borderSubtle: "#133541",
+      borderStrong: "#26647b",
+      navDark: "#041014",
+      primaryLight: "#67e8f9",
+      primaryAccent: "#06b6d4",
+      focusRing: "#22d3ee"
+    };
+  }
+
+  // 4. Vinho Merlot
+  if (pNorm === "#be123c" || sNorm === "#4c0519") {
+    return {
+      bgPage: "#18070d",
+      bgCard: "#280f18",
+      bgSubtle: "#341421",
+      bgHover: "#451c2d",
+      bgInput: "#1f0c14",
+      border: "#4f1e31",
+      borderSubtle: "#3a1624",
+      borderStrong: "#6c2a44",
+      navDark: "#110408",
+      primaryLight: "#fda4af",
+      primaryAccent: "#f43f5e",
+      focusRing: "#fb7185"
+    };
+  }
+
+  // 5. Âmbar Nobre
+  if (pNorm === "#d97706" || sNorm === "#451a03") {
+    return {
+      bgPage: "#161005",
+      bgCard: "#261c0c",
+      bgSubtle: "#332612",
+      bgHover: "#44341b",
+      bgInput: "#1e160a",
+      border: "#4d3a1e",
+      borderSubtle: "#3a2b16",
+      borderStrong: "#6c522b",
+      navDark: "#100b03",
+      primaryLight: "#fde68a",
+      primaryAccent: "#f59e0b",
+      focusRing: "#fbbf24"
+    };
+  }
+
+  // 6. Índigo Noturno
+  if (pNorm === "#4f46e5" || sNorm === "#1e1b4b") {
+    return {
+      bgPage: "#0c0d24",
+      bgCard: "#15173c",
+      bgSubtle: "#1c1f4e",
+      bgHover: "#262a66",
+      bgInput: "#101230",
+      border: "#292e6e",
+      borderSubtle: "#1e2251",
+      borderStrong: "#3d449f",
+      navDark: "#08091a",
+      primaryLight: "#a5b4fc",
+      primaryAccent: "#6366f1",
+      focusRing: "#818cf8"
+    };
+  }
+
+  // 7. Terracota
+  if (pNorm === "#ea580c" || sNorm === "#431407") {
+    return {
+      bgPage: "#170a05",
+      bgCard: "#27140b",
+      bgSubtle: "#351c11",
+      bgHover: "#472719",
+      bgInput: "#1e1008",
+      border: "#4f2b1a",
+      borderSubtle: "#3b2013",
+      borderStrong: "#6e3c25",
+      navDark: "#100603",
+      primaryLight: "#fdba74",
+      primaryAccent: "#f97316",
+      focusRing: "#fb923c"
+    };
+  }
+
+  // 8. Grafite Urbano
+  if (pNorm === "#475569" || sNorm === "#18181b") {
+    return {
+      bgPage: "#0f1115",
+      bgCard: "#181b21",
+      bgSubtle: "#21252d",
+      bgHover: "#2c313c",
+      bgInput: "#13161c",
+      border: "#2e3440",
+      borderSubtle: "#232832",
+      borderStrong: "#434c5e",
+      navDark: "#0a0c0e",
+      primaryLight: "#cbd5e1",
+      primaryAccent: "#94a3b8",
+      focusRing: "#94a3b8"
+    };
+  }
+
+  // 9. Ônix & Platina
+  if (pNorm === "#0f172a" || sNorm === "#020617") {
+    return {
+      bgPage: "#09090b",
+      bgCard: "#141417",
+      bgSubtle: "#1c1c21",
+      bgHover: "#27272e",
+      bgInput: "#0f0f12",
+      border: "#27272a",
+      borderSubtle: "#1d1d21",
+      borderStrong: "#3f3f46",
+      navDark: "#040406",
+      primaryLight: "#e4e4e7",
+      primaryAccent: "#a1a1aa",
+      focusRing: "#a1a1aa"
+    };
+  }
+
+  // 10. Azul Executivo (Padrão)
+  if (pNorm === "#2563eb" || sNorm === "#0f172a") {
+    return {
+      bgPage: "#0b1329",
+      bgCard: "#13203c",
+      bgSubtle: "#172648",
+      bgHover: "#1f335e",
+      bgInput: "#0f1a34",
+      border: "#23355b",
+      borderSubtle: "#1a2a4b",
+      borderStrong: "#334b7d",
+      navDark: "#070d1d",
+      primaryLight: "#93c5fd",
+      primaryAccent: "#3b82f6",
+      focusRing: "#60a5fa"
+    };
+  }
+
+  // Fallback Algorítmico baseado na matiz HSL da cor primária ou sidebar
+  const hsl = hexToHsl(primary || sidebar || "#2563eb");
+  const h = hsl.h;
+  const s = Math.min(hsl.s, 32);
+  return {
+    bgPage: `hsl(${h}, ${s}%, 7%)`,
+    bgCard: `hsl(${h}, ${Math.round(s * 0.9)}%, 12%)`,
+    bgSubtle: `hsl(${h}, ${Math.round(s * 0.85)}%, 16%)`,
+    bgHover: `hsl(${h}, ${Math.round(s * 0.8)}%, 22%)`,
+    bgInput: `hsl(${h}, ${Math.round(s * 0.9)}%, 10%)`,
+    border: `hsl(${h}, ${Math.round(s * 0.75)}%, 22%)`,
+    borderSubtle: `hsl(${h}, ${Math.round(s * 0.7)}%, 16%)`,
+    borderStrong: `hsl(${h}, ${Math.round(s * 0.8)}%, 32%)`,
+    navDark: `hsl(${h}, ${s}%, 5%)`,
+    primaryLight: `hsl(${h}, 80%, 75%)`,
+    primaryAccent: primary || `hsl(${h}, 70%, 55%)`,
+    focusRing: `hsl(${h}, 80%, 65%)`
+  };
+}
+
+function applySystemTheme(primary, secondary, sidebar, bg) {
+  if (!primary) primary = "#2563eb";
+  if (!secondary) secondary = "#1d4ed8";
+  if (!sidebar) sidebar = "#0f172a";
+  if (!bg) bg = "#f8fafc";
+
+  try {
+    localStorage.setItem("sgc_active_theme", JSON.stringify({ primary, secondary, sidebar, bg }));
+  } catch (e) {}
+
+  const darkPal = getDarkPaletteFor(primary, sidebar);
+
+  const targets = [document.documentElement, document.body].filter(Boolean);
+  targets.forEach((el) => {
+    el.style.setProperty("--primary", primary);
+    el.style.setProperty("--primary-accent", primary);
+    el.style.setProperty("--focus-ring", primary);
+    el.style.setProperty("--primary-hover", secondary);
+    el.style.setProperty("--nav-dark", sidebar);
+    el.style.setProperty("--nav-dark-border", "rgba(255, 255, 255, 0.12)");
+    el.style.setProperty("--nav-dark-surface", "rgba(255, 255, 255, 0.08)");
+
+    // Define variáveis adaptadas para o modo escuro sintonizadas com esta paleta
+    el.style.setProperty("--dark-bg-page", darkPal.bgPage);
+    el.style.setProperty("--dark-bg-card", darkPal.bgCard);
+    el.style.setProperty("--dark-bg-subtle", darkPal.bgSubtle);
+    el.style.setProperty("--dark-bg-hover", darkPal.bgHover);
+    el.style.setProperty("--dark-bg-input", darkPal.bgInput);
+    el.style.setProperty("--dark-border", darkPal.border);
+    el.style.setProperty("--dark-border-subtle", darkPal.borderSubtle);
+    el.style.setProperty("--dark-border-strong", darkPal.borderStrong);
+    el.style.setProperty("--dark-primary", darkPal.primaryLight);
+    el.style.setProperty("--dark-primary-accent", darkPal.primaryAccent);
+    el.style.setProperty("--dark-focus-ring", darkPal.focusRing);
+    el.style.setProperty("--dark-nav", darkPal.navDark);
+
+    const isDark = document.body.classList.contains("dark-mode") || document.documentElement.classList.contains("dark-mode");
+    if (bg && bg !== "AUTO" && !isDark) {
+      el.style.setProperty("--bg-page", bg);
+    } else {
+      el.style.removeProperty("--bg-page");
+    }
+  });
+
+  // Garante aplicação instantânea nos elementos de navegação e casca visual (Desktop e Mobile)
+  const isDarkActive = document.body.classList.contains("dark-mode") || document.documentElement.classList.contains("dark-mode");
+  const navBg = isDarkActive ? darkPal.navDark : sidebar;
+  document.querySelectorAll(".top-bar, .sidebar, .sidebar-brand, .mobile-bottom-nav").forEach((el) => {
+    el.style.backgroundColor = navBg;
+  });
+
+  // Ícones da marca e destaques
+  document.querySelectorAll(".brand-mark, .brand-dot").forEach((el) => {
+    el.style.backgroundColor = isDarkActive ? darkPal.primaryAccent : primary;
+  });
+
+  const userAvatar = $("userAvatar");
+  if (userAvatar) userAvatar.style.backgroundColor = isDarkActive ? darkPal.primaryAccent : primary;
+
+  // Botão ativo na barra móvel
+  const activeBottomBtn = document.querySelector(".m-nav-btn.active");
+  if (activeBottomBtn) activeBottomBtn.style.color = isDarkActive ? darkPal.primaryLight : primary;
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute("content", navBg);
+  }
+}
+
 async function loadCondoSettings() {
   try {
-    const settings = await api("/api/settings/public");
+    const slug = getCondoSlugFromUrl();
+    const query = slug ? `?slug=${encodeURIComponent(slug)}` : "";
+    const settings = await api(`/api/settings/public${query}`);
     if (settings && settings.nome_condominio) {
       window.condoSettingsData = settings;
       const name = settings.nome_condominio;
       const monogram = computeCondoMonogram(name);
 
       document.title = `${name} | SGC Sistema de Gestão de Condomínio`;
+
+      applySystemTheme(
+        settings.cor_primaria,
+        settings.cor_secundaria,
+        settings.cor_sidebar,
+        settings.cor_fundo
+      );
 
       // Monograma da marca
       document.querySelectorAll(".monogram-letter, #condoMonogram").forEach((el) => {
@@ -3596,7 +4679,369 @@ async function loadCondoSettings() {
   }
 }
 
+function setupSettingsTabs() {
+  const tabs = document.querySelectorAll(".btn-settings-tab");
+  tabs.forEach((tab) => {
+    if (tab.dataset.bound) return;
+    tab.dataset.bound = "true";
+    tab.addEventListener("click", () => {
+      const targetId = tab.dataset.tab;
+      if (!targetId) return;
+
+      tabs.forEach((t) => {
+        t.classList.remove("active");
+        t.setAttribute("aria-selected", "false");
+      });
+      document.querySelectorAll(".settings-tab-pane").forEach((pane) => {
+        pane.classList.remove("active");
+      });
+
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      const targetPane = document.getElementById(targetId);
+      if (targetPane) {
+        targetPane.classList.add("active");
+      }
+
+      if (targetId === "tabSettingsAreas") {
+        loadAreasManagementList();
+      }
+    });
+  });
+}
+
+function renderSimulatorState() {
+  const stage = $("themePreviewStage");
+  if (!stage) return;
+
+  const simTheme = stage._simTheme || {
+    primary: $("setCondoCorPrimaria") ? $("setCondoCorPrimaria").value : "#2563eb",
+    secondary: $("setCondoCorSecundaria") ? $("setCondoCorSecundaria").value : "#1d4ed8",
+    sidebar: $("setCondoCorSidebar") ? $("setCondoCorSidebar").value : "#0f172a",
+    bg: $("setCondoCorFundo") ? $("setCondoCorFundo").value : "AUTO"
+  };
+
+  const currentMode = stage.getAttribute("data-mode") || "auto";
+  let effectiveMode = currentMode;
+
+  if (currentMode === "auto") {
+    if (document.body.classList.contains("high-contrast") || document.documentElement.classList.contains("high-contrast")) {
+      effectiveMode = "contrast";
+    } else if (document.body.classList.contains("dark-mode") || document.documentElement.classList.contains("dark-mode")) {
+      effectiveMode = "dark";
+    } else {
+      effectiveMode = "light";
+    }
+  }
+
+  const darkPal = getDarkPaletteFor(simTheme.primary, simTheme.sidebar);
+
+  const condoInput = $("setCondoNome");
+  const condoName = condoInput && condoInput.value.trim() ? condoInput.value.trim() : "Residencial";
+  if ($("prevMiniCondoName")) $("prevMiniCondoName").textContent = condoName.split(" ")[0];
+  if ($("prevMiniTitleText")) $("prevMiniTitleText").textContent = `${condoName} • Portal SGC`;
+  if ($("prevMiniShellIcon")) $("prevMiniShellIcon").textContent = computeCondoMonogram(condoName);
+
+  const shell = $("prevMiniShell");
+  const shellIcon = $("prevMiniShellIcon");
+  const nav = $("prevMiniNav");
+  const btn = $("prevMiniBtn");
+  const pill = $("prevMiniPill");
+  const stageContent = stage.querySelector(".mini-content-stage");
+  const topbar = $("prevMiniTopbar");
+  const metricCards = stage.querySelectorAll(".mini-metric-card");
+  const banner = $("prevMiniModal");
+  const titlebar = stage.querySelector(".mini-app-titlebar");
+  const badge = $("prevMiniEnvBadge");
+
+  // Limpa estilos inline de renderizações anteriores para aplicação limpa
+  [shell, shellIcon, nav, btn, pill, stageContent, topbar, banner, titlebar, stage].forEach((el) => {
+    if (el) el.removeAttribute("style");
+  });
+  metricCards.forEach((c) => c.removeAttribute("style"));
+
+  if (effectiveMode === "contrast") {
+    // 1. Alto Contraste (WCAG AAA - Preto e Amarelo puro)
+    if (badge) badge.textContent = currentMode === "auto" ? "Sistema: Alto Contraste" : "Modo Alto Contraste";
+    stage.style.backgroundColor = "#000000";
+    stage.style.borderColor = "#ffff00";
+    stage.style.borderWidth = "2px";
+
+    if (titlebar) {
+      titlebar.style.backgroundColor = "#000000";
+      titlebar.style.borderColor = "#ffff00";
+      titlebar.style.color = "#ffffff";
+    }
+    if (badge) {
+      badge.style.backgroundColor = "#ffff00";
+      badge.style.color = "#000000";
+      badge.style.fontWeight = "800";
+    }
+    if (shell) {
+      shell.style.backgroundColor = "#000000";
+      shell.style.borderRight = "2px solid #ffff00";
+      shell.style.color = "#ffffff";
+    }
+    if (shellIcon) {
+      shellIcon.style.backgroundColor = "#ffff00";
+      shellIcon.style.color = "#000000";
+    }
+    if (nav) {
+      nav.style.backgroundColor = "#ffff00";
+      nav.style.color = "#000000";
+      nav.style.fontWeight = "800";
+    }
+    if (stageContent) {
+      stageContent.style.backgroundColor = "#000000";
+      stageContent.style.color = "#ffffff";
+    }
+    if (topbar) {
+      topbar.style.borderColor = "#ffff00";
+      topbar.style.color = "#ffffff";
+    }
+    metricCards.forEach((c) => {
+      c.style.backgroundColor = "#000000";
+      c.style.borderColor = "#ffff00";
+      c.style.borderWidth = "2px";
+      c.style.color = "#ffffff";
+      const val = c.querySelector(".mini-metric-value");
+      if (val) val.style.color = "#ffff00";
+      const tit = c.querySelector(".mini-metric-title");
+      if (tit) tit.style.color = "#ffffff";
+    });
+    if (pill) {
+      pill.style.backgroundColor = "#ffff00";
+      pill.style.color = "#000000";
+      pill.style.fontWeight = "800";
+    }
+    if (btn) {
+      btn.style.backgroundColor = "#ffff00";
+      btn.style.color = "#000000";
+      btn.style.border = "2px solid #ffffff";
+      btn.style.fontWeight = "800";
+    }
+    if (banner) {
+      banner.style.backgroundColor = "#000000";
+      banner.style.borderColor = "#ffff00";
+      banner.style.borderWidth = "2px";
+      banner.style.color = "#ffff00";
+    }
+  } else if (effectiveMode === "dark") {
+    // 2. Modo Escuro (Sintonizado com a paleta)
+    if (badge) badge.textContent = currentMode === "auto" ? "Sistema: Modo Escuro" : "Modo Escuro";
+    stage.style.backgroundColor = darkPal.bgPage;
+    stage.style.borderColor = darkPal.border;
+
+    if (titlebar) {
+      titlebar.style.backgroundColor = darkPal.navDark;
+      titlebar.style.borderColor = darkPal.border;
+      titlebar.style.color = "#cbd5e1";
+    }
+    if (badge) {
+      badge.style.backgroundColor = darkPal.bgSubtle;
+      badge.style.color = darkPal.primaryLight;
+      badge.style.border = `1px solid ${darkPal.border}`;
+    }
+    if (shell) {
+      shell.style.backgroundColor = darkPal.navDark;
+      shell.style.borderRight = `1px solid ${darkPal.border}`;
+      shell.style.color = "#f8fafc";
+    }
+    if (shellIcon) {
+      shellIcon.style.backgroundColor = darkPal.primaryAccent;
+      shellIcon.style.color = "#ffffff";
+    }
+    if (nav) {
+      nav.style.backgroundColor = "rgba(255, 255, 255, 0.12)";
+      nav.style.color = darkPal.primaryLight;
+      nav.style.fontWeight = "700";
+    }
+    if (stageContent) {
+      stageContent.style.backgroundColor = darkPal.bgPage;
+      stageContent.style.color = "#f8fafc";
+    }
+    if (topbar) {
+      topbar.style.borderColor = darkPal.border;
+      topbar.style.color = "#e2e8f0";
+    }
+    metricCards.forEach((c) => {
+      c.style.backgroundColor = darkPal.bgCard;
+      c.style.borderColor = darkPal.border;
+      c.style.color = "#f8fafc";
+      const val = c.querySelector(".mini-metric-value");
+      if (val) val.style.color = "#f8fafc";
+      const tit = c.querySelector(".mini-metric-title");
+      if (tit) tit.style.color = "#94a3b8";
+    });
+    if (pill) {
+      pill.style.backgroundColor = "rgba(16, 185, 129, 0.18)";
+      pill.style.color = "#34d399";
+      pill.style.borderColor = "rgba(16, 185, 129, 0.35)";
+    }
+    if (btn) {
+      btn.style.backgroundColor = darkPal.primaryAccent;
+      btn.style.color = "#ffffff";
+      btn.style.borderColor = darkPal.primaryLight;
+    }
+    if (banner) {
+      banner.style.backgroundColor = darkPal.bgSubtle;
+      banner.style.borderColor = darkPal.border;
+      banner.style.color = darkPal.primaryLight;
+    }
+  } else {
+    // 3. Modo Claro (Reflete a paleta institucional clara)
+    if (badge) badge.textContent = currentMode === "auto" ? "Sistema: Modo Claro" : "Modo Claro";
+    stage.style.backgroundColor = "#ffffff";
+    stage.style.borderColor = "#cbd5e1";
+
+    if (titlebar) {
+      titlebar.style.backgroundColor = "#f1f5f9";
+      titlebar.style.borderColor = "#e2e8f0";
+      titlebar.style.color = "#334155";
+    }
+    if (badge) {
+      badge.style.backgroundColor = "#e2e8f0";
+      badge.style.color = "#475569";
+    }
+    if (shell) {
+      shell.style.backgroundColor = simTheme.sidebar || "#0f172a";
+      shell.style.borderRight = "none";
+      shell.style.color = "#ffffff";
+    }
+    if (shellIcon) {
+      shellIcon.style.backgroundColor = simTheme.primary || "#2563eb";
+      shellIcon.style.color = "#ffffff";
+    }
+    if (nav) {
+      nav.style.backgroundColor = simTheme.primary || "#2563eb";
+      nav.style.color = "#ffffff";
+      nav.style.fontWeight = "600";
+    }
+    const cleanBg = simTheme.bg && simTheme.bg !== "AUTO" ? simTheme.bg : "#f8fafc";
+    if (stageContent) {
+      stageContent.style.backgroundColor = cleanBg;
+      stageContent.style.color = "#0f172a";
+    }
+    if (topbar) {
+      topbar.style.borderColor = "#e2e8f0";
+      topbar.style.color = "#0f172a";
+    }
+    metricCards.forEach((c) => {
+      c.style.backgroundColor = "#ffffff";
+      c.style.borderColor = "#e2e8f0";
+      c.style.color = "#0f172a";
+      const val = c.querySelector(".mini-metric-value");
+      if (val) val.style.color = "#0f172a";
+      const tit = c.querySelector(".mini-metric-title");
+      if (tit) tit.style.color = "#64748b";
+    });
+    if (pill) {
+      pill.style.backgroundColor = "#dcfce7";
+      pill.style.color = "#15803d";
+      pill.style.borderColor = "#bbf7d0";
+    }
+    if (btn) {
+      btn.style.backgroundColor = simTheme.primary || "#2563eb";
+      btn.style.color = "#ffffff";
+      btn.style.borderColor = simTheme.secondary || simTheme.primary;
+    }
+    if (banner) {
+      banner.style.backgroundColor = "#eff6ff";
+      banner.style.borderColor = "#bfdbfe";
+      banner.style.color = "#1e40af";
+    }
+  }
+}
+
+function updateThemePreviewSimulator(primary, secondary, sidebar, bg, name) {
+  const stage = $("themePreviewStage");
+  if (!stage) return;
+
+  if (!primary) primary = "#2563eb";
+  if (!secondary) secondary = "#1d4ed8";
+  if (!sidebar) sidebar = "#0f172a";
+  if (!bg) bg = "#f8fafc";
+
+  stage._simTheme = { primary, secondary, sidebar, bg, name };
+  renderSimulatorState();
+}
+window.renderSimulatorState = renderSimulatorState;
+window.updateThemePreviewSimulator = updateThemePreviewSimulator;
+
+function setupThemeCuratedPicker() {
+  const cards = document.querySelectorAll(".btn-theme-card");
+  cards.forEach((card) => {
+    if (card.dataset.bound) return;
+    card.dataset.bound = "true";
+    card.addEventListener("click", () => {
+      cards.forEach((c) => {
+        c.classList.remove("active");
+        c.setAttribute("aria-checked", "false");
+      });
+      card.classList.add("active");
+      card.setAttribute("aria-checked", "true");
+
+      const primary = card.dataset.primary;
+      const secondary = card.dataset.secondary;
+      const sidebar = card.dataset.sidebar;
+      const bg = card.dataset.bg;
+      const name = card.dataset.name;
+
+      if ($("setCondoCorPrimaria")) $("setCondoCorPrimaria").value = primary;
+      if ($("setCondoCorSecundaria")) $("setCondoCorSecundaria").value = secondary;
+      if ($("setCondoCorSidebar")) $("setCondoCorSidebar").value = sidebar;
+      if ($("setCondoCorFundo")) $("setCondoCorFundo").value = bg;
+      if ($("currentActiveThemeName")) $("currentActiveThemeName").textContent = name;
+
+      updateThemePreviewSimulator(primary, secondary, sidebar, bg, name);
+      applySystemTheme(primary, secondary, sidebar, bg);
+    });
+  });
+
+  const modeBtns = document.querySelectorAll(".btn-prev-mode");
+  modeBtns.forEach((btn) => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      modeBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const mode = btn.dataset.mode || "auto";
+      const stage = $("themePreviewStage");
+      if (stage) {
+        stage.setAttribute("data-mode", mode);
+        renderSimulatorState();
+      }
+    });
+  });
+
+  const inputCondoNome = $("setCondoNome");
+  if (inputCondoNome && !inputCondoNome.dataset.boundSim) {
+    inputCondoNome.dataset.boundSim = "true";
+    inputCondoNome.addEventListener("input", () => {
+      renderSimulatorState();
+    });
+  }
+
+  // Sincroniza inputs de cor customizados caso o usuário altere diretamente
+  ["setCondoCorPrimaria", "setCondoCorSecundaria", "setCondoCorSidebar", "setCondoCorFundo"].forEach((id) => {
+    const input = $(id);
+    if (input && !input.dataset.boundSim) {
+      input.dataset.boundSim = "true";
+      input.addEventListener("input", () => {
+        const prim = $("setCondoCorPrimaria") ? $("setCondoCorPrimaria").value : "#2563eb";
+        const sec = $("setCondoCorSecundaria") ? $("setCondoCorSecundaria").value : "#1d4ed8";
+        const side = $("setCondoCorSidebar") ? $("setCondoCorSidebar").value : "#0f172a";
+        const bgVal = $("setCondoCorFundo") ? $("setCondoCorFundo").value : "AUTO";
+        updateThemePreviewSimulator(prim, sec, side, bgVal, "Personalizado");
+      });
+    }
+  });
+}
+
 async function loadCondoSettingsForm() {
+  setupSettingsTabs();
+  setupThemeCuratedPicker();
+
   try {
     const s = await api("/api/settings");
     if (!s) return;
@@ -3612,15 +5057,43 @@ async function loadCondoSettingsForm() {
     }
     $("setQueimaPrioridade").checked = s.queima_prioridade_cancelamento ?? true;
     $("setEnviarEmailAtivo").checked = s.enviar_email_ativo ?? true;
+
+    // Sincroniza cores e tema ativo
+    if ($("setCondoCorPrimaria")) $("setCondoCorPrimaria").value = s.cor_primaria || "#2563eb";
+    if ($("setCondoCorSecundaria")) $("setCondoCorSecundaria").value = s.cor_secundaria || "#1d4ed8";
+    if ($("setCondoCorSidebar")) $("setCondoCorSidebar").value = s.cor_sidebar || "#0f172a";
+    if ($("setCondoCorFundo")) $("setCondoCorFundo").value = s.cor_fundo || "AUTO";
+
+    applySystemTheme(s.cor_primaria, s.cor_secundaria, s.cor_sidebar, s.cor_fundo);
+
+    const cards = document.querySelectorAll(".btn-theme-card");
+    let matched = false;
+    cards.forEach((c) => {
+      const match = c.dataset.primary?.toLowerCase() === (s.cor_primaria || "").toLowerCase();
+      c.classList.toggle("active", match);
+      c.setAttribute("aria-checked", String(match));
+      if (match) {
+        matched = true;
+        if ($("currentActiveThemeName")) $("currentActiveThemeName").textContent = c.dataset.name;
+        updateThemePreviewSimulator(c.dataset.primary, c.dataset.secondary, c.dataset.sidebar, c.dataset.bg, c.dataset.name);
+      }
+    });
+
+    if (!matched && cards[0]) {
+      cards[0].classList.add("active");
+      cards[0].setAttribute("aria-checked", "true");
+      if ($("currentActiveThemeName")) $("currentActiveThemeName").textContent = cards[0].dataset.name;
+      updateThemePreviewSimulator(cards[0].dataset.primary, cards[0].dataset.secondary, cards[0].dataset.sidebar, cards[0].dataset.bg, cards[0].dataset.name);
+    }
   } catch (err) {
     showToast("Erro ao carregar configurações do condomínio: " + err.message, "error");
   }
 }
 
 async function handleSaveCondoSettings(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   const btn = $("btnSaveCondoSettings");
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
 
   try {
     const payload = {
@@ -3628,6 +5101,10 @@ async function handleSaveCondoSettings(e) {
       endereco: $("setCondoEndereco").value.trim() || null,
       telefone_portaria: $("setCondoTelefone").value.trim() || null,
       email_contato: $("setCondoEmail").value.trim() || null,
+      cor_primaria: $("setCondoCorPrimaria") ? $("setCondoCorPrimaria").value.trim() : "#2563eb",
+      cor_secundaria: $("setCondoCorSecundaria") ? $("setCondoCorSecundaria").value.trim() : "#1d4ed8",
+      cor_sidebar: $("setCondoCorSidebar") ? $("setCondoCorSidebar").value.trim() : "#0f172a",
+      cor_fundo: $("setCondoCorFundo") ? $("setCondoCorFundo").value.trim() : "AUTO",
       intervalo_padrao_dias: parseInt($("setIntervaloDias").value, 10),
       prazo_standby_horas: parseInt($("setPrazoStandby").value, 10),
       prazo_retomada_horas: parseInt($("setPrazoRetomada").value, 10),
@@ -3649,7 +5126,7 @@ async function handleSaveCondoSettings(e) {
   } catch (err) {
     showToast(err.message, "error");
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -3770,49 +5247,130 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-let deferredInstallPrompt = null;
-const btnInstallPwa = document.getElementById('btnInstallPwa');
+// ==========================================
+// SUPORTE A PWA E INSTALAÇÃO COMO APLICATIVO
+// ==========================================
+let deferredInstallPrompt = window.deferredInstallPrompt || null;
+
+function isIOSDevice() {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent || '') ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+}
+
+function isAppStandalone() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true ||
+    document.referrer.includes('android-app://')
+  );
+}
+
+function updatePwaButtonsVisibility(visible) {
+  // Desativa completamente em iPhones / iPads e quando já está rodando instalado
+  if (isIOSDevice() || isAppStandalone()) {
+    visible = false;
+  }
+
+  const btnInstallPwa = document.getElementById('btnInstallPwa');
+  const navInstallApp = document.getElementById('navInstallApp');
+  const pwaOverviewBanner = document.getElementById('pwaOverviewBanner');
+  
+  if (btnInstallPwa) {
+    if (visible) btnInstallPwa.classList.remove('hidden');
+    else btnInstallPwa.classList.add('hidden');
+  }
+  if (navInstallApp) {
+    if (visible) navInstallApp.classList.remove('hidden');
+    else navInstallApp.classList.add('hidden');
+  }
+  if (pwaOverviewBanner) {
+    if (visible) pwaOverviewBanner.classList.remove('hidden');
+    else pwaOverviewBanner.classList.add('hidden');
+  }
+}
+
+async function handlePwaInstall() {
+  // Desativado em iPhone
+  if (isIOSDevice()) return;
+
+  const promptEvent = deferredInstallPrompt || window.deferredInstallPrompt;
+  if (promptEvent) {
+    try {
+      // Disparo automático e direto do diálogo nativo de instalação do sistema
+      promptEvent.prompt();
+      const choice = await promptEvent.userChoice;
+      console.log('[PWA] Resposta da instalação automática:', choice);
+      if (choice && choice.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+        window.deferredInstallPrompt = null;
+        updatePwaButtonsVisibility(false);
+      }
+    } catch (err) {
+      console.warn('[PWA] Erro ao disparar prompt automático:', err);
+    }
+  } else {
+    // Feedback rápido e discreto sem modal com texto longo
+    if (typeof showToast === 'function') {
+      showToast('Abra o menu (⋮) do seu navegador para instalar o aplicativo.', 'info');
+    }
+  }
+}
+
+function initPwaInstallation() {
+  // Se for iPhone ou se já estiver instalado, desativa todos os botões/banners
+  if (isIOSDevice() || isAppStandalone()) {
+    updatePwaButtonsVisibility(false);
+    return;
+  }
+
+  // Em aparelhos compatíveis (Android / Windows / Chrome), exibe para permitir a instalação
+  updatePwaButtonsVisibility(true);
+
+  const btnInstallPwa = document.getElementById('btnInstallPwa');
+  if (btnInstallPwa && !btnInstallPwa.dataset.pwaBound) {
+    btnInstallPwa.dataset.pwaBound = 'true';
+    btnInstallPwa.addEventListener('click', handlePwaInstall);
+  }
+
+  const navInstallApp = document.getElementById('navInstallApp');
+  if (navInstallApp && !navInstallApp.dataset.pwaBound) {
+    navInstallApp.dataset.pwaBound = 'true';
+    navInstallApp.addEventListener('click', handlePwaInstall);
+  }
+
+  const btnOverviewInstallPwa = document.getElementById('btnOverviewInstallPwa');
+  if (btnOverviewInstallPwa && !btnOverviewInstallPwa.dataset.pwaBound) {
+    btnOverviewInstallPwa.dataset.pwaBound = 'true';
+    btnOverviewInstallPwa.addEventListener('click', handlePwaInstall);
+  }
+}
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  if (btnInstallPwa) {
-    btnInstallPwa.classList.remove('hidden');
+  window.deferredInstallPrompt = e;
+  if (!isIOSDevice() && !isAppStandalone()) {
+    updatePwaButtonsVisibility(true);
   }
 });
 
-if (btnInstallPwa) {
-  btnInstallPwa.addEventListener('click', async () => {
-    if (deferredInstallPrompt) {
-      deferredInstallPrompt.prompt();
-      const { outcome } = await deferredInstallPrompt.userChoice;
-      console.log('[PWA] Resposta da instalação:', outcome);
-      deferredInstallPrompt = null;
-      btnInstallPwa.classList.add('hidden');
-    } else {
-      if (typeof showCustomConfirm === 'function') {
-        showCustomConfirm({
-          title: 'Instalar Aplicativo SGC',
-          message: 'Para instalar o aplicativo no seu smartphone:\n\n• No Android/Chrome: Toque no menu (⋮) e selecione "Instalar aplicativo" ou "Adicionar à tela inicial".\n• No iPhone/Safari: Toque no botão de Compartilhar e selecione "Adicionar à Tela de Início".',
-          confirmText: 'Entendi',
-          cancelText: 'Fechar',
-          isDanger: false,
-          iconName: 'building'
-        });
-      } else {
-        alert('Para instalar o aplicativo no seu celular:\n\n• No Android: Abra o menu do Chrome e selecione "Instalar aplicativo".\n• No iPhone: Toque em Compartilhar no Safari e selecione "Adicionar à Tela de Início".');
-      }
-    }
-  });
-}
-
 window.addEventListener('appinstalled', () => {
   console.log('[PWA] Aplicativo instalado com sucesso no aparelho!');
-  if (btnInstallPwa) {
-    btnInstallPwa.classList.add('hidden');
-  }
+  deferredInstallPrompt = null;
+  window.deferredInstallPrompt = null;
+  updatePwaButtonsVisibility(false);
   if (typeof showToast === 'function') {
     showToast('Aplicativo instalado com sucesso na sua tela de início!', 'success');
   }
 });
 
+// ==========================================
+// INICIALIZAÇÃO DA APLICAÇÃO (Executado após todos os módulos estarem declarados)
+// ==========================================
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootstrapApp);
+} else {
+  bootstrapApp();
+}

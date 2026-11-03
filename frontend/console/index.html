@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>CondoHub Console | Central de Operações</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=28">
+  <link rel="icon" type="image/png" href="/icons/condohub-icon.png">
+</head>
+<body class="dark-theme">
+
+  <!-- SVG Icon Sprite -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><path d="M21 2l-2 2m-1.5 1.5L14 9l-2-2-4 4 3 3-4 4H3v-4l8-8 1.5 1.5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.36-6.36l-2.12 2.12M8.76 15.24l-2.12 2.12m12.72 0l-2.12-2.12M8.76 8.76L6.64 6.64"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  </svg>
+
+  <!-- TELA 1: Acesso ao Console do Super Admin -->
+  <main id="loginView" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-badge">
+        <svg class="ico"><use href="#i-shield"/></svg>
+        <span>Painel do Super Admin</span>
+      </div>
+      <h2>Central de Operações</h2>
+      <p class="auth-sub">Controle master de rede para gestão e suporte aos condomínios integrados.</p>
+
+      <form id="formConsoleLogin" class="auth-form" autocomplete="off">
+        <div class="form-group">
+          <label for="consoleEmail">E-mail do Administrador</label>
+          <input type="email" id="consoleEmail" placeholder="admin@exemplo.com" required autofocus />
+        </div>
+        <div class="form-group">
+          <label for="consolePassword">Senha Master de Acesso</label>
+          <input type="password" id="consolePassword" placeholder="••••••••" required />
+        </div>
+        <button type="submit" id="btnSubmitLogin" class="btn-primary-glow">
+          <span>Acessar Console Master</span>
+        </button>
+      </form>
+      <div id="loginError" class="auth-error hidden"></div>
+      <p class="auth-footer-notice">Console Master • Acesso Restrito</p>
+    </div>
+  </main>
+
+  <!-- TELA 2: Painel de Controle Multi-Condomínio -->
+  <div id="dashboardView" class="master-shell hidden">
+    <!-- Header Executivo -->
+    <header class="master-topbar">
+      <div class="topbar-brand">
+        <img src="/icons/condohub-icon.png" alt="CondoHub" class="brand-img" />
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <strong>CondoHub Console</strong>
+            <span class="badge-role-gold">SUPER ADMIN</span>
+          </div>
+          <span>Central de Controle &amp; Gestão dos Condomínios</span>
+        </div>
+      </div>
+      <div class="topbar-user">
+        <div class="user-meta">
+          <span class="user-name">Administrador Geral</span>
+          <span id="displayAdminEmail" class="user-email">-</span>
+        </div>
+        <button id="btnLogout" type="button" class="btn-ghost" title="Encerrar sessão master">
+          <svg class="ico"><use href="#i-logout"/></svg>
+          <span>Sair</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="master-content">
+      <!-- Cards de Métricas Gerais -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon blue"><svg class="ico"><use href="#i-building"/></svg></div>
+          <div class="metric-data">
+            <span class="metric-label">Condomínios Ativos</span>
+            <strong id="metricCondosAtivos" class="metric-value">0</strong>
+            <span id="metricCondosTotal" class="metric-sub">0 cadastrados no total</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon emerald"><svg class="ico"><use href="#i-users"/></svg></div>
+          <div class="metric-data">
+            <span class="metric-label">Unidades sob Gestão</span>
+            <strong id="metricTotalUnidades" class="metric-value">0</strong>
+            <span id="metricTotalMoradores" class="metric-sub">0 moradores ativos</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon purple"><svg class="ico"><use href="#i-users"/></svg></div>
+          <div class="metric-data">
+            <span class="metric-label">Total de Usuários</span>
+            <strong id="metricTotalUsuarios" class="metric-value">0</strong>
+            <span class="metric-sub">Moradores, portaria e síndicos</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon amber"><svg class="ico"><use href="#i-shield"/></svg></div>
+          <div class="metric-data">
+            <span class="metric-label">Operação &amp; Segurança</span>
+            <strong id="metricEventos" class="metric-value">0</strong>
+            <span class="metric-sub">Reservas e ocorrências processadas</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navegação por Abas do Console -->
+      <!-- Navegação por Abas do Console Master -->
+      <nav class="console-tabs-nav" aria-label="Navegação do Painel Master">
+        <button type="button" class="console-tab-btn active" id="tabCondos">
+          <svg class="ico"><use href="#i-building"/></svg>
+          <span>Condomínios da Rede</span>
+          <span class="tab-badge" id="tabBadgeCondos">0</span>
+        </button>
+        <button type="button" class="console-tab-btn" id="tabCondoDetails">
+          <svg class="ico"><use href="#i-info"/></svg>
+          <span id="tabDetailsTitle">Gestão do Condomínio</span>
+          <span class="tab-badge" id="tabBadgeDetails">Selecione</span>
+        </button>
+        <button type="button" class="console-tab-btn" id="tabUsers">
+          <svg class="ico"><use href="#i-users"/></svg>
+          <span>Usuários da Rede</span>
+          <span class="tab-badge" id="tabBadgeUsers">0</span>
+        </button>
+        <button type="button" class="console-tab-btn" id="tabAudit">
+          <svg class="ico"><use href="#i-shield"/></svg>
+          <span>Auditoria Global (LGPD)</span>
+          <span class="tab-badge live-dot" id="tabBadgeAudit">Ao Vivo</span>
+        </button>
+        <button type="button" class="console-tab-btn" id="tabBroadcast">
+          <svg class="ico"><use href="#i-mail"/></svg>
+          <span>Comunicado Master</span>
+        </button>
+        <button type="button" class="console-tab-btn" id="tabSupportSettings">
+          <svg class="ico"><use href="#i-phone"/></svg>
+          <span>Canais de Suporte</span>
+        </button>
+      </nav>
+
+      <!-- ABA 1: Tabela Resumida de Condomínios (Zero Overflow Horizontal) -->
+      <section id="sectionCondos" class="section-table">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <h3>Condomínios Cadastrados</h3>
+          </div>
+          <div class="header-actions">
+            <!-- Barra de Busca Instantânea -->
+            <div class="search-box-console">
+              <svg class="ico search-icon"><use href="#i-search"/></svg>
+              <input type="text" id="inputSearchCondo" placeholder="Filtrar por nome, CNPJ, síndico ou slug..." autocomplete="off" />
+              <button type="button" id="btnClearSearch" class="btn-clear-search hidden" title="Limpar busca">&times;</button>
+            </div>
+
+            <!-- Filtros Rápidos de Status -->
+            <div class="status-filter-pills" id="statusFilterPills">
+              <button type="button" class="filter-pill active" data-status="ALL">Todos <span class="pill-count" id="countFilterAll">0</span></button>
+              <button type="button" class="filter-pill" data-status="ATIVO">Ativos <span class="pill-count" id="countFilterAtivos">0</span></button>
+              <button type="button" class="filter-pill" data-status="BLOQUEADO">Suspensos <span class="pill-count" id="countFilterSuspensos">0</span></button>
+            </div>
+
+            <button id="btnRefresh" class="btn-outline" title="Atualizar dados">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Atualizar</span>
+            </button>
+            <button id="btnOpenNewCondo" class="btn-primary">
+              <svg class="ico"><use href="#i-plus"/></svg> <span>Novo Condomínio</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hub de Condomínios em Row-Cards Modernos (Zero Quebra de Botões) -->
+        <div class="condos-hub-wrapper">
+          <!-- Cabeçalho das Colunas (Apenas Desktop) -->
+          <div class="condos-grid-head" aria-hidden="true">
+            <span class="cg-head-identity">Condomínio</span>
+            <span class="cg-head-sindico">Síndico Responsável</span>
+            <span class="cg-head-occupancy">Capacidade &amp; Ocupação</span>
+            <span class="cg-head-actions">Ações Rápidas</span>
+          </div>
+
+          <!-- Lista de Cards Interativos -->
+          <div id="condosListContainer" class="condos-cards-container">
+            <div class="condos-loading-state">
+              <div class="spinner-dot"></div>
+              <span>Carregando condomínios da rede...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 2: Gestão do Condomínio (Aba Separada Completa / Dossiê Executivo) -->
+      <section id="sectionCondoDetails" class="section-table hidden">
+        
+        <!-- Estado Vazio (Nenhum condomínio selecionado ainda) -->
+        <div id="detailsEmptyState" class="details-empty-state">
+          <div class="empty-state-icon">
+            <svg class="ico"><use href="#i-building"/></svg>
+          </div>
+          <h4>Nenhum condomínio selecionado</h4>
+          <p>Selecione um condomínio na lista para gerenciar unidades, usuários e acessos.</p>
+          <button type="button" class="btn-primary" id="btnGoToCondosFromEmpty">
+            <svg class="ico"><use href="#i-building"/></svg>
+            <span>Ver Lista de Condomínios</span>
+          </button>
+        </div>
+
+        <!-- Conteúdo Ativo do Condomínio Selecionado -->
+        <div id="detailsActiveContent" class="details-active-content hidden">
+          <!-- Barra Superior de Navegação & Ações Unificadas -->
+          <div class="details-top-header">
+            <div class="details-breadcrumb-group">
+              <button type="button" id="btnBackToCondosTop" class="btn-breadcrumb" title="Voltar à lista de condomínios">
+                <svg class="ico"><use href="#i-building"/></svg>
+                <span>&larr; Voltar para Todos os Condomínios</span>
+              </button>
+              <span class="breadcrumb-divider">/</span>
+              <strong id="tabDetailsCondoNameBreadcrumb" class="breadcrumb-current">Residencial</strong>
+            </div>
+
+            <div class="details-master-actions">
+              <button type="button" class="btn-header-action primary" id="tabDetailsBtnImpersonate" title="Acessar painel como Síndico (Suporte)">
+                <svg class="ico"><use href="#i-external"/></svg> <span>Acessar Painel</span>
+              </button>
+              <button type="button" class="btn-header-action" id="tabDetailsBtnEdit" title="Editar dados cadastrais, endereço e capacidade">
+                <svg class="ico"><use href="#i-edit"/></svg> <span>Editar</span>
+              </button>
+              <button type="button" class="btn-header-action" id="tabDetailsBtnResendInvite" title="Reenviar convite de ativação para o síndico">
+                <svg class="ico"><use href="#i-mail"/></svg> <span>Reenviar Convite</span>
+              </button>
+              <button type="button" class="btn-header-action" id="tabDetailsBtnResetPass" title="Redefinir senha de emergência do síndico">
+                <svg class="ico"><use href="#i-key"/></svg> <span>Trocar Senha</span>
+              </button>
+              <button type="button" class="btn-header-action danger" id="tabDetailsBtnToggleStatus" title="Suspender ou liberar acesso">
+                <svg class="ico"><use href="#i-lock"/></svg> <span id="tabDetailsToggleStatusLabel">Suspender Condomínio</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card Executivo Unificado do Condomínio (Dark Glass & Identidade Integrada) -->
+          <div class="condo-details-hero-card" id="tabDetailsBannerBg">
+            <div class="hero-card-main">
+              <div class="hero-card-left">
+                <div class="hero-avatar-box" id="tabDetailsAvatarBox">
+                  <svg class="ico"><use href="#i-building"/></svg>
+                </div>
+                <div class="hero-info-stack">
+                  <div class="hero-title-row">
+                    <h3 id="tabDetailsNomeDisplay">Nome do Condomínio</h3>
+                    <span id="tabDetailsStatusBadge" class="badge-status-modern ativo"><span class="dot-status"></span> Ativo</span>
+                    <span class="hero-plan-tag" id="tabDetailsPlanoDisplay">Plano Padrão</span>
+                  </div>
+                  <div class="hero-meta-row">
+                    <span id="tabDetailsCnpjDisplay">CNPJ: -</span>
+                    <span class="meta-separator">&bull;</span>
+                    <span id="tabDetailsCreatedDisplay">Cadastrado em: -</span>
+                    <span class="meta-separator">&bull;</span>
+                    <span id="tabDetailsIdDisplay">ID: #0</span>
+                    <span id="tabDetailsMotivoBannerWrapper" class="banner-motivo-wrapper hidden">
+                      <span class="meta-separator">&bull;</span>
+                      <span id="tabDetailsMotivoBanner" class="banner-motivo-tag">Motivo: -</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barra Integrada de Acesso ao Portal -->
+            <div class="hero-portal-bar">
+              <div class="portal-bar-left">
+                <span class="portal-bar-label">Portal:</span>
+                <code id="tabDetailsUrlDisplay" class="portal-bar-url">http://127.0.0.1:8000/c/.../</code>
+              </div>
+              <div class="portal-bar-actions">
+                <button type="button" class="btn-portal-pill" id="tabBtnCopyCondoUrl" title="Copiar URL do Portal">
+                  <svg class="ico"><use href="#i-copy"/></svg> <span>Copiar</span>
+                </button>
+                <button type="button" class="btn-portal-pill primary" id="tabBtnOpenCondoUrl" title="Abrir portal como Síndico (Suporte)">
+                  <svg class="ico"><use href="#i-external"/></svg> <span>Abrir Portal</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerta de Suspensão / Estado Pausado (visível apenas se BLOQUEADO) -->
+          <div id="tabDetailsSuspendedAlert" class="suspended-alert-banner hidden">
+            <div class="suspended-alert-icon">
+              <svg class="ico"><use href="#i-lock"/></svg>
+            </div>
+            <div class="suspended-alert-body">
+              <div class="suspended-alert-title-row">
+                <strong>Condomínio com Acesso Suspenso</strong>
+                <span id="tabDetailsMotivoBadge" class="suspended-motivo-pill hidden">Motivo: -</span>
+              </div>
+              <div id="tabDetailsMotivoDetail" class="suspended-motivo-detail hidden" style="margin-top: 4px;">
+                <svg class="ico" style="width: 14px; height: 14px;"><use href="#i-info"/></svg>
+                <span><strong>Motivo Registrado:</strong> <span id="tabDetailsMotivoText">-</span></span>
+              </div>
+            </div>
+            <button type="button" class="btn-action unblock" id="tabDetailsBtnAlertReactivate" title="Reativar acesso do condomínio">
+              <svg class="ico"><use href="#i-unlock"/></svg>
+              <span>Reativar Condomínio</span>
+            </button>
+          </div>
+
+          <!-- Grade de Métricas & Saúde Operacional em Tempo Real -->
+          <div class="form-section-title" style="margin-top: 1.5rem;">
+            <svg class="ico" style="color: var(--primary);"><use href="#i-shield"/></svg>
+            <span>Saúde Operacional &amp; Capacidade em Tempo Real</span>
+          </div>
+
+          <div class="details-kpi-grid">
+            <div class="kpi-mini-card">
+              <div class="kpi-mini-head">
+                <span class="kpi-mini-label">Unidades &amp; Moradores</span>
+                <div class="kpi-mini-icon blue"><svg class="ico"><use href="#i-users"/></svg></div>
+              </div>
+              <div class="kpi-mini-value">
+                <strong id="tabDetailsUnidadesCount">0</strong>
+                <span class="kpi-mini-sub" id="tabDetailsUnidadesSub">de 100 max</span>
+              </div>
+              <div class="capacity-bar-bg" style="margin-top: 0.4rem;">
+                <div id="tabDetailsCapacityBar" class="capacity-bar-fill" style="width: 0%; background-color: var(--primary);"></div>
+              </div>
+              <span class="kpi-mini-footer" id="tabDetailsMoradoresCount">0 moradores cadastrados</span>
+            </div>
+
+            <div class="kpi-mini-card">
+              <div class="kpi-mini-head">
+                <span class="kpi-mini-label">Portaria &amp; Encomendas</span>
+                <div class="kpi-mini-icon amber"><svg class="ico"><use href="#i-package"/></svg></div>
+              </div>
+              <div class="kpi-mini-value">
+                <strong id="tabDetailsEncomendasCount">0</strong>
+                <span class="kpi-mini-sub">na guarita</span>
+              </div>
+              <span class="kpi-mini-footer" id="tabDetailsPorteirosCount" style="margin-top: 0.85rem;">0 porteiros na equipe</span>
+            </div>
+
+            <div class="kpi-mini-card">
+              <div class="kpi-mini-head">
+                <span class="kpi-mini-label">Ocorrências &amp; Chamados</span>
+                <div class="kpi-mini-icon rose"><svg class="ico"><use href="#i-alert-circle"/></svg></div>
+              </div>
+              <div class="kpi-mini-value">
+                <strong id="tabDetailsOcorrenciasCount">0</strong>
+                <span class="kpi-mini-sub">abertas</span>
+              </div>
+              <span class="kpi-mini-footer" id="tabDetailsOcorrenciasStatus" style="margin-top: 0.85rem;">Chamados pendentes</span>
+            </div>
+
+            <div class="kpi-mini-card">
+              <div class="kpi-mini-head">
+                <span class="kpi-mini-label">Lazer &amp; Convivência</span>
+                <div class="kpi-mini-icon purple"><svg class="ico"><use href="#i-calendar"/></svg></div>
+              </div>
+              <div class="kpi-mini-value">
+                <strong id="tabDetailsAreasCount">0</strong>
+                <span class="kpi-mini-sub">áreas comuns</span>
+              </div>
+              <span class="kpi-mini-footer" id="tabDetailsReservasCount" style="margin-top: 0.85rem;">0 reservas realizadas</span>
+            </div>
+          </div>
+
+          <!-- Detalhes em 2 Colunas: Síndico e Contato/Infraestrutura -->
+          <div class="details-cols-2" style="margin-top: 1.5rem;">
+            <!-- Coluna 1: Síndico Titular -->
+            <div class="details-panel-box">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg class="ico" style="color: var(--primary);"><use href="#i-users"/></svg>
+                  <strong>Síndico Responsável</strong>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-text-action" id="tabBtnDetailsResendInviteCard" style="color: #2563eb;">Reenviar Convite</button>
+                  <button type="button" class="btn-text-action" id="tabBtnDetailsResetSindico">Redefinir Senha</button>
+                </div>
+              </div>
+              <div class="sindico-details-profile">
+                <div class="sindico-avatar lg" id="tabDetailsSindicoAvatar">S</div>
+                <div class="sindico-details-meta">
+                  <strong id="tabDetailsSindicoNome">-</strong>
+                  <span class="muted-sm" id="tabDetailsSindicoEmail">-</span>
+                  <div class="sindico-contact-row" style="margin-top: 0.4rem;">
+                    <span id="tabDetailsSindicoTelefoneBadge" class="contact-pill">-</span>
+                    <a href="#" id="tabDetailsSindicoWhatsApp" target="_blank" class="whatsapp-btn hidden">
+                      <svg class="ico"><use href="#i-whatsapp"/></svg> <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel Administradora Parceira (visível quando Gestão Compartilhada) -->
+            <div class="details-panel-box hidden" id="tabDetailsAdmBox" style="border-left: 3px solid #10b981;">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg class="ico" style="color: #10b981;"><use href="#i-building"/></svg>
+                  <strong>Administradora Parceira</strong>
+                  <span class="badge-plan pro" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.72rem; padding: 2px 6px;">Gestão Compartilhada</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-text-action" id="tabBtnDetailsResendAdmInvite" style="color: #10b981;">Reenviar Convite</button>
+                </div>
+              </div>
+              <div class="sindico-details-profile">
+                <div class="sindico-avatar lg" id="tabDetailsAdmAvatar" style="background: linear-gradient(135deg, #10b981, #059669);">A</div>
+                <div class="sindico-details-meta">
+                  <strong id="tabDetailsAdmNome">-</strong>
+                  <span class="muted-sm" id="tabDetailsAdmEmail">-</span>
+                  <div class="sindico-contact-row" style="margin-top: 0.4rem;">
+                    <span id="tabDetailsAdmStatusBadge" class="badge-status-modern ativo" style="font-size: 0.72rem;"><span class="dot-status"></span> Ativo</span>
+                    <span id="tabDetailsAdmTelefoneBadge" class="contact-pill hidden">-</span>
+                    <a href="#" id="tabDetailsAdmWhatsApp" target="_blank" class="whatsapp-btn hidden">
+                      <svg class="ico"><use href="#i-whatsapp"/></svg> <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel Subsíndico(a) Responsável (visível quando possui Subsíndico) -->
+            <div class="details-panel-box hidden" id="tabDetailsSubBox" style="border-left: 3px solid #7c3aed;">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg class="ico" style="color: #7c3aed;"><use href="#i-users"/></svg>
+                  <strong>Subsíndico(a) Responsável</strong>
+                  <span class="badge-plan pro" style="background: rgba(124, 58, 237, 0.15); color: #c4b5fd; font-size: 0.72rem; padding: 2px 6px;">Governança</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-text-action" id="tabBtnDetailsResendSubInvite" style="color: #7c3aed;">Reenviar Convite</button>
+                  <button type="button" class="btn-text-action" id="tabBtnDetailsResetSub">Redefinir Senha</button>
+                </div>
+              </div>
+              <div class="sindico-details-profile">
+                <div class="sindico-avatar lg" id="tabDetailsSubAvatar" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">S</div>
+                <div class="sindico-details-meta">
+                  <strong id="tabDetailsSubNome">-</strong>
+                  <span class="muted-sm" id="tabDetailsSubEmail">-</span>
+                  <div class="sindico-contact-row" style="margin-top: 0.4rem;">
+                    <span id="tabDetailsSubStatusBadge" class="badge-status-modern ativo" style="font-size: 0.72rem;"><span class="dot-status"></span> Ativo</span>
+                    <span id="tabDetailsSubTelefoneBadge" class="contact-pill hidden">-</span>
+                    <a href="#" id="tabDetailsSubWhatsApp" target="_blank" class="whatsapp-btn hidden">
+                      <svg class="ico"><use href="#i-whatsapp"/></svg> <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card quando não há Subsíndico vinculado -->
+            <div class="details-panel-box hidden" id="tabDetailsNoSubBox" style="border: 1px dashed rgba(124, 58, 237, 0.25); background: rgba(124, 58, 237, 0.02);">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg class="ico" style="color: #a78bfa;"><use href="#i-users"/></svg>
+                  <strong style="color: #c4b5fd;">Subsíndico(a)</strong>
+                  <span class="label-badge-info" style="background: rgba(124, 58, 237, 0.15); color: #c4b5fd;">Opcional</span>
+                </div>
+                <button type="button" class="btn-text-action" id="tabBtnDetailsAddSub" style="color: #a78bfa; font-weight: 600;">+ Adicionar</button>
+              </div>
+              <div style="padding: 6px 0; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;">
+                <span>Nenhum subsíndico vinculado a este condomínio.</span>
+              </div>
+            </div>
+
+            <!-- Coluna 2: Dados de Infraestrutura & Cores -->
+            <div class="details-panel-box">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg class="ico" style="color: var(--emerald);"><use href="#i-building"/></svg>
+                  <strong>Contato &amp; Localização</strong>
+                </div>
+              </div>
+              <div class="infra-details-list">
+                <div class="infra-item">
+                  <span class="infra-label">Endereço:</span>
+                  <span class="infra-val" id="tabDetailsEnderecoVal">-</span>
+                </div>
+                <div class="infra-item">
+                  <span class="infra-label">Guarita / Portaria:</span>
+                  <span class="infra-val" id="tabDetailsTelefoneVal">-</span>
+                </div>
+                <div class="infra-item">
+                  <span class="infra-label">E-mail Oficial:</span>
+                  <span class="infra-val" id="tabDetailsEmailVal">-</span>
+                </div>
+                <div class="infra-item">
+                  <span class="infra-label">Cores do Tema:</span>
+                  <span class="infra-val" id="tabDetailsCoresVal">
+                    <span class="color-swatch-duo">
+                      <span class="color-dot" id="tabDetailsDotPrimaria"></span>
+                      <span class="color-dot" id="tabDetailsDotSecundaria"></span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Todos os Usuários do Condomínio -->
+          <div class="details-users-card" style="margin-top: 1.75rem; background-color: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.25rem; box-shadow: var(--shadow-sm);">
+            <div class="table-header-bar" style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.85rem;">
+              <div class="table-title-group">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg class="ico" style="color: var(--primary);"><use href="#i-users"/></svg>
+                  <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main);">Usuários do Condomínio</h4>
+                  <span id="tabDetailsUsersBadgeCount" class="badge-plan pro" style="font-size: 0.75rem;">0 usuários</span>
+                </div>
+              </div>
+              <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <div class="search-box-console" style="min-width: 220px;">
+                  <svg class="ico search-icon"><use href="#i-search"/></svg>
+                  <input type="text" id="inputDetailsUserSearch" placeholder="Buscar por nome, e-mail, ap..." autocomplete="off" />
+                </div>
+                <select id="selectDetailsUserRole" class="input-filter-select">
+                  <option value="">Todas as Funções</option>
+                  <option value="SINDICO">Síndicos</option>
+                  <option value="PORTARIA">Portaria</option>
+                  <option value="MORADOR">Moradores</option>
+                  <option value="ADMIN">Administradores</option>
+                </select>
+                <button type="button" id="btnRefreshDetailsUsers" class="btn-outline" title="Atualizar lista de usuários">
+                  <svg class="ico"><use href="#i-refresh"/></svg> <span>Atualizar</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="master-table">
+                <thead>
+                  <tr>
+                    <th>Usuário &amp; Contato</th>
+                    <th>Unidade / Função</th>
+                    <th>Perfil de Acesso</th>
+                    <th>Status</th>
+                    <th class="text-right">Ações de Suporte</th>
+                  </tr>
+                </thead>
+                <tbody id="tabDetailsUsersTableBody">
+                  <tr>
+                    <td colspan="5" class="text-center py-4">Carregando usuários do condomínio...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Rodapé com Botão de Voltar -->
+          <div class="details-footer-bar" style="margin-top: 2rem;">
+            <button type="button" id="btnBackToCondosBottom" class="btn-outline">
+              <svg class="ico"><use href="#i-building"/></svg> <span>&larr; Voltar para Lista de Condomínios</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 3: Gestão Global de Usuários da Rede -->
+      <section id="sectionUsers" class="section-table hidden">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <h3>Usuários da Rede Master</h3>
+          </div>
+          <div class="header-actions" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            <!-- Filtro 1: Usuário & Contato -->
+            <div class="search-box-console" style="min-width: 220px;">
+              <svg class="ico search-icon"><use href="#i-search"/></svg>
+              <input type="text" id="inputSearchUser" placeholder="Buscar usuário, e-mail, tel..." autocomplete="off" title="Filtro: Usuário &amp; Contato" />
+            </div>
+
+            <!-- Filtro 2: Condomínio / Unidade -->
+            <select id="selectFilterUserCondo" class="input-filter-select" style="min-width: 180px;" title="Filtro: Condomínio">
+              <option value="">Todos os Condomínios</option>
+            </select>
+            <div class="search-box-console" style="width: 140px;">
+              <svg class="ico search-icon"><use href="#i-building"/></svg>
+              <input type="text" id="inputFilterUserUnit" placeholder="Unidade / Ap..." autocomplete="off" title="Filtro: Unidade / Apartamento" />
+            </div>
+
+            <!-- Filtro 3: Perfil de Acesso -->
+            <select id="selectFilterUserRole" class="input-filter-select" title="Filtro: Perfil de Acesso">
+              <option value="">Todas as Funções</option>
+              <option value="SINDICO">Síndicos</option>
+              <option value="PORTARIA">Portaria</option>
+              <option value="MORADOR">Moradores</option>
+              <option value="ADMIN">Administradores</option>
+            </select>
+
+            <!-- Filtro 4: Status -->
+            <select id="selectFilterUserStatus" class="input-filter-select" title="Filtro: Status">
+              <option value="">Todos os Status</option>
+              <option value="ATIVO">● Ativos</option>
+              <option value="BLOQUEADO">● Bloqueados</option>
+            </select>
+
+            <button type="button" id="btnResetUserFilters" class="btn-ghost" title="Limpar todos os filtros">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Limpar</span>
+            </button>
+            <button id="btnRefreshUsers" class="btn-outline" title="Atualizar usuários">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Atualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="master-table">
+            <thead>
+              <tr>
+                <th>Usuário &amp; Contato</th>
+                <th>Condomínio / Unidade</th>
+                <th>Perfil de Acesso</th>
+                <th>Status</th>
+                <th class="text-right">Ações de Suporte</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr>
+                <td colspan="5" class="text-center py-4">Carregando usuários da rede...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ABA 4: Trilha de Auditoria Global (LGPD) -->
+      <section id="sectionAudit" class="section-table hidden">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <h3>Trilha de Auditoria &amp; Conexões Globais (LGPD)</h3>
+          </div>
+          <div class="header-actions">
+            <button id="btnRefreshAudit" class="btn-outline" title="Atualizar logs de auditoria">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Atualizar Logs</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="master-table">
+            <thead>
+              <tr>
+                <th>Data / Hora</th>
+                <th>Condomínio</th>
+                <th>Usuário / E-mail</th>
+                <th>Endereço IP</th>
+                <th>Dispositivo / Navegador</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <tr>
+                <td colspan="6" class="text-center py-4">Carregando logs de auditoria...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ABA 5: Disparo de Comunicado Master (Broadcast) -->
+      <section id="sectionBroadcast" class="section-table hidden">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <h3>Central de Comunicados Master</h3>
+          </div>
+          <div class="header-actions">
+            <button type="button" id="btnRefreshBroadcasts" class="btn-outline" title="Atualizar histórico de comunicados">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Atualizar Histórico</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card de Transmissão de Comunicado Master -->
+        <div class="broadcast-composer-card">
+          <div class="card-header-styled">
+            <div class="modal-icon-badge blue"><svg class="ico"><use href="#i-mail"/></svg></div>
+            <div style="flex: 1;">
+              <h4>Novo Comunicado Oficial</h4>
+            </div>
+            <span id="broadcastAudienceBadge" class="badge-plan pro" style="font-size: 0.75rem;">Rede Completa</span>
+          </div>
+
+          <form id="formBroadcastMaster" class="broadcast-editor-form" autocomplete="off" style="margin-top: 1rem;">
+            <!-- Grid Categoria + Destinatários -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+              <div class="form-group">
+                <label>Categoria do Comunicado</label>
+                <input type="hidden" id="broadcastCategoria" value="GERAL" />
+                <div class="category-chips-group" id="categoryChipsGroup">
+                  <button type="button" class="btn-category-chip active" data-cat="GERAL">
+                    <span class="cat-chip-dot blue"></span>
+                    <span>Geral</span>
+                  </button>
+                  <button type="button" class="btn-category-chip" data-cat="URGENTE">
+                    <span class="cat-chip-dot rose"></span>
+                    <span>Urgente</span>
+                  </button>
+                  <button type="button" class="btn-category-chip" data-cat="MANUTENCAO">
+                    <span class="cat-chip-dot amber"></span>
+                    <span>Manutenção</span>
+                  </button>
+                  <button type="button" class="btn-category-chip" data-cat="ASSEMBLEIA">
+                    <span class="cat-chip-dot purple"></span>
+                    <span>Diretoria</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="broadcastDestino">Destinatários</label>
+                <select id="broadcastDestino" class="input-select">
+                  <option value="">Todos os Condomínios Ativos da Rede (Broadcast Geral)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.25rem;">
+              <label for="broadcastTitulo">Título do Comunicado *</label>
+              <div class="input-with-icon">
+                <svg class="ico input-ico"><use href="#i-edit"/></svg>
+                <input type="text" id="broadcastTitulo" placeholder="Ex: Manutenção Programada no Servidor Central" required />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <label for="broadcastMensagem" style="margin-bottom: 0;">Mensagem Oficial *</label>
+                <button type="button" id="btnInsertBroadcastBullet" class="btn-action" style="padding: 0.2rem 0.55rem; font-size: 0.75rem;" title="Inserir marcador de tópicos (•)">
+                  <span>+ Marcador (•)</span>
+                </button>
+              </div>
+              <textarea id="broadcastMensagem" rows="4" placeholder="Digite o conteúdo do comunicado que será afixado no mural de moradores e síndicos..." required style="line-height: 1.5; font-family: inherit;"></textarea>
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.35rem;">
+                <small id="broadcastCharCount" class="muted-sm" style="font-size: 0.75rem;">0 caracteres</small>
+              </div>
+            </div>
+
+            <div class="form-footer-actions" style="margin-top: 1.25rem; display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+              <button type="button" id="btnResetBroadcast" class="btn-action">Limpar</button>
+              <button type="submit" class="btn-primary" id="btnSendBroadcast">
+                <svg class="ico"><use href="#i-mail"/></svg>
+                <span>Transmitir Comunicado Master</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabela Inferior: Histórico de Comunicados Transmitidos -->
+        <div class="broadcast-history-card" style="margin-top: 2rem;">
+          <div class="card-header-styled" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="modal-icon-badge blue" style="width: 36px; height: 36px;"><svg class="ico"><use href="#i-mail"/></svg></div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <h4 style="margin: 0;">Histórico de Comunicados Master</h4>
+                  <span id="badgeBroadcastHistoryCount" class="badge-plan pro" style="font-size: 0.75rem;">0 disparos</span>
+                </div>
+              </div>
+            </div>
+            <div class="header-actions">
+              <span class="text-muted" style="font-size: 0.8rem;">Ocultar remove o aviso do mural dos clientes, mantendo-o aqui.</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="master-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Categoria</th>
+                  <th>Título &amp; Mensagem</th>
+                  <th>Destino</th>
+                  <th>Status no Mural</th>
+                  <th class="text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="broadcastHistoryTableBody">
+                <tr>
+                  <td colspan="6" class="text-center py-4">Carregando histórico de comunicados...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 6: Configuração de Canais de Suporte aos Síndicos -->
+      <section id="sectionSupportSettings" class="section-table hidden">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <h3>Canais de Suporte aos Síndicos</h3>
+          </div>
+          <div class="header-actions">
+            <button type="button" id="btnRefreshSupportSettings" class="btn-outline" title="Recarregar dados">
+              <svg class="ico"><use href="#i-refresh"/></svg> <span>Recarregar</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="support-settings-grid">
+          <!-- Coluna 1: Formulário de Configuração -->
+          <div class="support-form-card">
+            <div class="card-header-styled">
+              <div class="modal-icon-badge blue"><svg class="ico"><use href="#i-phone"/></svg></div>
+              <div>
+                <h4>Editar Contatos Oficiais</h4>
+              </div>
+            </div>
+
+            <form id="formSupportSettings" class="support-form" autocomplete="off">
+              <div class="form-group">
+                <label for="cfgSuporteEmail">E-mail Oficial de Atendimento *</label>
+                <div class="input-with-icon">
+                  <svg class="ico input-ico"><use href="#i-mail"/></svg>
+                  <input type="email" id="cfgSuporteEmail" placeholder="suporte@corsini.inf.br" required />
+                </div>
+              </div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group flex-1">
+                  <label for="cfgSuporteTelefone">Telefone / WhatsApp da Central *</label>
+                  <div class="input-with-icon">
+                    <svg class="ico input-ico"><use href="#i-phone"/></svg>
+                    <input type="text" id="cfgSuporteTelefone" placeholder="(11) 98765-4321" required />
+                  </div>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="cfgSuporteHorario">Horário de Atendimento</label>
+                  <input type="text" id="cfgSuporteHorario" placeholder="Segunda a Sexta, das 08h às 18h" />
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 1rem;">
+                <label for="cfgTituloRegularizacao">Título do Bloco de Orientações</label>
+                <input type="text" id="cfgTituloRegularizacao" placeholder="O que fazer para regularizar?" />
+              </div>
+
+              <div class="form-group" style="margin-top: 1rem;">
+                <label for="cfgMensagemRegularizacao">Texto das Orientações de Regularização</label>
+                <textarea id="cfgMensagemRegularizacao" rows="6" class="input-textarea" style="line-height: 1.5; font-family: inherit;" placeholder="Para restabelecer o acesso ao portal, o síndico ou responsável predial deve entrar em contato com nossa equipe de atendimento:&#10;• Verifique eventuais pendências administrativas, cadastrais ou contratuais.&#10;• Após a regularização, a liberação dos acessos é realizada em tempo real."></textarea>
+              </div>
+
+              <div class="form-footer-actions" style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="btnResetSupportDefaults" class="btn-ghost">Restaurar Padrão</button>
+                <button type="submit" id="btnSaveSupportSettings" class="btn-primary">
+                  <svg class="ico"><use href="#i-check"/></svg>
+                  <span>Salvar Canais de Suporte</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Coluna 2: Live Preview em Tempo Real -->
+          <div class="support-preview-card">
+            <div class="card-header-styled">
+              <div class="modal-icon-badge amber"><svg class="ico"><use href="#i-sparkles"/></svg></div>
+              <div>
+                <h4>Pré-visualização do Aviso</h4>
+              </div>
+            </div>
+
+            <!-- Preview Card idêntico ao aviso do síndico -->
+            <div class="preview-suspension-box">
+              <div class="preview-box-header">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-info"/></svg>
+                <strong id="previewActionTitle">O que fazer para regularizar?</strong>
+              </div>
+              <div id="previewActionDesc" class="preview-action-desc" style="white-space: pre-line; line-height: 1.5; margin-bottom: 12px;">
+                Para restabelecer o acesso ao portal, o síndico ou responsável predial deve entrar em contato com nossa equipe de atendimento:
+• Verifique eventuais pendências administrativas, cadastrais ou contratuais.
+• Após a regularização, a liberação dos acessos é realizada em tempo real.
+              </div>
+              <div class="preview-contacts-row">
+                <div class="preview-contact-pill">
+                  <svg class="ico ico-xs" aria-hidden="true"><use href="#i-mail"/></svg>
+                  <span id="previewSupportEmail">suporte@corsini.inf.br</span>
+                </div>
+                <div class="preview-contact-pill">
+                  <svg class="ico ico-xs" aria-hidden="true"><use href="#i-phone"/></svg>
+                  <span id="previewSupportPhone">Central: (11) 98765-4321</span>
+                </div>
+              </div>
+              <div class="preview-hours-note" id="previewSupportHoursBox">
+                <span class="preview-hours-label">Horário de Atendimento:</span>
+                <span id="previewSupportHours">Segunda a Sexta, das 08h às 18h</span>
+              </div>
+            </div>
+
+            <div class="preview-sync-badge">
+              <svg class="ico ico-xs"><use href="#i-check"/></svg>
+              <span>Atualização instantânea em todos os portais da rede</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- MODAL 1: Cadastro de Novo Condomínio (Simplificado & Ativação Automática) -->
+  <div id="modalNewCondo" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalNewCondoTitle">
+    <div class="modal-card modal-md">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-badge blue"><svg class="ico"><use href="#i-building"/></svg></div>
+          <div>
+            <h4 id="modalNewCondoTitle">Cadastrar Novo Condomínio</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Cadastro ágil: o síndico ativará sua própria senha via convite digital</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalNewCondo" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <form id="formCreateCondo">
+        <div class="modal-body">
+          
+          <div class="info-callout" style="border-left-color: #2563eb; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.65rem;">
+            <svg class="ico" style="color: #2563eb; width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;"><use href="#i-info"/></svg>
+            <span style="font-size: 0.82rem; color: var(--text-main); line-height: 1.4;">
+              <strong>Onboarding Ágil B2B:</strong> Defina o modelo de governança e cadastre os gestores. O sistema gerará <strong>links seguros de ativação exclusiva</strong> para cada perfil cadastrar sua senha e dados do condomínio.
+            </span>
+          </div>
+
+          <!-- Modelo de Governança -->
+          <div class="governance-selector-wrap" style="margin-bottom: 1.15rem;">
+            <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;">
+              Modelo de Governança Condominial *
+            </label>
+            <div class="gov-options-grid">
+              <label class="gov-card-option active" id="cardGovAutogestao">
+                <input type="radio" name="newTipoGestao" id="radioGovAutogestao" value="AUTOGESTAO" checked style="display: none;" />
+                <div class="gov-card-header">
+                  <div class="gov-radio-dot"></div>
+                  <strong style="font-size: 0.88rem;">Autogestão</strong>
+                </div>
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin: 4px 0 0 0; line-height: 1.35;">
+                  Apenas o <strong>Síndico</strong> administra o condomínio. Envia 1 convite de ativação exclusivo.
+                </p>
+              </label>
+
+              <label class="gov-card-option" id="cardGovCompartilhada">
+                <input type="radio" name="newTipoGestao" id="radioGovCompartilhada" value="COMPARTILHADA" style="display: none;" />
+                <div class="gov-card-header">
+                  <div class="gov-radio-dot"></div>
+                  <strong style="font-size: 0.88rem;">Gestão Compartilhada</strong>
+                </div>
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin: 4px 0 0 0; line-height: 1.35;">
+                  <strong>Síndico + Administradora</strong>. Ambos colaboram, gerenciam condôminos e recebem convites individuais.
+                </p>
+              </label>
+            </div>
+          </div>
+
+          <!-- Campos da Administradora (exibido apenas se Compartilhada) -->
+          <div id="wrapperAdmFields" class="adm-fields-box hidden" style="background: rgba(16, 185, 129, 0.05); border: 1.5px dashed #10b981; border-radius: 10px; padding: 14px; margin-bottom: 1.15rem;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #10b981; color: white;">
+                <svg class="ico" style="width: 13px; height: 13px;"><use href="#i-building"/></svg>
+              </span>
+              <strong style="font-size: 0.85rem; color: #34d399;">Dados da Administradora Parceira</strong>
+              <span class="label-badge-info" style="margin-left: auto; background: rgba(16, 185, 129, 0.2); color: #34d399;">Acesso Gestor</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="newAdmNome">Nome da Administradora / Gestor *</label>
+                <input type="text" id="newAdmNome" placeholder="Ex: Lello Condomínios ou Roberto" />
+              </div>
+              <div class="form-group flex-1">
+                <label for="newAdmEmail">E-mail Institucional da Administradora *</label>
+                <input type="email" id="newAdmEmail" placeholder="gestao@administradora.com" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 0;">
+              <div class="form-group flex-1">
+                <label for="newAdmTelefone">
+                  <span>WhatsApp da Administradora</span>
+                  <span class="label-badge-info">Opcional</span>
+                </label>
+                <input type="tel" id="newAdmTelefone" placeholder="(11) 97777-8888" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Governança Adicional: Subsíndico(a) -->
+          <div class="subsindico-toggle-box" style="background: rgba(124, 58, 237, 0.05); border: 1.5px dashed #7c3aed; border-radius: 10px; padding: 14px; margin-bottom: 1.15rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #7c3aed; color: white;">
+                  <svg class="ico" style="width: 13px; height: 13px;"><use href="#i-users"/></svg>
+                </span>
+                <div>
+                  <strong style="font-size: 0.85rem; color: #c4b5fd;">Subsíndico(a) / Gestão Auxiliar</strong>
+                  <span class="label-badge-info" style="margin-left: 6px; background: rgba(124, 58, 237, 0.2); color: #c4b5fd;">Governança</span>
+                </div>
+              </div>
+              <label class="switch-ui" style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                <input type="checkbox" id="toggleNewTemSubsindico" />
+                <span class="slider-round"></span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Habilitar Subsíndico</span>
+              </label>
+            </div>
+            
+            <div id="wrapperSubsindicoFields" class="hidden" style="margin-top: 12px; border-top: 1px solid rgba(124, 58, 237, 0.2); padding-top: 12px;">
+              <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0 0 10px 0; line-height: 1.35;">
+                O subsíndico terá plenos poderes de gestão condominial compartilhada e receberá um link seguro de ativação exclusivo válido por 7 dias.
+              </p>
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="newSubsindicoNome">Nome Completo do Subsíndico *</label>
+                  <input type="text" id="newSubsindicoNome" placeholder="Ex: Roberto Albuquerque" />
+                </div>
+                <div class="form-group flex-1">
+                  <label for="newSubsindicoEmail">E-mail do Subsíndico *</label>
+                  <input type="email" id="newSubsindicoEmail" placeholder="subsindico@condominio.com" />
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom: 0;">
+                <div class="form-group flex-1">
+                  <label for="newSubsindicoTelefone">
+                    <span>WhatsApp / Celular do Subsíndico</span>
+                    <span class="label-badge-info">Opcional</span>
+                  </label>
+                  <input type="tel" id="newSubsindicoTelefone" placeholder="(11) 98765-4321" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Dados do Síndico (Foco Principal) -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="newSindicoNome">Nome ou Apelido do Síndico / Gestor *</label>
+              <input type="text" id="newSindicoNome" placeholder="Ex: Carlos Silva ou Carlos" required autofocus />
+            </div>
+            <div class="form-group flex-1">
+              <label for="newSindicoEmail">E-mail Institucional do Síndico *</label>
+              <input type="email" id="newSindicoEmail" placeholder="sindico@condominio.com" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="newSindicoTelefone">
+                <span>WhatsApp / Celular do Síndico</span>
+                <span class="label-badge-info">Opcional</span>
+              </label>
+              <input type="tel" id="newSindicoTelefone" placeholder="(11) 98765-4321" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="newCondoNome">
+                <span>Nome / Referência do Condomínio</span>
+                <span class="label-badge-info">Opcional</span>
+              </label>
+              <input type="text" id="newCondoNome" placeholder="Ex: Residencial Bela Vista (ou deixe para o síndico)" />
+            </div>
+          </div>
+
+          <!-- Limite / Capacidade Contratada do Plano -->
+          <div class="form-row" style="margin-top: 0.25rem;">
+            <div class="form-group flex-full">
+              <label for="newCondoLimite">
+                <span>Capacidade Contratada (Limite de Unidades / Apartamentos) *</span>
+                <span class="label-badge-info" style="color: #60a5fa;">Plano Fechado</span>
+              </label>
+              <div class="input-with-presets">
+                <input type="number" id="newCondoLimite" min="1" max="5000" value="44" placeholder="Ex: 44" required style="font-size: 1rem; font-weight: 700; color: #60a5fa;" />
+                <div class="quick-capacity-chips">
+                  <button type="button" class="btn-capacity-chip" onclick="setNewCondoCapacity(20)">20 un</button>
+                  <button type="button" class="btn-capacity-chip" onclick="setNewCondoCapacity(30)">30 un</button>
+                  <button type="button" class="btn-capacity-chip active" onclick="setNewCondoCapacity(44)">44 un</button>
+                  <button type="button" class="btn-capacity-chip" onclick="setNewCondoCapacity(60)">60 un</button>
+                  <button type="button" class="btn-capacity-chip" onclick="setNewCondoCapacity(100)">100 un</button>
+                  <button type="button" class="btn-capacity-chip" onclick="setNewCondoCapacity(200)">200 un</button>
+                </div>
+              </div>
+              <small style="color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; display: block;">
+                O síndico não poderá cadastrar mais apartamentos do que esta quantidade negociada no plano comercial.
+              </small>
+            </div>
+          </div>
+
+          <!-- Theming Rápido -->
+          <div class="color-presets-wrapper" style="margin-top: 0.5rem;">
+            <span class="preset-label">Cor principal do tema da marca:</span>
+            <div class="theme-preset-buttons">
+              <button type="button" class="btn-theme-chip active" data-primary="#2563eb" data-secondary="#1d4ed8">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"></span>
+                <span>Azul</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#059669" data-secondary="#047857">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #059669, #047857);"></span>
+                <span>Verde</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#334155" data-secondary="#1e293b">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #334155, #1e293b);"></span>
+                <span>Grafite</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#7c3aed" data-secondary="#6d28d9">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);"></span>
+                <span>Roxo</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#dc2626" data-secondary="#b91c1c">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #dc2626, #b91c1c);"></span>
+                <span>Rubi</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#d97706" data-secondary="#b45309">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #d97706, #b45309);"></span>
+                <span>Âmbar</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#db2777" data-secondary="#be185d">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #db2777, #be185d);"></span>
+                <span>Rosa</span>
+              </button>
+              <button type="button" class="btn-theme-chip" data-primary="#0891b2" data-secondary="#0e7490">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #0891b2, #0e7490);"></span>
+                <span>Turquesa</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tom de Fundo da Barra Lateral (Sidebar Shell) -->
+          <div class="color-presets-wrapper" style="margin-top: 0.85rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span class="preset-label" style="font-weight: 600; font-size: 0.8rem;">Tom da Barra Lateral / Topbar (Sidebar):</span>
+              <span id="labelNewCondoSidebar" style="font-size: 0.72rem; color: var(--text-dim); font-family: monospace;">#09090b</span>
+            </div>
+            <div class="theme-preset-buttons">
+              <button type="button" class="btn-sidebar-chip active" data-sidebar="#09090b">
+                <span class="chip-color-preview" style="background: #09090b; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Ônix</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#ffffff">
+                <span class="chip-color-preview" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.25);"></span>
+                <span>Branco</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#0f172a">
+                <span class="chip-color-preview" style="background: #0f172a; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Ardósia</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#1e3a8a">
+                <span class="chip-color-preview" style="background: #1e3a8a; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Azul Real</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#064e3b">
+                <span class="chip-color-preview" style="background: #064e3b; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Floresta</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#29180f">
+                <span class="chip-color-preview" style="background: #29180f; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Espresso</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#3b0764">
+                <span class="chip-color-preview" style="background: #3b0764; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Roxo</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip" data-sidebar="#f1f5f9">
+                <span class="chip-color-preview" style="background: #f1f5f9; border: 1px solid rgba(0,0,0,0.25);"></span>
+                <span>Platina</span>
+              </button>
+            </div>
+          </div>
+
+          <input type="hidden" id="newCondoCorPrimaria" value="#2563eb" />
+          <input type="hidden" id="newCondoCorSecundaria" value="#1d4ed8" />
+          <input type="hidden" id="newCondoCorSidebar" value="#09090b" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="btnCancelNewCondo">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnSaveNewCondo">
+            <svg class="ico"><use href="#i-check"/></svg>
+            <span>Gerar Senha e Enviar Convite</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Sucesso e Link de Ativação do Síndico -->
+  <div id="modalInviteSuccess" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalInviteSuccessTitle">
+    <div class="modal-card modal-md">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-badge emerald"><svg class="ico"><use href="#i-check"/></svg></div>
+          <div>
+            <h4 id="modalInviteSuccessTitle">Convite Criado com Sucesso!</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Credenciais provisórias prontas para o síndico</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalInviteSuccess" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-callout" style="border-left-color: #10b981; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.65rem;">
+          <svg class="ico" style="color: #10b981; width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;"><use href="#i-check"/></svg>
+          <span style="font-size: 0.85rem; color: var(--text-main); line-height: 1.45;" id="succInviteDesc">
+            Convite(s) de primeiro acesso gerados com links de uso único válidos por 7 dias.
+          </span>
+        </div>
+
+        <!-- Seção 1: Convite do Síndico -->
+        <div class="invite-recipient-card" id="cardInviteSindico" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-strong); border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span>
+              <strong style="font-size: 0.88rem; color: var(--text-main);">Síndico Titular:</strong>
+              <span id="succSindicoNomeDisplay" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">-</span>
+            </div>
+            <span id="succSindicoEmail" style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">-</span>
+          </div>
+
+          <div class="input-with-button">
+            <input type="text" id="succActivationUrl" readonly style="font-family: monospace; font-size: 0.8rem; background: var(--bg-input);" />
+            <button type="button" id="btnCopyActivationUrl" class="btn-input-action" title="Copiar link do Síndico">
+              <svg class="ico"><use href="#i-copy"/></svg>
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 8px; flex-wrap: wrap;">
+            <a id="btnShareWhatsApp" href="#" target="_blank" class="btn-primary" style="background: #25d366; text-decoration: none; font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico" style="fill: currentColor; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              <span>WhatsApp Síndico</span>
+            </a>
+            <button type="button" class="btn-outline" id="btnOpenAtivarPreview" style="font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico"><use href="#i-external"/></svg>
+              <span>Abrir Link Síndico</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Seção 2: Convite da Administradora (Opcional se compartilhada) -->
+        <div class="invite-recipient-card hidden" id="cardInviteAdm" style="background: var(--bg-surface-elevated); border: 1.5px solid #10b981; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+              <strong style="font-size: 0.88rem; color: #34d399;">Administradora Parceira:</strong>
+              <span id="succAdmNomeDisplay" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">-</span>
+            </div>
+            <span id="succAdmEmail" style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">-</span>
+          </div>
+
+          <div class="input-with-button">
+            <input type="text" id="succAdmActivationUrl" readonly style="font-family: monospace; font-size: 0.8rem; background: var(--bg-input);" />
+            <button type="button" id="btnCopyAdmActivationUrl" class="btn-input-action" title="Copiar link da Administradora">
+              <svg class="ico"><use href="#i-copy"/></svg>
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 8px; flex-wrap: wrap;">
+            <a id="btnShareWhatsAppAdm" href="#" target="_blank" class="btn-primary" style="background: #25d366; text-decoration: none; font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico" style="fill: currentColor; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              <span>WhatsApp Administradora</span>
+            </a>
+            <button type="button" class="btn-outline" id="btnOpenAtivarPreviewAdm" style="font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico"><use href="#i-external"/></svg>
+              <span>Abrir Link Administradora</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Seção 3: Convite do Subsíndico (Opcional se cadastrado) -->
+        <div class="invite-recipient-card hidden" id="cardInviteSubsindico" style="background: var(--bg-surface-elevated); border: 1.5px solid #7c3aed; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #7c3aed;"></span>
+              <strong style="font-size: 0.88rem; color: #c4b5fd;">Subsíndico(a) Responsável:</strong>
+              <span id="succSubsindicoNomeDisplay" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">-</span>
+            </div>
+            <span id="succSubsindicoEmail" style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">-</span>
+          </div>
+
+          <div class="input-with-button">
+            <input type="text" id="succSubActivationUrl" readonly style="font-family: monospace; font-size: 0.8rem; background: var(--bg-input);" />
+            <button type="button" id="btnCopySubActivationUrl" class="btn-input-action" title="Copiar link do Subsíndico">
+              <svg class="ico"><use href="#i-copy"/></svg>
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 8px; flex-wrap: wrap;">
+            <a id="btnShareWhatsAppSub" href="#" target="_blank" class="btn-primary" style="background: #25d366; text-decoration: none; font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico" style="fill: currentColor; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              <span>WhatsApp Subsíndico</span>
+            </a>
+            <button type="button" class="btn-outline" id="btnOpenAtivarPreviewSub" style="font-size: 0.78rem; padding: 6px 12px; height: auto;">
+              <svg class="ico"><use href="#i-external"/></svg>
+              <span>Abrir Link Subsíndico</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" id="btnDoneInviteSuccess">
+          <svg class="ico"><use href="#i-check"/></svg>
+          <span>Concluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL 2: Editar Dados do Condomínio & Síndico -->
+  <div id="modalEditCondo" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalEditCondoTitle">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-badge emerald"><svg class="ico"><use href="#i-edit"/></svg></div>
+          <div>
+            <h4 id="modalEditCondoTitle">Editar Condomínio &amp; Síndico</h4>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalEditCondo" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <form id="formEditCondo">
+        <input type="hidden" id="editCondoId" />
+        <div class="modal-body">
+          
+          <!-- Seção 1: Dados Estruturais -->
+          <div class="form-section-title">
+            <span class="step-num">1</span>
+            <span>Dados Estruturais &amp; Infraestrutura</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="editCondoNome">Nome Oficial do Condomínio *</label>
+              <input type="text" id="editCondoNome" required />
+            </div>
+            <div class="form-group flex-1">
+              <label for="editCondoCnpj">CNPJ</label>
+              <input type="text" id="editCondoCnpj" placeholder="00.000.000/0001-00" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-full">
+              <label for="editCondoSlug">
+                <span>URL / Link Exclusivo do Condomínio *</span>
+                <span class="label-badge-info">Personalizável</span>
+              </label>
+              <div class="url-slug-input-wrapper">
+                <span class="url-domain-badge url-domain-prefix">http://127.0.0.1:8000/c/</span>
+                <input type="text" id="editCondoSlug" class="input-slug-field" placeholder="bela-vista" required autocomplete="off" spellcheck="false" />
+                <span class="url-slash-badge">/</span>
+              </div>
+              <small class="form-hint">Alterar a URL mudará o endereço de acesso dos moradores deste condomínio.</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="editCondoEndereco">Endereço Completo</label>
+              <input type="text" id="editCondoEndereco" placeholder="Av. Principal, 1000 - Bairro" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="editCondoTelefone">Telefone Guarita / Portaria</label>
+              <input type="text" id="editCondoTelefone" placeholder="(11) 99999-9999" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="editCondoEmail">E-mail Oficial da Administração</label>
+              <input type="email" id="editCondoEmail" placeholder="administracao@condominio.com" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="editCondoLimite">Capacidade Máxima de Unidades</label>
+              <input type="number" id="editCondoLimite" min="1" max="5000" required />
+            </div>
+          </div>
+
+          <!-- Theming da Edição -->
+          <div class="color-presets-wrapper" style="margin-top: 0.5rem;">
+            <span class="preset-label">Paletas rápidas para este condomínio:</span>
+            <div class="theme-preset-buttons">
+              <button type="button" class="btn-theme-chip-edit" data-primary="#2563eb" data-secondary="#1d4ed8">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"></span>
+                <span>Azul Real</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#059669" data-secondary="#047857">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #059669, #047857);"></span>
+                <span>Esmeralda</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#334155" data-secondary="#1e293b">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #334155, #1e293b);"></span>
+                <span>Grafite</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#7c3aed" data-secondary="#6d28d9">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);"></span>
+                <span>Roxo Real</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#dc2626" data-secondary="#b91c1c">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #dc2626, #b91c1c);"></span>
+                <span>Rubi</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#d97706" data-secondary="#b45309">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #d97706, #b45309);"></span>
+                <span>Âmbar</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#db2777" data-secondary="#be185d">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #db2777, #be185d);"></span>
+                <span>Rosa</span>
+              </button>
+              <button type="button" class="btn-theme-chip-edit" data-primary="#0891b2" data-secondary="#0e7490">
+                <span class="chip-color-preview" style="background: linear-gradient(135deg, #0891b2, #0e7490);"></span>
+                <span>Turquesa</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="editCondoCorPrimaria">Cor Primária</label>
+              <div class="color-picker-group">
+                <input type="color" id="editCondoCorPrimaria" value="#2563eb" />
+                <span id="labelEditCorPrimaria">#2563eb</span>
+              </div>
+            </div>
+            <div class="form-group flex-1">
+              <label for="editCondoCorSecundaria">Cor Secundária</label>
+              <div class="color-picker-group">
+                <input type="color" id="editCondoCorSecundaria" value="#1d4ed8" />
+                <span id="labelEditCorSecundaria">#1d4ed8</span>
+              </div>
+            </div>
+            <div class="form-group flex-1">
+              <label for="editCondoCorSidebar">Fundo Sidebar</label>
+              <div class="color-picker-group">
+                <input type="color" id="editCondoCorSidebar" value="#09090b" />
+                <span id="labelEditCorSidebar">#09090b</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Presets Rápidos de Fundo da Sidebar -->
+          <div class="color-presets-wrapper" style="margin-top: 0.5rem;">
+            <span class="preset-label">Tons Rápidos para Barra Lateral / Menu (Sidebar):</span>
+            <div class="theme-preset-buttons">
+              <button type="button" class="btn-sidebar-chip-edit active" data-sidebar="#09090b">
+                <span class="chip-color-preview" style="background: #09090b; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Ônix</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#ffffff">
+                <span class="chip-color-preview" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.25);"></span>
+                <span>Branco</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#0f172a">
+                <span class="chip-color-preview" style="background: #0f172a; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Ardósia</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#1e3a8a">
+                <span class="chip-color-preview" style="background: #1e3a8a; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Azul Real</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#064e3b">
+                <span class="chip-color-preview" style="background: #064e3b; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Floresta</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#29180f">
+                <span class="chip-color-preview" style="background: #29180f; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Espresso</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#3b0764">
+                <span class="chip-color-preview" style="background: #3b0764; border: 1px solid rgba(0,0,0,0.2);"></span>
+                <span>Roxo</span>
+              </button>
+              <button type="button" class="btn-sidebar-chip-edit" data-sidebar="#f1f5f9">
+                <span class="chip-color-preview" style="background: #f1f5f9; border: 1px solid rgba(0,0,0,0.25);"></span>
+                <span>Platina</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Seção 2: Modelo de Governança & Administradora -->
+          <div class="form-section-title" style="margin-top: 1.5rem;">
+            <span class="step-num">2</span>
+            <span>Modelo de Governança &amp; Gestores</span>
+          </div>
+
+          <div class="governance-selector-wrap" style="margin-bottom: 1.15rem;">
+            <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;">
+              Modelo de Governança Atual *
+            </label>
+            <div class="gov-options-grid">
+              <label class="gov-card-option active" id="cardEditGovAutogestao">
+                <input type="radio" name="editTipoGestao" id="radioEditGovAutogestao" value="AUTOGESTAO" checked style="display: none;" />
+                <div class="gov-card-header">
+                  <div class="gov-radio-dot"></div>
+                  <strong style="font-size: 0.88rem;">Autogestão</strong>
+                </div>
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin: 4px 0 0 0; line-height: 1.35;">
+                  Apenas o <strong>Síndico</strong> administra o condomínio. Sem administradora vinculada.
+                </p>
+              </label>
+
+              <label class="gov-card-option" id="cardEditGovCompartilhada">
+                <input type="radio" name="editTipoGestao" id="radioEditGovCompartilhada" value="COMPARTILHADA" style="display: none;" />
+                <div class="gov-card-header">
+                  <div class="gov-radio-dot"></div>
+                  <strong style="font-size: 0.88rem;">Gestão Compartilhada</strong>
+                </div>
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin: 4px 0 0 0; line-height: 1.35;">
+                  <strong>Síndico + Administradora</strong>. Ambos colaboram e gerenciam condôminos conjuntamente.
+                </p>
+              </label>
+            </div>
+          </div>
+
+          <!-- Campos da Administradora na Edição -->
+          <div id="wrapperEditAdmFields" class="adm-fields-box hidden" style="background: rgba(16, 185, 129, 0.05); border: 1.5px dashed #10b981; border-radius: 10px; padding: 14px; margin-bottom: 1.15rem;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #10b981; color: white;">
+                <svg class="ico" style="width: 13px; height: 13px;"><use href="#i-building"/></svg>
+              </span>
+              <strong style="font-size: 0.85rem; color: #34d399;">Dados da Administradora Parceira</strong>
+              <span class="label-badge-info" style="margin-left: auto; background: rgba(16, 185, 129, 0.2); color: #34d399;">Acesso Gestor</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="editAdmNome">Nome da Administradora / Gestor *</label>
+                <input type="text" id="editAdmNome" placeholder="Ex: Lello Condomínios ou Roberto" />
+              </div>
+              <div class="form-group flex-1">
+                <label for="editAdmEmail">E-mail Institucional da Administradora *</label>
+                <input type="email" id="editAdmEmail" placeholder="gestao@administradora.com" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 0;">
+              <div class="form-group flex-1">
+                <label for="editAdmTelefone">
+                  <span>WhatsApp da Administradora</span>
+                  <span class="label-badge-info">Opcional</span>
+                </label>
+                <input type="tel" id="editAdmTelefone" placeholder="(11) 97777-8888" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 3: Síndico Responsável -->
+          <div class="form-section-title" style="margin-top: 1.5rem;">
+            <span class="step-num">3</span>
+            <span>Síndico Responsável &amp; Acesso</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="editSindicoNome">Nome Completo do Síndico</label>
+              <input type="text" id="editSindicoNome" placeholder="Nome do síndico" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="editSindicoTelefone">Telefone / WhatsApp do Síndico</label>
+              <input type="text" id="editSindicoTelefone" placeholder="(11) 98888-7777" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="editSindicoEmail">E-mail de Acesso do Síndico</label>
+              <input type="email" id="editSindicoEmail" placeholder="sindico@condominio.com" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="editSindicoSenha">Nova Senha (Opcional)</label>
+              <div class="input-with-button">
+                <input type="password" id="editSindicoSenha" placeholder="Deixe em branco para não alterar" minlength="6" />
+                <button type="button" id="btnToggleEditPassword" class="btn-input-action" title="Mostrar/ocultar senha">
+                  <svg class="ico"><use href="#i-eye"/></svg>
+                </button>
+                <button type="button" id="btnGenPasswordEdit" class="btn-input-action" title="Gerar senha segura automática">
+                  <svg class="ico"><use href="#i-sparkles"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 4: Subsíndico(a) & Governança -->
+          <div class="form-section-title" style="margin-top: 1.5rem;">
+            <span class="step-num">4</span>
+            <span>Subsíndico(a) &amp; Governança</span>
+          </div>
+
+          <div class="subsindico-toggle-box" style="background: rgba(124, 58, 237, 0.05); border: 1.5px dashed #7c3aed; border-radius: 10px; padding: 14px; margin-bottom: 1.15rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #7c3aed; color: white;">
+                  <svg class="ico" style="width: 13px; height: 13px;"><use href="#i-users"/></svg>
+                </span>
+                <div>
+                  <strong style="font-size: 0.85rem; color: #c4b5fd;">Subsíndico(a) Vinculado</strong>
+                  <span id="badgeEditSubStatus" class="label-badge-info" style="margin-left: 6px; background: rgba(124, 58, 237, 0.2); color: #c4b5fd;">Inativo</span>
+                </div>
+              </div>
+              <label class="switch-ui" style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                <input type="checkbox" id="editTemSubsindico" />
+                <span class="slider-round"></span>
+                <span id="labelEditTemSubsindico" style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Habilitar Subsíndico</span>
+              </label>
+            </div>
+
+            <div id="wrapperEditSubsindicoFields" class="hidden" style="margin-top: 12px; border-top: 1px solid rgba(124, 58, 237, 0.2); padding-top: 12px;">
+              <div class="form-row">
+                <div class="form-group flex-2">
+                  <label for="editSubsindicoNome">Nome Completo do Subsíndico *</label>
+                  <input type="text" id="editSubsindicoNome" placeholder="Nome do subsíndico" />
+                </div>
+                <div class="form-group flex-1">
+                  <label for="editSubsindicoTelefone">WhatsApp / Telefone</label>
+                  <input type="text" id="editSubsindicoTelefone" placeholder="(11) 98888-7777" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="editSubsindicoEmail">E-mail de Acesso do Subsíndico *</label>
+                  <input type="email" id="editSubsindicoEmail" placeholder="subsindico@condominio.com" />
+                </div>
+                <div class="form-group flex-1">
+                  <label for="editSubsindicoSenha">Nova Senha do Subsíndico (Opcional)</label>
+                  <div class="input-with-button">
+                    <input type="password" id="editSubsindicoSenha" placeholder="Deixe em branco p/ não alterar" minlength="6" />
+                    <button type="button" id="btnToggleEditSubPassword" class="btn-input-action" title="Mostrar/ocultar senha">
+                      <svg class="ico"><use href="#i-eye"/></svg>
+                    </button>
+                    <button type="button" id="btnGenPasswordEditSub" class="btn-input-action" title="Gerar senha segura automática">
+                      <svg class="ico"><use href="#i-sparkles"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                <button type="button" class="btn-text-action" id="btnRemoveEditSubsindico" style="color: var(--rose, #f43f5e); font-size: 0.78rem;">
+                  <svg class="ico" style="width: 14px; height: 14px; vertical-align: middle;"><use href="#i-trash"/></svg> Desvincular Subsíndico
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="btnCancelEditCondo">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnSaveEditCondo">
+            <svg class="ico"><use href="#i-check"/></svg>
+            <span>Salvar Todas as Alterações</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Resetar Senha do Síndico -->
+  <div id="modalResetPassword" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalResetPasswordTitle">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-badge amber"><svg class="ico"><use href="#i-key"/></svg></div>
+          <div>
+            <h4 id="modalResetPasswordTitle">Redefinir Senha do Síndico</h4>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalResetPassword" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <form id="formResetPassword">
+        <input type="hidden" id="resetCondoId" />
+        <input type="hidden" id="resetPapelRole" value="SINDICO" />
+        <div class="modal-body">
+          <div class="info-callout">
+            <span class="callout-label">Condomínio:</span>
+            <strong id="resetCondoNomeDisplay">-</strong><br />
+            <span class="callout-label" id="resetTargetRoleLabel">Síndico Responsável:</span>
+            <span id="resetSindicoEmailDisplay">-</span>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label for="resetNovaSenha">Nova Senha de Acesso *</label>
+            <div class="input-with-button">
+              <input type="text" id="resetNovaSenha" placeholder="Digite ou gere uma senha forte" required minlength="6" />
+              <button type="button" id="btnGenPasswordReset" class="btn-input-action" title="Gerar senha segura automática">
+                <svg class="ico"><use href="#i-sparkles"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="btnCancelResetPassword">Cancelar</button>
+          <button type="submit" class="btn-primary-amber" id="btnSaveResetPassword">
+            <svg class="ico"><use href="#i-key"/></svg>
+            <span>Confirmar Nova Senha</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Redefinir Senha de Usuário da Rede -->
+  <div id="modalResetUserPassword" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalResetUserPasswordTitle">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-badge amber"><svg class="ico"><use href="#i-key"/></svg></div>
+          <div>
+            <h4 id="modalResetUserPasswordTitle">Redefinir Senha de Usuário</h4>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalResetUserPassword" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <form id="formResetUserPassword">
+        <input type="hidden" id="resetTargetUserId" />
+        <div class="modal-body">
+          <div class="info-callout" style="border-left-color: #f59e0b; display: flex; align-items: center; gap: 0.85rem;">
+            <div id="resetUserAvatar" class="sindico-avatar" style="width: 44px; height: 44px; font-size: 1.15rem; flex-shrink: 0; background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 50%;">U</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <strong id="resetUserNomeDisplay" style="font-size: 0.95rem; color: var(--text-main);">-</strong>
+                <span id="resetUserRoleBadge" class="badge-plan">-</span>
+              </div>
+              <div id="resetUserEmailDisplay" style="font-size: 0.8rem; color: var(--text-muted); word-break: break-all; margin-top: 0.15rem;">-</div>
+              <div id="resetUserCondoDisplay" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem;">-</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.5rem;">
+            <label for="resetUserNovaSenha">Nova Senha Provisória ou Definitiva *</label>
+            <div class="input-with-button">
+              <input type="text" id="resetUserNovaSenha" placeholder="Digite ou gere uma senha segura" required minlength="6" autocomplete="off" />
+              <button type="button" id="btnToggleUserPwVisibility" class="btn-input-action" title="Visualizar ou ocultar senha">
+                <svg class="ico" id="iconEyeUserPw"><use href="#i-eye"/></svg>
+              </button>
+              <button type="button" id="btnGenPasswordUserReset" class="btn-input-action" title="Gerar senha segura automática">
+                <svg class="ico"><use href="#i-sparkles"/></svg>
+              </button>
+              <button type="button" id="btnCopyPasswordUserReset" class="btn-input-action" title="Copiar senha para área de transferência">
+                <svg class="ico"><use href="#i-copy"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-check-group" style="display: flex; align-items: center; gap: 0.65rem; margin-top: 0.5rem; padding: 0.65rem 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+            <input type="checkbox" id="resetUserForceChange" style="cursor: pointer; width: 16px; height: 16px; accent-color: #f59e0b;" checked />
+            <label for="resetUserForceChange" style="font-size: 0.85rem; color: var(--text-main); cursor: pointer; margin-bottom: 0;">
+              Exigir troca de senha no próximo login
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="btnCancelResetUserPassword">Cancelar</button>
+          <button type="submit" class="btn-primary-amber" id="btnSaveResetUserPassword">
+            <svg class="ico"><use href="#i-key"/></svg>
+            <span>Confirmar Nova Senha</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Dossiê Completo do Condomínio (Executivo) -->
+  <div id="modalCondoDetails" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="detailsCondoNomeDisplay">
+    <div class="modal-card modal-lg details-modal-shell">
+      
+      <!-- Top Dynamic Brand Banner -->
+      <div class="condo-details-banner" id="detailsBannerBg">
+        <div class="banner-top-actions">
+          <span class="badge-role-gold" id="detailsPlanoDisplay">CONDOMÍNIO ATIVO</span>
+          <button type="button" class="btn-close-banner" id="btnCloseModalDetails" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="banner-brand-profile">
+          <div class="banner-avatar-box" id="detailsAvatarBox">
+            <svg class="ico"><use href="#i-building"/></svg>
+          </div>
+          <div class="banner-title-meta">
+            <div class="banner-title-row">
+              <h3 id="detailsCondoNomeDisplay">Nome do Condomínio</h3>
+              <span id="detailsStatusBadge" class="badge-status ativo">● Ativo</span>
+            </div>
+            <div class="banner-sub-meta">
+              <span id="detailsCnpjDisplay">CNPJ: -</span>
+              <span>&bull;</span>
+              <span id="detailsCreatedDisplay">Cadastrado em: -</span>
+              <span>&bull;</span>
+              <span id="detailsIdDisplay">ID: #0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body details-body">
+        
+        <!-- URL Exclusiva do Portal -->
+        <div class="url-access-card">
+          <div class="url-access-info">
+            <span class="url-card-label">Portal Exclusivo dos Moradores &amp; Portaria:</span>
+            <code id="detailsUrlDisplay">http://127.0.0.1:8000/c/.../</code>
+          </div>
+          <div class="url-access-actions">
+            <button type="button" class="btn-copy-url" id="btnCopyCondoUrl" title="Copiar URL">
+              <svg class="ico"><use href="#i-copy"/></svg> <span>Copiar</span>
+            </button>
+            <a href="#" target="_blank" class="btn-open-url" id="btnOpenCondoUrl" title="Abrir em nova aba">
+              <svg class="ico"><use href="#i-external"/></svg> <span>Abrir</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Grade de Métricas & Saúde Operacional -->
+        <div class="form-section-title" style="margin-top: 0.5rem;">
+          <svg class="ico" style="color: var(--primary);"><use href="#i-shield"/></svg>
+          <span>Saúde Operacional &amp; Capacidade em Tempo Real</span>
+        </div>
+
+        <div class="details-kpi-grid">
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-head">
+              <span class="kpi-mini-label">Unidades &amp; Moradores</span>
+              <div class="kpi-mini-icon blue"><svg class="ico"><use href="#i-users"/></svg></div>
+            </div>
+            <div class="kpi-mini-value">
+              <strong id="detailsUnidadesCount">0</strong>
+              <span class="kpi-mini-sub" id="detailsUnidadesSub">de 100 max</span>
+            </div>
+            <div class="capacity-bar-bg" style="margin-top: 0.4rem;">
+              <div id="detailsCapacityBar" class="capacity-bar-fill" style="width: 0%; background-color: var(--primary);"></div>
+            </div>
+            <span class="kpi-mini-footer" id="detailsMoradoresCount">0 moradores cadastrados</span>
+          </div>
+
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-head">
+              <span class="kpi-mini-label">Portaria &amp; Encomendas</span>
+              <div class="kpi-mini-icon amber"><svg class="ico"><use href="#i-package"/></svg></div>
+            </div>
+            <div class="kpi-mini-value">
+              <strong id="detailsEncomendasCount">0</strong>
+              <span class="kpi-mini-sub">na guarita</span>
+            </div>
+            <span class="kpi-mini-footer" id="detailsPorteirosCount" style="margin-top: 0.85rem;">0 porteiros na equipe</span>
+          </div>
+
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-head">
+              <span class="kpi-mini-label">Ocorrências &amp; Chamados</span>
+              <div class="kpi-mini-icon rose"><svg class="ico"><use href="#i-alert-circle"/></svg></div>
+            </div>
+            <div class="kpi-mini-value">
+              <strong id="detailsOcorrenciasCount">0</strong>
+              <span class="kpi-mini-sub">abertas</span>
+            </div>
+            <span class="kpi-mini-footer" id="detailsOcorrenciasStatus" style="margin-top: 0.85rem;">Chamados pendentes</span>
+          </div>
+
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-head">
+              <span class="kpi-mini-label">Lazer &amp; Convivência</span>
+              <div class="kpi-mini-icon purple"><svg class="ico"><use href="#i-calendar"/></svg></div>
+            </div>
+            <div class="kpi-mini-value">
+              <strong id="detailsAreasCount">0</strong>
+              <span class="kpi-mini-sub">áreas comuns</span>
+            </div>
+            <span class="kpi-mini-footer" id="detailsReservasCount" style="margin-top: 0.85rem;">0 reservas realizadas</span>
+          </div>
+        </div>
+
+        <!-- Seções em 2 colunas: Síndico e Contato -->
+        <div class="details-cols-2">
+          
+          <!-- Coluna 1: Síndico -->
+          <div class="details-panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg class="ico" style="color: var(--primary);"><use href="#i-users"/></svg>
+                <strong>Síndico Responsável</strong>
+              </div>
+              <button type="button" class="btn-text-action" id="btnDetailsResetPassword">Redefinir Senha</button>
+            </div>
+            <div class="sindico-details-profile">
+              <div class="sindico-avatar lg" id="detailsSindicoAvatar">S</div>
+              <div class="sindico-details-meta">
+                <strong id="detailsSindicoNome">-</strong>
+                <span class="muted-sm" id="detailsSindicoEmail">-</span>
+                <div class="sindico-contact-row" style="margin-top: 0.4rem;">
+                  <span id="detailsSindicoTelefoneBadge" class="contact-pill">-</span>
+                  <a href="#" id="detailsSindicoWhatsApp" target="_blank" class="whatsapp-btn hidden">
+                    <svg class="ico"><use href="#i-whatsapp"/></svg> <span>WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Dados de Infraestrutura -->
+          <div class="details-panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg class="ico" style="color: var(--emerald);"><use href="#i-building"/></svg>
+                <strong>Contato &amp; Localização</strong>
+              </div>
+            </div>
+            <div class="infra-details-list">
+              <div class="infra-item">
+                <span class="infra-label">Endereço:</span>
+                <span class="infra-val" id="detailsEnderecoVal">-</span>
+              </div>
+              <div class="infra-item">
+                <span class="infra-label">Guarita / Portaria:</span>
+                <span class="infra-val" id="detailsTelefoneVal">-</span>
+              </div>
+              <div class="infra-item">
+                <span class="infra-label">E-mail Oficial:</span>
+                <span class="infra-val" id="detailsEmailVal">-</span>
+              </div>
+              <div class="infra-item">
+                <span class="infra-label">Cores do Tema:</span>
+                <span class="infra-val" id="detailsCoresVal">
+                  <span class="color-swatch-duo">
+                    <span class="color-dot" id="detailsDotPrimaria"></span>
+                    <span class="color-dot" id="detailsDotSecundaria"></span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" id="btnCancelDetails">Fechar</button>
+        <button type="button" class="btn-action edit" id="btnDetailsEditThisCondo">
+          <svg class="ico"><use href="#i-edit"/></svg>
+          <span>Editar Condomínio</span>
+        </button>
+        <button type="button" class="btn-primary" id="btnDetailsImpersonate">
+          <svg class="ico"><use href="#i-external"/></svg>
+          <span>Entrar no Painel como Síndico</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Suspender ou Reativar Condomínio (Experiência Executiva & Segurança) -->
+  <div id="modalToggleCondoStatus" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
+    <div class="modal-card modal-status-shell">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div id="statusModalIconBadge" class="modal-icon-badge rose">
+            <svg class="ico"><use href="#i-lock"/></svg>
+          </div>
+          <div>
+            <h4 id="statusModalTitle">Suspender Acesso do Condomínio</h4>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseModalToggleStatus" aria-label="Fechar modal">&times;</button>
+      </div>
+
+      <form id="formToggleCondoStatus">
+        <input type="hidden" id="statusTargetCondoId" />
+        <input type="hidden" id="statusTargetNextAction" />
+        <input type="hidden" id="statusTargetCondoNome" />
+
+        <div class="modal-body">
+          <!-- Card de Identificação do Condomínio -->
+          <div class="status-condo-preview">
+            <div class="preview-avatar" id="statusModalAvatar">J</div>
+            <div class="preview-meta">
+              <strong id="statusModalCondoNome">Residencial Jardins do Sol</strong>
+              <div class="preview-badges">
+                <span id="statusModalCnpjBadge" class="preview-pill">CNPJ: -</span>
+                <span id="statusModalUnidadesBadge" class="preview-pill">0 unidades</span>
+                <span id="statusModalStatusBadge" class="badge-status-modern ativo"><span class="dot-status"></span> Ativo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloco Exclusivo de Suspensão -->
+          <div id="statusSectionSuspend">
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="statusSuspendReason">Motivo da Suspensão</label>
+              <select id="statusSuspendReason" class="input-select">
+                <option value="Inadimplência ou Atraso no Faturamento">Inadimplência ou Atraso no Faturamento</option>
+                <option value="Solicitação da Administração / Síndico">Solicitação da Administração / Síndico</option>
+                <option value="Revisão Cadastral / Migração de Dados">Revisão Cadastral / Migração de Dados</option>
+                <option value="Manutenção Operacional ou Contratual">Manutenção Operacional ou Contratual</option>
+                <option value="Outro Motivo">Outro Motivo</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <div class="form-label-row">
+                <label for="statusSuspendNotes">Anotações Internas</label>
+                <span class="form-label-tag">Auditoria</span>
+              </div>
+              <textarea id="statusSuspendNotes" rows="3" class="input-textarea" placeholder="Detalhes ou justificativa da suspensão..."></textarea>
+            </div>
+
+            <!-- Contatos de suporte vinculados -->
+            <div class="status-support-contacts-hint" style="margin-top: 1rem; padding: 0.75rem 0.95rem; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                <span style="color: #93c5fd; font-weight: 600;">Contatos exibidos no aviso ao condomínio:</span><br/>
+                <span id="hintSupportContactsDisplay" style="color: var(--text-main); font-weight: 600;">suporte@corsini.inf.br • Central: (11) 98765-4321</span>
+              </div>
+              <button type="button" id="btnGoToSupportSettingsFromModal" class="btn-ghost-xs" style="font-size: 0.75rem; white-space: nowrap; color: #60a5fa; cursor: pointer; background: transparent; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 9px; border-radius: 4px;">Alterar Contatos &rarr;</button>
+            </div>
+          </div>
+
+          <!-- Bloco Exclusivo de Reativação -->
+          <div id="statusSectionReactivate" class="hidden">
+            <div id="reactivateMotivoBox" class="reactivate-motivo-box" style="margin-top: 1rem;">
+              <span class="reactivate-motivo-label">Motivo registrado da suspensão:</span>
+              <strong id="reactivateCurrentMotivoText">-</strong>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="btnCancelToggleStatus">Cancelar</button>
+          <button type="submit" id="btnSubmitToggleStatus" class="btn-primary-glow btn-danger-action">
+            <svg class="ico" id="btnSubmitToggleStatusIcon"><use href="#i-lock"/></svg>
+            <span id="btnSubmitToggleStatusText">Confirmar Suspensão</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Região de Notificações Toast -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="app.js?v=42"></script>
+</body>
+</html>

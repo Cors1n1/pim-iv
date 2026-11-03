@@ -9,6 +9,7 @@ class CommonArea(Base):
     __tablename__ = "areas_comuns"
 
     id = Column(Integer, primary_key=True, index=True)
+    condominio_id = Column(Integer, ForeignKey("condominios.id", ondelete="RESTRICT"), nullable=False, default=1, index=True)
     nome = Column(String(100), nullable=False)
     descricao = Column(Text, nullable=True)
     capacidade_pessoas = Column(Integer, nullable=False)
@@ -22,6 +23,7 @@ class CommonArea(Base):
     ativo = Column(Boolean, default=True, nullable=False)
     criado_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
+    condominio = relationship("Condominio", back_populates="areas_comuns")
     reservas = relationship("Reservation", back_populates="area_comum", cascade="all, delete-orphan")
 
 

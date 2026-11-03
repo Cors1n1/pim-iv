@@ -1,0 +1,61 @@
+<div id="modalDayReservations" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dayReservationsTitle">
+  <div class="custom-dialog-card modal-day-reservations-card">
+    <div class="custom-dialog-header">
+      <div class="custom-dialog-icon primary">
+        <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>
+      </div>
+      <div class="custom-dialog-headings">
+        <h3 id="dayReservationsTitle" class="custom-dialog-title">Reservas do Dia</h3>
+        <p id="dayReservationsSubtitle" class="custom-dialog-message">Carregando cronograma...</p>
+      </div>
+      <button id="btnDayReservationsCloseX" type="button" class="btn-dialog-close" aria-label="Fechar">
+        <svg class="ico" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+
+    <!-- Barra de Resumo Rápido do Dia -->
+    <div id="dayReservationsSummaryBar" class="day-reservations-summary-bar">
+      <div class="day-res-chips-group">
+        <div class="day-res-chip">
+          <span>Agendamentos:</span>
+          <strong id="dayResCountTotal">0</strong>
+        </div>
+        <div class="day-res-chip text-success">
+          <span>Confirmadas:</span>
+          <strong id="dayResCountConfirmed">0</strong>
+        </div>
+        <div class="day-res-chip text-warning">
+          <span>Standby:</span>
+          <strong id="dayResCountStandby">0</strong>
+        </div>
+      </div>
+      <button id="btnDayResNewReservationTop" type="button" class="btn-primary-sm btn-day-res-action-top" title="Fazer reserva para este dia">
+        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+        <span>Agendar neste Dia</span>
+      </button>
+    </div>
+
+    <!-- Lista de Reservas do Dia Selecionado -->
+    <div id="dayReservationsListContainer" class="day-reservations-list-container">
+      <!-- Cards injetados via JavaScript -->
+    </div>
+
+    <!-- Estado Vazio (Sem Reservas no Dia) -->
+    <div id="dayReservationsEmptyState" class="day-reservations-empty-state hidden">
+      <div class="empty-icon-wrap">
+        <svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>
+      </div>
+      <h4 class="empty-title">Nenhuma reserva para este dia!</h4>
+      <p class="empty-desc">Todos os espaços comuns (churrasqueira, salão de festas, quadra, etc.) estão totalmente disponíveis para você agendar.</p>
+    </div>
+
+    <!-- Rodapé de Ações do Modal -->
+    <div class="custom-dialog-footer modal-day-reservations-footer">
+      <button id="btnDayResNewReservation" type="button" class="btn-dialog-primary">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+        <span>Solicitar Reserva para este Dia</span>
+      </button>
+      <button id="btnDayReservationsClose" type="button" class="btn-dialog-secondary">Fechar</button>
+    </div>
+  </div>
+</div>

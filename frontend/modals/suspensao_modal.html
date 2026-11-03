@@ -1,0 +1,79 @@
+<div id="modalCondoSuspended" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="suspendedCondoTitle" style="z-index: 10050;">
+  <div class="custom-dialog-card modal-suspension-card">
+    <div class="custom-dialog-header">
+      <div id="suspendedModalIcon" class="custom-dialog-icon danger">
+        <svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>
+      </div>
+      <div class="custom-dialog-headings">
+        <h3 id="suspendedCondoTitle" class="custom-dialog-title suspension-title">Acesso ao Condomínio Suspenso</h3>
+        <p id="suspendedCondoMessage" class="custom-dialog-message suspension-message">O acesso ao portal deste condomínio foi temporariamente pausado pela administração central.</p>
+      </div>
+    </div>
+
+    <div class="custom-dialog-body" style="margin: 0.75rem 0;">
+      <!-- 1. EXCLUSIVO PARA O SÍNDICO: Motivo Oficial Registrado -->
+      <div id="suspendedModalReasonBox" class="suspension-box reason-box">
+        <span class="suspension-box-label danger">
+          Motivo da Suspensão:
+        </span>
+        <strong id="suspendedModalReasonText" class="suspension-box-text danger">
+          Solicitação da Administração / Síndico
+        </strong>
+      </div>
+
+      <!-- 2. EXCLUSIVO PARA O SÍNDICO: O que fazer / Regularização -->
+      <div id="suspendedSindicoActionBox" class="suspension-box action-box">
+        <div class="suspension-box-header">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-info"/></svg>
+          <strong id="suspendedSindicoActionTitle">O que fazer para regularizar?</strong>
+        </div>
+        <div id="suspendedSindicoActionDesc" class="action-desc" style="white-space: pre-line; line-height: 1.5; margin-bottom: 12px;">
+          Para restabelecer o acesso ao portal, o síndico ou responsável predial deve entrar em contato com nossa equipe de atendimento:
+• Verifique eventuais pendências administrativas, cadastrais ou contratuais.
+• Após a regularização, a liberação dos acessos é realizada em tempo real.
+        </div>
+        <div class="suspension-support-contacts">
+          <a id="suspendedSupportEmailLink" href="mailto:suporte@corsini.inf.br" class="contact-pill" title="Enviar e-mail para o suporte">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-mail"/></svg>
+            <span id="suspendedSupportEmailText">suporte@corsini.inf.br</span>
+          </a>
+          <a id="suspendedSupportPhoneLink" href="tel:11987654321" class="contact-pill" title="Telefone / Central de suporte">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-phone"/></svg>
+            <span id="suspendedSupportPhoneText">Central: (11) 98765-4321</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. EXCLUSIVO PARA O MORADOR: Aviso Simples e Orientação (Sem expor o porquê) -->
+      <div id="suspendedResidentInfoBox" class="suspension-box resident-box hidden">
+        <div class="suspension-box-header neutral">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-info"/></svg>
+          <strong>Comunicado aos Moradores</strong>
+        </div>
+        <p class="resident-desc">
+          O portal deste condomínio está temporariamente indisponível no momento.
+        </p>
+        <p class="resident-subdesc">
+          Por gentileza, procure o <strong>síndico</strong> ou a <strong>administração do condomínio</strong> para obter mais esclarecimentos e previsão de normalização dos acessos.
+        </p>
+      </div>
+
+      <!-- 4. GARANTIA DE DADOS SEGUROS (Exibido para todos os perfis) -->
+      <div class="suspension-box security-box">
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+          <svg class="ico ico-sm security-icon" aria-hidden="true"><use href="#i-check"/></svg>
+          <span class="security-text">
+            <strong>Seus dados estão 100% seguros:</strong> Todas as encomendas, dados de moradores, unidades e reservas permanecem preservados e íntegros. Assim que o acesso for normalizado, tudo retornará ao estado ativo.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="custom-dialog-footer" style="padding-top: 14px;">
+      <button id="btnDismissSuspendedModal" type="button" class="btn-dialog-primary" style="width: 100%; justify-content: center;">
+        <svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg>
+        <span id="btnDismissSuspendedText">Compreendi, Voltar à Tela Inicial</span>
+      </button>
+    </div>
+  </div>
+</div>

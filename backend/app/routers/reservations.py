@@ -39,7 +39,7 @@ async def list_common_areas(
 ) -> List[CommonAreaResponse]:
     """Retorna a lista de salão de festas, churrasqueira, etc. com regras de horário."""
     service = ReservationService(db)
-    return await service.list_common_areas(include_inactive=include_inactive)
+    return await service.list_common_areas(current_user=_current_user, include_inactive=include_inactive)
 
 
 @router.post("/areas", response_model=CommonAreaResponse, summary="Criar nova área comum (exclusivo síndico)")

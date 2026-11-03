@@ -42,14 +42,17 @@ class TicketService:
         """
         Retorna a lista de ocorrências:
         - Morador: vê apenas as suas ocorrências (privacidade e LGPD).
-        - Síndico / Admin: vê todas as ocorrências de todos os moradores.
+        - Síndico / Admin: vê todas as ocorrências estritamente do seu condomínio.
         """
         if current_user.tipo_usuario == "MORADOR":
             tickets = await self.ticket_repo.list_by_user(current_user.id)
             if status_filter:
                 tickets = [t for t in tickets if t.status == status_filter.upper()]
         else:
-            tickets = await self.ticket_repo.list_all(status_filter)
+            tickets = await self.ticket_repo.list_all(
+                condominio_id=current_user.condominio_id,
+                status_filter=status_filter
+            )
 
         return [self._to_response(t, current_user.id) for t in tickets]
 
@@ -62,17 +65,27 @@ class TicketService:
             )
 
         unidade_id = data.unidade_id or current_user.unidade_id
+        if unidade_id:
+            unit = await self.unit_repo.get_by_id(unidade_id, condominio_id=current_user.condominio_id)
+            if not unit:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Unidade informada não pertence ao seu condomínio."
+                )
+
+        from app.core.security import sanitize_text
 
         ticket = Ticket(
+            condominio_id=current_user.condominio_id,
             unidade_id=unidade_id,
             usuario_id=current_user.id,
-            titulo=data.titulo.strip(),
-            descricao=data.descricao.strip(),
+            titulo=sanitize_text(data.titulo),
+            descricao=sanitize_text(data.descricao),
             categoria=data.categoria,
             status="ABERTO"
         )
         created = await self.ticket_repo.create(ticket)
-        reloaded = await self.ticket_repo.get_by_id(created.id)
+        reloaded = await self.ticket_repo.get_by_id(created.id, condominio_id=current_user.condominio_id)
         assert reloaded is not None
         return self._to_response(reloaded, current_user.id)
 
@@ -84,11 +97,16 @@ class TicketService:
                 detail="Apenas o síndico ou administração podem responder ocorrências."
             )
 
-        ticket = await self.ticket_repo.get_by_id(ticket_id)
+        ticket = await self.ticket_repo.get_by_id(ticket_id, condominio_id=current_user.condominio_id)
         if not ticket:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ocorrência não encontrada.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ocorrência não encontrada ou pertence a outro condomínio."
+            )
 
-        ticket.resposta_sindico = data.resposta_sindico.strip()
+        from app.core.security import sanitize_text
+
+        ticket.resposta_sindico = sanitize_text(data.resposta_sindico)
         ticket.status = data.status
         ticket.respondido_por = current_user.id
         ticket.respondido_em = datetime.now()
@@ -98,9 +116,12 @@ class TicketService:
 
     async def cancel_ticket(self, current_user: User, ticket_id: int) -> TicketResponse:
         """Morador cancela uma ocorrência que ele próprio abriu."""
-        ticket = await self.ticket_repo.get_by_id(ticket_id)
+        ticket = await self.ticket_repo.get_by_id(ticket_id, condominio_id=current_user.condominio_id)
         if not ticket:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ocorrência não encontrada.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ocorrência não encontrada ou pertence a outro condomínio."
+            )
 
         if current_user.tipo_usuario == "MORADOR" and ticket.usuario_id != current_user.id:
             raise HTTPException(

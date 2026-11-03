@@ -1,0 +1,351 @@
+<section id="windowOverview" class="workspace-view overview-clean">
+          
+          <!-- Cabeçalho Executivo Limpo -->
+          <header class="clean-overview-header">
+            <div class="header-welcome-col">
+              <div class="welcome-meta">
+                <span id="headerCondoBadge" class="condo-badge">Condomínio</span>
+                <span class="meta-dot">&bull;</span>
+                <span id="pageDate" class="header-date"></span>
+              </div>
+              <h2 class="welcome-heading" id="overviewUserGreeting">Visão Geral</h2>
+            </div>
+
+            <!-- Ações Primárias Discretas (No máximo 2 ou 3 botões limpos) -->
+            <div class="header-actions-col" id="overviewHeaderActions">
+              <button type="button" class="btn-clean-action" id="btnOverviewRefresh" title="Atualizar dados" aria-label="Atualizar dados da visão geral">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-refresh"/></svg>
+                <span>Atualizar</span>
+              </button>
+              <!-- Morador -->
+              <button type="button" class="btn-clean-action" id="btnCleanReserva" data-window="windowReservations">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+                <span>Nova Reserva</span>
+              </button>
+              <button type="button" class="btn-clean-action" id="btnCleanVisitante" data-window="windowVisitors">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-user-check"/></svg>
+                <span>Liberar Visitante</span>
+              </button>
+              <button type="button" class="btn-clean-action" id="btnCleanOcorrencia" data-window="windowTickets">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+                <span>Abrir Chamado</span>
+              </button>
+
+              <!-- Portaria -->
+              <button type="button" class="btn-clean-action hidden" id="btnCleanPortariaVisitante" data-window="windowVisitors">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-user-check"/></svg>
+                <span>Entrada de Visitante</span>
+              </button>
+              <button type="button" class="btn-clean-action hidden" id="btnCleanPortariaEncomenda" data-window="windowDeliveries">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-package"/></svg>
+                <span>Registrar Encomenda</span>
+              </button>
+
+              <!-- Síndico -->
+              <button type="button" class="btn-clean-action hidden" id="btnCleanAdminAviso" data-window="windowNotices">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-megaphone"/></svg>
+                <span>Publicar Comunicado</span>
+              </button>
+              <button type="button" class="btn-clean-action hidden" id="btnCleanAdminUnidade" data-window="windowUnits">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-users"/></svg>
+                <span>Cadastrar Unidade</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Banner de Aplicativo de Celular (Mobile PWA - Requisito Oficial PIM IV) -->
+          <div id="pwaOverviewBanner" class="ov-pwa-banner" role="complementary" aria-label="Aplicativo Móvel SGC">
+            <div class="ov-pwa-content">
+              <div class="ov-pwa-icon" aria-hidden="true">
+                <span style="font-size: 1.5rem; line-height: 1;">📲</span>
+              </div>
+              <div class="ov-pwa-texts">
+                <div class="ov-pwa-badge">📱 Solução Mobile &bull; PIM IV</div>
+                <strong>Instalar Aplicativo de Celular</strong>
+                <p>Instale o SGC na tela inicial do seu smartphone (Android ou iPhone) para acessar portaria, reservas e notificações rápidas.</p>
+              </div>
+            </div>
+            <div class="ov-pwa-action">
+              <button type="button" class="btn-primary-sm btn-pwa-install-action" id="btnOverviewInstallPwa" title="Instalar como aplicativo no smartphone">
+                <span>📲 Instalar no Celular</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumo numérico por perfil (preenchido via JS) -->
+          <div id="overviewKpiStrip" class="ov-kpi-strip" role="group" aria-label="Resumo"></div>
+
+          <!-- Alertas que exigem ação -->
+          <div id="overviewAlerts" class="ov-alerts" role="region" aria-label="Pendências"></div>
+ 
+          <!-- Card de Retomada de Vaga (Direito de Preferência / Anti-sabotagem) -->
+          <div id="overviewRecoveryBanner" class="recovery-offer-banner hidden" role="region" aria-label="Direito de Preferência de Reserva">
+            <div class="recovery-offer-icon" aria-hidden="true">
+              <svg class="ico"><use href="#i-zap"/></svg>
+            </div>
+            <div class="recovery-offer-content">
+              <span class="recovery-offer-badge">Vaga Liberada &bull; Direito de Preferência</span>
+              <h3 class="recovery-offer-title" id="overviewRecoveryTitle">A data que você desejava está liberada!</h3>
+              <p class="recovery-offer-desc" id="overviewRecoveryDesc">Um morador cancelou a reserva concorrente. Como você estava na fila de espera, a data foi reservada com exclusividade para você pelas próximas 24 horas.</p>
+              <div class="recovery-offer-meta" id="overviewRecoveryMeta"></div>
+            </div>
+            <div class="recovery-offer-actions">
+              <button type="button" class="btn-recovery-accept" id="btnOverviewAcceptOffer">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                <span>Confirmar Minha Vaga</span>
+              </button>
+              <button type="button" class="btn-recovery-decline" id="btnOverviewDeclineOffer">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-close"/></svg>
+                <span>Dispensar Vaga</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- PAINEL DIÁRIO MODULAR POR PERFIL DE ACESSO -->
+          <!-- ========================================== -->
+          <div id="dailyDashboardView" class="daily-dashboard-view">
+
+            <!-- 1. PAINEL DO MORADOR -->
+            <div id="moradorDailyPanel" class="daily-role-panel">
+              <!-- Alerta de Encomenda na Guarita -->
+              <div id="moradorDeliveryAlert" class="daily-alert-card delivery-highlight" role="region" aria-label="Status de encomendas">
+                <div class="daily-alert-icon" aria-hidden="true">
+                  <svg class="ico ico-lg"><use href="#i-package"/></svg>
+                </div>
+                <div class="daily-alert-content">
+                  <div class="daily-alert-kicker">Central de Entregas</div>
+                  <h3 id="moradorDeliveryTitle" class="daily-alert-title">Verificando encomendas...</h3>
+                  <p id="moradorDeliveryDesc" class="daily-alert-text">Consulte a portaria para retirar suas correspondências e pacotes.</p>
+                  <div id="moradorDeliveryItems" class="daily-delivery-items-preview"></div>
+                </div>
+                <div class="daily-alert-action">
+                  <button type="button" class="btn-daily-primary" data-window="windowDeliveries">
+                    <span>Ver Minhas Encomendas</span>
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grade Dupla: Próxima Reserva & Último Comunicado -->
+              <div class="daily-duo-grid">
+                <!-- Próxima Reserva Confirmada -->
+                <article class="daily-card" id="moradorReservationCard">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-calendar"/></svg></div>
+                      <h4>Sua Próxima Reserva</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowReservations">Ver todas</button>
+                  </div>
+                  <div class="daily-card-body" id="moradorReservationBody">
+                    <p class="daily-placeholder-text">Consultando agendamentos...</p>
+                  </div>
+                </article>
+
+                <!-- Último Comunicado da Administração -->
+                <article class="daily-card" id="moradorNoticeCard">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-megaphone"/></svg></div>
+                      <h4>Comunicado Recente</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowNotices">Mural completo</button>
+                  </div>
+                  <div class="daily-card-body" id="moradorNoticeBody">
+                    <p class="daily-placeholder-text">Consultando mural oficial...</p>
+                  </div>
+                </article>
+              </div>
+
+              <!-- 3 Botões de Ação Rápida Grandes e Táteis -->
+              <div class="daily-quick-actions" role="group" aria-label="Ações rápidas para condôminos">
+                <button type="button" class="btn-big-action" data-window="windowReservations">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-calendar"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Agendar Espaço</strong>
+                  </div>
+                </button>
+
+                <button type="button" class="btn-big-action" data-window="windowVisitors">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-user-check"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Liberar Visitante</strong>
+                  </div>
+                </button>
+
+                <button type="button" class="btn-big-action" data-window="windowTickets">
+                  <div class="big-action-icon" aria-hidden="true">
+                    <svg class="ico"><use href="#i-alert-circle"/></svg>
+                  </div>
+                  <div class="big-action-texts">
+                    <strong>Abrir Ocorrência</strong>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. PAINEL DA PORTARIA (OPERAÇÃO ÁGIL 24H) -->
+            <div id="portariaDailyPanel" class="daily-role-panel hidden">
+              <!-- Barra de Busca Rápida de Apartamento e Morador -->
+              <div class="portaria-fast-search-card">
+                <div class="portaria-fast-search-header">
+                  <div class="fast-search-title">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-search"/></svg>
+                    <span>Localização Rápida de Apartamentos &amp; Moradores</span>
+                  </div>
+                  <span class="fast-search-hint">Atendimento imediato na guarita</span>
+                </div>
+                <div class="portaria-fast-search-input-wrap">
+                  <input type="text" id="inputPortariaFastSearch" class="portaria-search-field" placeholder="Digite o número do apartamento (ex: 102) ou o nome do morador..." aria-label="Buscar morador ou apartamento" />
+                  <button type="button" id="btnPortariaFastSearchClear" class="btn-clear-search hidden" title="Limpar busca">&times;</button>
+                </div>
+                <div id="portariaFastSearchResults" class="portaria-fast-search-results hidden"></div>
+              </div>
+
+              <!-- Visitantes Esperados Hoje -->
+              <div class="daily-card portaria-today-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-user-check"/></svg></div>
+                    <h4>Visitantes e Prestadores Esperados para Hoje</h4>
+                  </div>
+                  <div class="daily-card-actions">
+                    <button type="button" class="btn-daily-sm-action" data-window="windowVisitors">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+                      <span>Novo Visitante</span>
+                    </button>
+                    <button type="button" class="daily-link" data-window="windowVisitors">Ver todos</button>
+                  </div>
+                </div>
+                <div class="daily-card-body">
+                  <div id="portariaTodayGuestsFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Carregando visitantes de hoje...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Encomendas na Guarita Aguardando Baixa -->
+              <div class="daily-card portaria-packages-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-package"/></svg></div>
+                    <h4>Encomendas Pendentes de Retirada</h4>
+                  </div>
+                  <div class="daily-card-actions">
+                    <button type="button" class="btn-daily-sm-action" data-window="windowDeliveries">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+                      <span>Nova Encomenda</span>
+                    </button>
+                    <button type="button" class="daily-link" data-window="windowDeliveries">Gerenciar todas</button>
+                  </div>
+                </div>
+                <div class="daily-card-body">
+                  <div id="portariaPendingPackagesFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Carregando encomendas na guarita...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. PAINEL DO SÍNDICO / ADMIN -->
+            <div id="sindicoDailyPanel" class="daily-role-panel hidden">
+              <!-- Chamados de Moradores em Aberto -->
+              <div class="daily-card sindico-tickets-card">
+                <div class="daily-card-header">
+                  <div class="daily-card-title-wrap">
+                    <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-alert-circle"/></svg></div>
+                    <h4>Ocorrências e Chamados Aguardando Parecer do Síndico</h4>
+                  </div>
+                  <button type="button" class="daily-link" data-window="windowTickets">Livro de ocorrências &rarr;</button>
+                </div>
+                <div class="daily-card-body">
+                  <div id="sindicoPendingTicketsFeed" class="daily-table-feed">
+                    <p class="daily-placeholder-text">Verificando chamados pendentes...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grade Dupla: Lazer nos Próximos Dias & Atalhos Administrativos -->
+              <div class="daily-duo-grid">
+                <!-- Ocupação das Áreas Comuns -->
+                <article class="daily-card">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-calendar"/></svg></div>
+                      <h4>Eventos Agendados nas Áreas Comuns</h4>
+                    </div>
+                    <button type="button" class="daily-link" data-window="windowReservations">Ver calendário</button>
+                  </div>
+                  <div class="daily-card-body" id="sindicoAgendaFeed">
+                    <p class="daily-placeholder-text">Consultando reservas...</p>
+                  </div>
+                </article>
+
+                <!-- Atalhos Executivos do Síndico -->
+                <article class="daily-card">
+                  <div class="daily-card-header">
+                    <div class="daily-card-title-wrap">
+                      <div class="daily-card-icon" aria-hidden="true"><svg class="ico ico-sm"><use href="#i-shield"/></svg></div>
+                      <h4>Ações Administrativas Diretas</h4>
+                    </div>
+                  </div>
+                  <div class="daily-card-body">
+                    <div class="sindico-shortcuts-list">
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowNotices">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-megaphone"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Publicar Comunicado</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowUnits">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-users"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Unidades e Moradores</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowAudit">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-clipboard"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Auditoria e Logs</strong>
+                        </div>
+                      </button>
+
+                      <button type="button" class="btn-sindico-shortcut" data-window="windowSettings">
+                        <div class="shortcut-ico"><svg class="ico ico-sm"><use href="#i-settings"/></svg></div>
+                        <div class="shortcut-texts">
+                          <strong>Configurações</strong>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BLOCO DE COMPATIBILIDADE RETROATIVA (OCULTO - PRESERVA IDs) -->
+          <div class="hidden" aria-hidden="true" style="display:none !important;">
+            <span id="statMoradores">0</span>
+            <span id="statAcessos">0</span>
+            <span id="statEncomendasMorador">0</span>
+            <span id="statReservas">0</span>
+            <span id="statAvisos">0</span>
+            <div id="overviewNoticesList"></div>
+            <div id="overviewAgendaList"></div>
+            <div id="overviewDeliveriesList"></div>
+            <div id="cardStatMoradores"></div>
+            <div id="cardStatAcessos"></div>
+            <div id="cardStatEncomendas"></div>
+            <div id="cardStatReservas"></div>
+            <div id="cardStatAvisos"></div>
+          </div>
+
+        </section>

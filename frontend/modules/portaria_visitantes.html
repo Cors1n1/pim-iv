@@ -1,0 +1,167 @@
+<section id="windowVisitors" class="workspace-view workspace-window hidden" aria-labelledby="windowVisitorsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-user-check"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Controle de portaria</span>
+                  </nav>
+                  <h3 id="windowVisitorsTitle" class="window-title">Controle de portaria e visitantes</h3>
+                  <p id="windowVisitorsSub" class="window-sub">Liberação prévia de convidados, prestadores de serviço e registro de entrada/saída</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button id="btnNewVisitorToggle" type="button" class="btn-primary">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+                  <span id="btnNewVisitorLabel">Autorizar visitante</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Seção Estratégica da Portaria: Raio-X Rápido da Unidade (Apenas Portaria/Admin) -->
+              <div id="porterQuickLookupCard" class="porter-quick-card hidden">
+                <div class="porter-quick-header">
+                  <div class="porter-quick-titles">
+                    <h4>
+                      <svg class="ico ico-sm" aria-hidden="true" style="color:var(--primary-accent);"><use href="#i-search"/></svg>
+                      Raio-X da Unidade (Consulta Rápida da Portaria)
+                    </h4>
+                    <p class="muted">Digite o número do apartamento, bloco ou morador para visualizar encomendas e visitantes em tempo real.</p>
+                  </div>
+                  <div class="porter-quick-search-box">
+                    <input type="text" id="inputPorterQuickSearch" class="porter-search-input" placeholder="Buscar Apto, Bloco ou Nome... (Ex: 101)" autocomplete="off" />
+                    <button type="button" id="btnPorterQuickClear" class="btn-secondary-sm hidden" title="Limpar busca">Limpar</button>
+                  </div>
+                </div>
+
+                <!-- Container onde são renderizados os resultados do Raio-X -->
+                <div id="porterQuickResults" class="porter-quick-results hidden">
+                  <!-- Injetado dinamicamente via JS -->
+                </div>
+              </div>
+
+              <!-- Seção Proeminente da Portaria: Convidados dos Eventos de Hoje (Apenas Portaria/Admin) -->
+              <div id="todayGuestsSection" class="today-guests-card hidden">
+                <div class="today-guests-card-header">
+                  <div class="today-badge-icon">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-calendar"/></svg>
+                  </div>
+                  <div class="today-guests-titles">
+                    <h4>Convidados de Eventos de Hoje</h4>
+                    <p class="muted">Lista unificada em tempo real para a guarita liberar entrada e registrar saída com 1 clique.</p>
+                  </div>
+                  <button type="button" id="btnRefreshTodayGuests" class="btn-secondary-sm" title="Recarregar convidados de hoje">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                    <span>Atualizar Convidados</span>
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Nome do Convidado</th>
+                        <th>Destino / Evento</th>
+                        <th>Horário Previsto</th>
+                        <th>Status Portaria</th>
+                        <th>Ações na Guarita</th>
+                      </tr>
+                    </thead>
+                    <tbody id="todayGuestsTableBody">
+                      <tr><td colspan="5" class="table-empty">Nenhum evento com lista de convidados para hoje.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Formulário retrátil para autorização / cadastro de visitante avulso -->
+              <form id="formNewVisitor" class="form-mini hidden" style="margin-bottom: 20px;">
+                <div class="section-title-split">
+                  <h4 id="formNewVisitorTitle">Autorizar visitante ou prestador de serviço</h4>
+                  <button type="button" id="btnCancelVisitor" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputVisitorNome">Nome completo do visitante</label>
+                    <input type="text" id="inputVisitorNome" placeholder="Ex: Lucas Ferreira dos Santos" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputVisitorDoc">Documento (RG / CPF)</label>
+                    <input type="text" id="inputVisitorDoc" placeholder="Opcional ou conferido na entrada" />
+                  </div>
+                </div>
+                <div class="form-row form-row-visitor-access">
+                  <div class="form-group-mini" id="groupVisitorUnit">
+                    <label for="selectVisitorUnit">Unidade de destino</label>
+                    <select id="selectVisitorUnit" required>
+                      <option value="">Carregando apartamentos...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectVisitorTipo">Tipo de acesso</label>
+                    <select id="selectVisitorTipo" required>
+                      <option value="VISITANTE">Visitante / Convidado</option>
+                      <option value="PRESTADOR_SERVICO">Prestador de serviço / Manutenção</option>
+                      <option value="DELIVERY">Entregador / Delivery</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputVisitorData">Data prevista</label>
+                    <input type="date" id="inputVisitorData" required />
+                  </div>
+                </div>
+                <div class="form-group-mini">
+                  <label for="inputVisitorObs">Observações / Empresa (se aplicável)</label>
+                  <input type="text" id="inputVisitorObs" placeholder="Ex: Técnico da internet, convidado de aniversário..." />
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Salvar autorização</button>
+                  <button type="button" id="btnCancelVisitor2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <!-- Barra de filtros -->
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label for="filterVisitorStatus">Status:</label>
+                  <select id="filterVisitorStatus">
+                    <option value="">Todos</option>
+                    <option value="AGUARDANDO">Aguardando chegada</option>
+                    <option value="NO_LOCAL">Presentes no condomínio</option>
+                    <option value="FINALIZADO">Saída registrada</option>
+                    <option value="CANCELADO">Cancelados</option>
+                  </select>
+                </div>
+                <button id="btnRefreshVisitors" type="button" class="btn-secondary-sm" title="Atualizar lista">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                  <span>Atualizar</span>
+                </button>
+              </div>
+
+              <!-- Tabela de visitantes -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Visitante</th>
+                      <th>Data Prevista</th>
+                      <th>Destino</th>
+                      <th>Documento</th>
+                      <th>Tipo</th>
+                      <th>Status</th>
+                      <th>Entrada</th>
+                      <th>Saída</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="visitorsTableBody">
+                    <tr><td colspan="9" class="table-empty">Carregando registros de portaria...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

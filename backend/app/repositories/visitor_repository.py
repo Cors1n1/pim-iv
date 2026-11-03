@@ -13,6 +13,7 @@ class VisitorRepository:
 
     async def list_all(
         self,
+        condominio_id: Optional[int] = None,
         status_filter: Optional[str] = None,
         date_filter: Optional[date] = None
     ) -> List[Visitor]:
@@ -27,6 +28,8 @@ class VisitorRepository:
             )
             .order_by(Visitor.data_prevista.desc(), Visitor.criado_em.desc())
         )
+        if condominio_id is not None:
+            stmt = stmt.where(Visitor.condominio_id == condominio_id)
         if status_filter:
             stmt = stmt.where(Visitor.status == status_filter.upper())
         if date_filter:
@@ -50,8 +53,8 @@ class VisitorRepository:
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_id(self, visitor_id: int) -> Optional[Visitor]:
-        """Busca visitante por ID com todos os relacionamentos pré-carregados."""
+    async def get_by_id(self, visitor_id: int, condominio_id: Optional[int] = None) -> Optional[Visitor]:
+        """Busca visitante por ID com todos os relacionamentos pré-carregados e validação de condomínio."""
         stmt = (
             select(Visitor)
             .options(
@@ -62,6 +65,8 @@ class VisitorRepository:
             )
             .where(Visitor.id == visitor_id)
         )
+        if condominio_id is not None:
+            stmt = stmt.where(Visitor.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 

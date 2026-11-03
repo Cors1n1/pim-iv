@@ -24,9 +24,15 @@ class ReservationService:
         self.db = db
         self.repo = ReservationRepository(db)
 
-    async def list_common_areas(self, include_inactive: bool = False) -> List[CommonAreaResponse]:
+    async def list_common_areas(
+        self,
+        current_user: Optional[User] = None,
+        condominio_id: Optional[int] = None,
+        include_inactive: bool = False
+    ) -> List[CommonAreaResponse]:
         """Retorna as áreas de lazer e convivência do condomínio."""
-        areas = await self.repo.list_areas(include_inactive=include_inactive)
+        condo_id = condominio_id or (current_user.condominio_id if current_user else None)
+        areas = await self.repo.list_areas(condominio_id=condo_id, include_inactive=include_inactive)
         return [CommonAreaResponse.model_validate(a) for a in areas]
 
     async def create_common_area(self, current_user: User, data: CommonAreaCreate) -> CommonAreaResponse:
@@ -43,7 +49,9 @@ class ReservationService:
                 detail="O horário de abertura deve ser anterior ao horário de encerramento."
             )
 
+        condo_id = current_user.condominio_id or 1
         new_area = CommonArea(
+            condominio_id=condo_id,
             nome=data.nome.strip(),
             descricao=data.descricao.strip() if data.descricao else None,
             capacidade_pessoas=data.capacidade_pessoas,
@@ -67,11 +75,11 @@ class ReservationService:
                 detail="Apenas o síndico ou administradores podem alterar as regras das áreas comuns."
             )
 
-        area = await self.repo.get_area_by_id(area_id)
+        area = await self.repo.get_area_by_id(area_id, condominio_id=current_user.condominio_id)
         if not area:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Área comum não encontrada."
+                detail="Área comum não encontrada ou pertence a outro condomínio."
             )
 
         new_inicio = data.hora_inicio if data.hora_inicio is not None else area.hora_inicio
@@ -111,11 +119,11 @@ class ReservationService:
 
     async def check_priority(self, current_user: User, area_id: int, data_reserva: date) -> ReservationPriorityCheckResponse:
         """Verifica se a unidade do condômino possui Alta Prioridade ou Baixa Prioridade (Standby)."""
-        area = await self.repo.get_area_by_id(area_id)
+        area = await self.repo.get_area_by_id(area_id, condominio_id=current_user.condominio_id)
         if not area:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Área comum não encontrada.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Área comum não encontrada ou pertence a outro condomínio.")
 
-        settings = await SettingsRepository(self.db).get_settings()
+        settings = await SettingsRepository(self.db).get_settings(condominio_id=current_user.condominio_id or 1)
         intervalo_req = area.intervalo_dias_prioridade or settings.intervalo_padrao_dias or 30
         max_ativas = area.max_reservas_ativas or 2
 
@@ -193,7 +201,7 @@ class ReservationService:
         Retorna as reservas com máscara de privacidade e LGPD, aplicando auto-promoção de standby
         quando a janela de corte (48h) for atingida sem contestação.
         """
-        reservas = await self.repo.list_reservations()
+        reservas = await self.repo.list_reservations(condominio_id=current_user.condominio_id)
         is_morador = current_user.tipo_usuario == "MORADOR"
         results: List[ReservationResponse] = []
         hoje = date.today()
@@ -268,11 +276,11 @@ class ReservationService:
                 detail="O horário de início deve ser anterior ao horário de término."
             )
 
-        area = await self.repo.get_area_by_id(data.area_comum_id)
+        area = await self.repo.get_area_by_id(data.area_comum_id, condominio_id=current_user.condominio_id)
         if not area or not area.ativo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Área comum não encontrada ou desativada para uso."
+                detail="Área comum não encontrada ou pertence a outro condomínio."
             )
 
         # Validação 1: Funcionamento permitido da área
@@ -409,11 +417,11 @@ class ReservationService:
 
     async def cancel_reservation(self, current_user: User, reservation_id: int) -> ReservationResponse:
         """Cancela uma reserva existente com checagem de permissão."""
-        res = await self.repo.get_by_id(reservation_id)
+        res = await self.repo.get_by_id(reservation_id, condominio_id=current_user.condominio_id)
         if not res:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reserva não encontrada."
+                detail="Reserva não encontrada ou pertence a outro condomínio."
             )
 
         if current_user.tipo_usuario == "PORTARIA":
@@ -422,10 +430,10 @@ class ReservationService:
                 detail="Porteiros não possuem permissão para cancelar reservas."
             )
 
-        if current_user.tipo_usuario == "MORADOR" and res.usuario_id != current_user.id:
+        if res.usuario_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Você não tem permissão para cancelar a reserva de outro condômino."
+                detail="Apenas o titular da reserva pode solicitar o seu cancelamento."
             )
 
         if res.chave_entregue or res.chave_devolvida:
@@ -531,9 +539,9 @@ class ReservationService:
 
     async def accept_offer(self, current_user: User, reservation_id: int) -> ReservationResponse:
         """Morador aceita a oferta de retomada da vaga com direito de preferência."""
-        res = await self.repo.get_by_id(reservation_id)
+        res = await self.repo.get_by_id(reservation_id, condominio_id=current_user.condominio_id)
         if not res:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada ou pertence a outro condomínio.")
 
         if res.usuario_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acesso não autorizado a esta oferta.")
@@ -579,9 +587,9 @@ class ReservationService:
 
     async def decline_offer(self, current_user: User, reservation_id: int) -> ReservationResponse:
         """Morador declina a oferta e libera a data para o condomínio."""
-        res = await self.repo.get_by_id(reservation_id)
+        res = await self.repo.get_by_id(reservation_id, condominio_id=current_user.condominio_id)
         if not res:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada ou pertence a outro condomínio.")
 
         if res.usuario_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acesso não autorizado a esta oferta.")
@@ -624,9 +632,9 @@ class ReservationService:
                 detail="Apenas funcionários da portaria ou administração podem registrar a entrega de chaves."
             )
 
-        res = await self.repo.get_by_id(reservation_id)
+        res = await self.repo.get_by_id(reservation_id, condominio_id=current_user.condominio_id)
         if not res:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada ou pertence a outro condomínio.")
 
         if res.status != "CONFIRMADA":
             raise HTTPException(
@@ -668,9 +676,9 @@ class ReservationService:
                 detail="Apenas funcionários da portaria ou administração podem registrar a devolução de chaves."
             )
 
-        res = await self.repo.get_by_id(reservation_id)
+        res = await self.repo.get_by_id(reservation_id, condominio_id=current_user.condominio_id)
         if not res:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada ou pertence a outro condomínio.")
 
         if not res.chave_entregue:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A chave ainda não foi registrada como entregue.")

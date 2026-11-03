@@ -1,0 +1,30 @@
+<header class="top-bar" role="banner">
+    <div class="top-bar-content">
+      <div class="brand-mini">
+        <button id="btnToggleMobileDrawer" type="button" class="mobile-drawer-toggle" aria-label="Abrir menu de navegação" title="Abrir menu">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-menu"/></svg>
+        </button>
+        <img src="/icons/condohub-icon.png" alt="CondoHub" class="brand-mini-logo" />
+        <span id="topbarCondoName">Condomínio</span>
+      </div>
+      <div class="accessibility-controls" role="group" aria-label="Recursos de acessibilidade">
+        <button id="btnInstallPwa" type="button" class="acc-btn pwa-install-btn" title="Instalar como aplicativo de celular no smartphone ou computador (PWA)" aria-label="Instalar como aplicativo de celular">
+          <span class="acc-glyph" aria-hidden="true">📲</span>
+          <span id="installPwaLabel">Instalar no Celular</span>
+        </button>
+        <button id="btnDarkMode" type="button" class="acc-btn" aria-pressed="false" title="Tema escuro: descansa a vista em ambientes com pouca luz">
+          <span class="acc-glyph" aria-hidden="true">&#9790;</span>
+          <span id="darkModeLabel">Tema escuro</span>
+        </button>
+        <button id="btnContrast" type="button" class="acc-btn" aria-pressed="false" title="Alto contraste: letras amarelas e brancas sobre fundo preto">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-contrast"/></svg>
+          <span id="contrastLabel">Alto contraste</span>
+        </button>
+        <div class="font-stepper" role="group" aria-label="Tamanho da letra">
+          <button id="btnFontDown" type="button" class="acc-btn acc-btn-icon" title="Diminuir letra" aria-label="Diminuir tamanho da letra">A&minus;</button>
+          <span id="fontLevelLabel" class="font-level" aria-live="polite">Normal</span>
+          <button id="btnTextSize" type="button" class="acc-btn acc-btn-icon" title="Aumentar letra" aria-label="Aumentar tamanho da letra">A+</button>
+        </div>
+      </div>
+    </div>
+  </header>

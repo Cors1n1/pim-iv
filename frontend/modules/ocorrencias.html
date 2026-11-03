@@ -1,0 +1,96 @@
+<section id="windowTickets" class="workspace-view workspace-window hidden" aria-labelledby="windowTicketsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Ocorrências</span>
+                  </nav>
+                  <h3 id="windowTicketsTitle" class="window-title">Livro de ocorrências e chamados</h3>
+                  <p id="windowTicketsSub" class="window-sub">Registro de solicitações, barulho e manutenções com resposta oficial do síndico</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button id="btnNewTicketToggle" type="button" class="btn-primary">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+                  <span>Abrir ocorrência</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Formulário retrátil para novo chamado -->
+              <form id="formNewTicket" class="form-mini hidden" style="margin-bottom: 20px;">
+                <div class="section-title-split">
+                  <h4>Registrar novo chamado / ocorrência</h4>
+                  <button type="button" id="btnCancelTicket" class="btn-secondary-sm">Fechar</button>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-mini form-grow-2">
+                    <label for="inputTicketTitulo">Título da ocorrência</label>
+                    <input type="text" id="inputTicketTitulo" placeholder="Ex: Barulho excessivo no andar superior" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="selectTicketCategoria">Categoria</label>
+                    <select id="selectTicketCategoria" required>
+                      <option value="BARULHO">Barulho / Perturbação</option>
+                      <option value="MANUTENCAO">Manutenção predial</option>
+                      <option value="VAZAMENTO">Vazamento / Hidráulica</option>
+                      <option value="SEGURANCA">Segurança condominial</option>
+                      <option value="OUTROS">Outros assuntos</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group-mini">
+                  <label for="inputTicketDescricao">Descrição detalhada</label>
+                  <textarea id="inputTicketDescricao" rows="3" placeholder="Descreva os fatos, datas, horários e detalhes pertinentes..." required></textarea>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Enviar ao síndico</button>
+                  <button type="button" id="btnCancelTicket2" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <!-- Barra de filtros -->
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label for="filterTicketStatus">Status:</label>
+                  <select id="filterTicketStatus">
+                    <option value="">Todos os status</option>
+                    <option value="ABERTO">Em aberto</option>
+                    <option value="EM_ANALISE">Em análise</option>
+                    <option value="CONCLUIDO">Concluídos</option>
+                    <option value="CANCELADO">Cancelados</option>
+                  </select>
+                </div>
+                <button id="btnRefreshTickets" type="button" class="btn-secondary-sm" title="Atualizar lista">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>
+                  <span>Atualizar</span>
+                </button>
+              </div>
+
+              <!-- Tabela de ocorrências -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Assunto</th>
+                      <th>Data</th>
+                      <th>Unidade / Solicitante</th>
+                      <th>Categoria</th>
+                      <th>Status</th>
+                      <th>Parecer do Síndico</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ticketsTableBody">
+                    <tr><td colspan="7" class="table-empty">Carregando ocorrências...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

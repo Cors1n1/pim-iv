@@ -1,0 +1,176 @@
+<section id="windowReservations" class="workspace-view workspace-window hidden" aria-labelledby="windowReservationsTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Reservas</span>
+                  </nav>
+                  <h3 id="windowReservationsTitle" class="window-title">Reservas de espaços comuns</h3>
+                  <p id="windowReservationsSub" class="window-sub">Agendamento de churrasqueira, salão de festas e quadra</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <!-- Banner de Retomada na tela de Reservas -->
+              <div id="reservationsRecoveryBanner" class="recovery-offer-banner hidden" role="region" aria-label="Oferta de vaga liberada">
+                <div class="recovery-offer-icon" aria-hidden="true">
+                  <svg class="ico"><use href="#i-zap"/></svg>
+                </div>
+                <div class="recovery-offer-content">
+                  <span class="recovery-offer-badge">Vaga Liberada &bull; Direito de Preferência</span>
+                  <h3 class="recovery-offer-title" id="resRecoveryTitle">A data pretendida está disponível com exclusividade!</h3>
+                  <p class="recovery-offer-desc" id="resRecoveryDesc">Você possui preferência de 24 horas para garantir esta reserva após a desistência da reserva anterior.</p>
+                  <div class="recovery-offer-meta" id="resRecoveryMeta"></div>
+                </div>
+                <div class="recovery-offer-actions">
+                  <button type="button" class="btn-recovery-accept" id="btnResAcceptOffer">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>Confirmar Minha Vaga</span>
+                  </button>
+                  <button type="button" class="btn-recovery-decline" id="btnResDeclineOffer">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-close"/></svg>
+                    <span>Dispensar Vaga</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="residentReservationToolbar" class="window-toolbar window-toolbar-split">
+                <button id="btnToggleNewReservationForm" type="button" class="btn-primary-sm">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Nova solicitação de reserva
+                </button>
+              </div>
+
+              <!-- Calendário Visual Interativo de Reservas e Disponibilidade -->
+              <div id="reservationsCalendarSection" class="calendar-reservation-wrapper">
+                <div class="calendar-controls-bar">
+                  <div class="calendar-filter-group">
+                    <label for="calendarAreaFilter"><strong>Espaço:</strong></label>
+                    <select id="calendarAreaFilter" class="select-calendar-area">
+                      <option value="">Todos os Espaços</option>
+                    </select>
+                  </div>
+                  
+                  <div class="calendar-nav-group">
+                    <button type="button" id="btnCalPrevMonth" class="btn-cal-nav" title="Mês anterior" aria-label="Mês anterior">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                    </button>
+                    <span id="calCurrentMonthLabel" class="calendar-month-heading">Outubro 2026</span>
+                    <button type="button" id="btnCalNextMonth" class="btn-cal-nav" title="Próximo mês" aria-label="Próximo mês">
+                      <svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+                    </button>
+                    <button type="button" id="btnCalToday" class="btn-cal-today">Hoje</button>
+                  </div>
+
+                  <div class="calendar-legend">
+                    <span class="legend-item"><span class="legend-dot status-free"></span> Livre</span>
+                    <span class="legend-item"><span class="legend-dot status-standby"></span> Standby</span>
+                    <span class="legend-item"><span class="legend-dot status-booked"></span> Confirmada</span>
+                    <span class="legend-item"><span class="legend-dot status-mine"></span> Minha Reserva</span>
+                  </div>
+                </div>
+
+                <div class="calendar-grid-container">
+                  <div class="calendar-weekdays">
+                    <span><span class="day-full">Dom</span><span class="day-short">D</span></span>
+                    <span><span class="day-full">Seg</span><span class="day-short">S</span></span>
+                    <span><span class="day-full">Ter</span><span class="day-short">T</span></span>
+                    <span><span class="day-full">Qua</span><span class="day-short">Q</span></span>
+                    <span><span class="day-full">Qui</span><span class="day-short">Q</span></span>
+                    <span><span class="day-full">Sex</span><span class="day-short">S</span></span>
+                    <span><span class="day-full">Sáb</span><span class="day-short">S</span></span>
+                  </div>
+                  <div id="reservationsCalendarGrid" class="calendar-days-grid">
+                    <!-- Gerado dinamicamente via JS -->
+                  </div>
+                </div>
+                <p class="calendar-click-tip">
+                  <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+                  <span>Dica: Clique em qualquer dia para ver os agendamentos do dia em pop-up ou solicitar uma nova reserva.</span>
+                </p>
+              </div>
+
+              <form id="formNewReservation" class="form-mini hidden">
+                <h4>Agendar espaço de lazer</h4>
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="selectReservationArea">Área comum</label>
+                    <select id="selectReservationArea" required>
+                      <option value="">Carregando áreas...</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row form-row-schedule">
+                  <div class="form-group-mini">
+                    <label for="inputReservationDate">Data pretendida</label>
+                    <input type="date" id="inputReservationDate" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputReservationTimeStart">Horário de início</label>
+                    <input type="time" id="inputReservationTimeStart" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputReservationTimeEnd">Horário de término</label>
+                    <input type="time" id="inputReservationTimeEnd" required />
+                  </div>
+                </div>
+
+                <!-- Banner dinâmico com as regras operacionais da área selecionada -->
+                <div id="areaRulesHint" class="area-rules-hint hidden">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>
+                  <span id="areaRulesHintText">Regras de funcionamento</span>
+                </div>
+
+                <!-- Card dinâmico de verificação de prioridade -->
+                <div id="reservationPriorityNotice" class="reservation-priority-notice hidden">
+                  <div class="priority-notice-icon" id="priorityNoticeIcon">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-zap"/></svg>
+                  </div>
+                  <div class="priority-notice-content">
+                    <strong id="priorityNoticeTitle">Checando disponibilidade e prioridade...</strong>
+                    <p id="priorityNoticeDesc"></p>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group-mini form-full">
+                    <label for="inputReservationObs">Observações / finalidade</label>
+                    <input type="text" id="inputReservationObs" placeholder="Ex: Almoço em família" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar reserva</button>
+                  <button type="button" id="btnCancelNewReservation" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Espaço comum</th>
+                      <th>Data e Horário</th>
+                      <th>Solicitante / Apartamento</th>
+                      <th>Status</th>
+                      <th>Controle de chaves</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reservationsTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando reservas...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

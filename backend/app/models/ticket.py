@@ -8,6 +8,7 @@ class Ticket(Base):
     __tablename__ = "ocorrencias"
 
     id = Column(Integer, primary_key=True, index=True)
+    condominio_id = Column(Integer, ForeignKey("condominios.id", ondelete="RESTRICT"), nullable=False, default=1, index=True)
     unidade_id = Column(Integer, ForeignKey("unidades.id", ondelete="SET NULL"), nullable=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False, index=True)
     titulo = Column(String(150), nullable=False)
@@ -20,6 +21,7 @@ class Ticket(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     atualizado_em = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    condominio = relationship("Condominio", back_populates="ocorrencias")
     unidade = relationship("Unit")
     usuario = relationship("User", foreign_keys=[usuario_id])
     sindico = relationship("User", foreign_keys=[respondido_por])

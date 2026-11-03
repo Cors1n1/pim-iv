@@ -23,7 +23,8 @@ class GuestService:
         if not reserva:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
 
-        is_owner = (reserva.usuario_id == current_user.id)
+        is_same_unit = bool(current_user.unidade_id and reserva.unidade_id and current_user.unidade_id == reserva.unidade_id)
+        is_owner = (reserva.usuario_id == current_user.id) or is_same_unit
         is_staff = current_user.tipo_usuario in ("ADMIN", "SINDICO", "PORTARIA")
         if not is_owner and not is_staff:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acesso restrito ao titular da reserva ou portaria.")
@@ -43,9 +44,11 @@ class GuestService:
         if not reserva:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
 
-        # PRIVACIDADE ABSOLUTA: Apenas o condômino titular pode gerenciar convidados de sua reserva
-        is_owner = (reserva.usuario_id == current_user.id)
-        if not is_owner:
+        # Apenas o condômino titular (ou de mesma unidade) ou administração pode gerenciar convidados
+        is_same_unit = bool(current_user.unidade_id and reserva.unidade_id and current_user.unidade_id == reserva.unidade_id)
+        is_owner = (reserva.usuario_id == current_user.id) or is_same_unit
+        is_admin = current_user.tipo_usuario in ("ADMIN", "SINDICO")
+        if not is_owner and not is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Apenas o condômino titular da reserva pode gerenciar seus convidados."
@@ -77,7 +80,7 @@ class GuestService:
 
         # Dispara convite por e-mail se solicitado explicitamente pelo morador
         if data.enviar_convite and email_clean:
-            settings = await self.settings_repo.get_settings()
+            settings = await self.settings_repo.get_settings(condominio_id=current_user.condominio_id or 1)
             if settings.enviar_email_ativo:
                 anfitriao = reserva.usuario.nome if reserva.usuario else "Condômino"
                 unidade_desc = f"{reserva.unidade.bloco} - Apto {reserva.unidade.numero}" if reserva.unidade else "Residência"
@@ -113,8 +116,10 @@ class GuestService:
         if not reserva:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reserva não encontrada.")
 
-        is_owner = (reserva.usuario_id == current_user.id)
-        if not is_owner:
+        is_same_unit = bool(current_user.unidade_id and reserva.unidade_id and current_user.unidade_id == reserva.unidade_id)
+        is_owner = (reserva.usuario_id == current_user.id) or is_same_unit
+        is_admin = current_user.tipo_usuario in ("ADMIN", "SINDICO")
+        if not is_owner and not is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Apenas o condômino titular da reserva pode gerenciar seus convidados."
@@ -129,7 +134,7 @@ class GuestService:
 
     async def checkin_guest(self, current_user: User, reservation_id: int, guest_id: int) -> GuestResponse:
         if current_user.tipo_usuario not in ("PORTARIA", "ADMIN", "SINDICO"):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Exclusivo para a portaria ou administração.")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Apenas funcionários da portaria ou administração podem registrar a entrada de convidados.")
 
         guest = await self.guest_repo.get_by_id(guest_id)
         if not guest or guest.reserva_id != reservation_id:
@@ -140,7 +145,7 @@ class GuestService:
 
     async def checkout_guest(self, current_user: User, guest_id: int) -> GuestResponse:
         if current_user.tipo_usuario not in ("PORTARIA", "ADMIN", "SINDICO"):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Exclusivo para a portaria ou administração.")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Apenas funcionários da portaria ou administração podem registrar a saída de convidados.")
 
         guest = await self.guest_repo.get_by_id(guest_id)
         if not guest:
@@ -152,7 +157,7 @@ class GuestService:
     async def list_today_guests(self, current_user: User) -> List[dict]:
         if current_user.tipo_usuario not in ("PORTARIA", "ADMIN", "SINDICO"):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Exclusivo para a portaria ou administração.")
-        return await self.guest_repo.list_today_guests()
+        return await self.guest_repo.list_today_guests(condominio_id=current_user.condominio_id)
 
     async def resend_invite(
         self,

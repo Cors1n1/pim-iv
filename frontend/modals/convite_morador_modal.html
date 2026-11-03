@@ -1,0 +1,43 @@
+<div id="modalAssignResident" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="formAssignResidentTitle">
+  <div class="custom-dialog-card" style="max-width: 520px;">
+    <div class="custom-dialog-header">
+      <div class="custom-dialog-icon primary" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+        <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>
+      </div>
+      <div class="custom-dialog-headings">
+        <h3 id="formAssignResidentTitle" class="custom-dialog-title">Convidar Morador para a Unidade</h3>
+        <p id="formAssignResidentSub" class="custom-dialog-message">Informe o primeiro nome e e-mail. O morador receberá um link seguro para definir sua senha e dados pessoais com total privacidade (LGPD).</p>
+      </div>
+      <button id="btnAssignResidentCloseX" type="button" class="btn-dialog-close" aria-label="Fechar">
+        <svg class="ico" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+
+    <form id="formAssignResident" style="margin-top: 1rem;">
+      <input type="hidden" id="assignTargetUnitId" />
+
+      <div class="form-group-mini" style="margin-bottom: 1rem;">
+        <label for="inputResidentNome">Primeiro nome ou como prefere ser chamado *</label>
+        <input type="text" id="inputResidentNome" placeholder="Ex: Roberto ou Carla" required autocomplete="off" />
+      </div>
+
+      <div class="form-group-mini" style="margin-bottom: 1.25rem;">
+        <label for="inputResidentEmail">E-mail do morador (Para envio do link de ativação) *</label>
+        <input type="email" id="inputResidentEmail" placeholder="morador@email.com" required autocomplete="off" />
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.75rem 0.9rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #475569; display: flex; align-items: flex-start; gap: 0.5rem;">
+        <svg class="ico ico-xs" aria-hidden="true" style="color: #2563eb; flex-shrink: 0; margin-top: 2px;"><use href="#i-shield"/></svg>
+        <span>O morador completará seu próprio cadastro (sobrenome, CPF, telefone celular e senha) através da página exclusiva de ativação.</span>
+      </div>
+
+      <div class="custom-dialog-footer" style="padding: 0; margin-top: 1rem;">
+        <button id="btnCancelAssignResident" type="button" class="btn-dialog-secondary">Cancelar</button>
+        <button type="submit" id="btnSubmitAssignResident" class="btn-dialog-primary">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-mail"/></svg>
+          <span>Enviar Convite de Ativação</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

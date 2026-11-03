@@ -21,4 +21,4 @@ async def list_audit_logs(
     Exclusivo para a administração e síndico do condomínio.
     """
     service = AuditService(db)
-    return await service.get_recent_logs(limit=limit)
+    return await service.get_recent_logs(condominio_id=_admin.condominio_id, limit=limit)

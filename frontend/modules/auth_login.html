@@ -1,0 +1,160 @@
+<section id="loginSection" class="auth-layout" aria-labelledby="loginTitle">
+      <aside class="auth-hero">
+        <div class="hero-brand">
+          <div class="brand-monogram" aria-hidden="true">
+            <img src="/icons/condohub-icon.png" alt="CondoHub Logo" class="brand-hero-logo" />
+            <span id="condoMonogram" class="monogram-letter hidden">CH</span>
+          </div>
+          <div class="brand-headings">
+            <span class="hero-brand-kicker">Condomínio Residencial</span>
+            <h2 id="heroCondoTitle" class="hero-brand-title">Condomínio</h2>
+            <span class="hero-brand-sub">Portal Integrado de Gestão &amp; Convivência</span>
+          </div>
+        </div>
+
+        <div class="hero-body">
+          <div class="hero-manifesto">
+            <h3 class="hero-manifesto-title">Gestão eficiente e comunicação segura para todo o condomínio.</h3>
+            <p class="hero-manifesto-text">Acesso unificado para moradores, portaria e administração com total controle de acessos e serviços essenciais.</p>
+          </div>
+
+          <div class="hero-pillars" aria-label="Serviços integrados do condomínio">
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-shield"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Portaria &amp; Acesso 24 Horas</strong>
+                <span>Identificação de visitantes, prestadores de serviço e segurança patrimonial contínua.</span>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-package"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Central de Encomendas</strong>
+                <span>Protocolo digital no recebimento e notificação em tempo real ao morador.</span>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                <svg class="ico ico-sm"><use href="#i-calendar"/></svg>
+              </div>
+              <div class="pillar-content">
+                <strong>Convivência &amp; Transparência</strong>
+                <span>Reservas de espaços de lazer, mural oficial de avisos e prestação de contas.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-location-chip">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-building"/></svg>
+            <span>Av. Central, 1200 &bull; 3 Torres &bull; 72 Apartamentos</span>
+          </div>
+        </div>
+
+        <div class="hero-foot">
+          <div class="foot-status">
+            <span class="status-indicator-dot" aria-hidden="true"></span>
+            <span>Ambiente Seguro &bull; Proteção de Dados (LGPD)</span>
+          </div>
+          <span class="foot-version"><span id="footCondoName">SGC Condomínio</span> &bull; v4.2</span>
+        </div>
+      </aside>
+
+      <div class="auth-panel">
+        <div class="auth-card">
+          <div class="auth-header">
+            <span class="auth-kicker">Portal do Condomínio</span>
+            <h1 id="loginTitle" class="auth-title">Acesso ao Sistema</h1>
+          </div>
+
+          <div id="alertBox" class="alert-box hidden" role="alert" aria-live="polite"></div>
+
+          <form id="loginForm" class="auth-form" novalidate>
+            <div class="form-group">
+              <label for="inputEmail">
+                <span>E-mail cadastrado</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-leading-icon" aria-hidden="true">
+                  <svg class="ico ico-sm"><use href="#i-mail"/></svg>
+                </span>
+                <input type="email" id="inputEmail" placeholder="Digite seu e-mail cadastrado" required autocomplete="email" aria-required="true" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputPassword">
+                <span>Senha de acesso</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-leading-icon" aria-hidden="true">
+                  <svg class="ico ico-sm"><use href="#i-lock"/></svg>
+                </span>
+                <input type="password" id="inputPassword" placeholder="Digite sua senha de acesso" required autocomplete="current-password" aria-required="true" />
+                <button type="button" id="togglePassword" class="btn-toggle-eye" aria-label="Mostrar ou ocultar senha" title="Visualizar ou ocultar senha">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg>
+                </button>
+              </div>
+              <div id="capsLockWarning" class="caps-warning hidden" role="status" aria-live="polite">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+                <span>Atenção: A tecla Fixa (Caps Lock) está ativada no seu teclado</span>
+              </div>
+            </div>
+
+            <button type="submit" id="btnLogin" class="btn-primary">
+              <span class="btn-text">Entrar no Sistema</span>
+              <span class="spinner hidden" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div class="demo-profiles">
+            <div class="demo-header">
+              <span class="demo-title">Acesso Rápido para Teste:</span>
+            </div>
+            <div class="demo-buttons">
+              <button type="button" class="btn-chip" data-email="sindico.jardins@teste.com" data-pass="senha123" title="Preencher com credenciais do Síndico">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-shield"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Síndico</span>
+                  <span class="chip-scope">Rodrigo (Geral)</span>
+                </div>
+              </button>
+              <button type="button" class="btn-chip" data-email="portaria.jardins@teste.com" data-pass="senha123" title="Preencher com credenciais da Portaria">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-key"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Portaria</span>
+                  <span class="chip-scope">Carlos (24h)</span>
+                </div>
+              </button>
+              <button type="button" class="btn-chip" data-email="lucas.silva@teste.com" data-pass="senha123" title="Preencher com credenciais do Morador">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-users"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Morador</span>
+                  <span class="chip-scope">Lucas (Apto 101)</span>
+                </div>
+              </button>
+              <button type="button" class="btn-chip" data-email="subsindica.jardins@teste.com" data-pass="senha123" title="Preencher com credenciais da Subsíndica">
+                <div class="chip-icon-box" aria-hidden="true">
+                  <svg class="ico ico-xs"><use href="#i-building"/></svg>
+                </div>
+                <div class="chip-data">
+                  <span class="chip-role">Subsíndica</span>
+                  <span class="chip-scope">Fernanda (Bloco B)</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>

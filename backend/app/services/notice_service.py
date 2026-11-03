@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,9 +13,14 @@ class NoticeService:
         self.db = db
         self.repo = NoticeRepository(db)
 
-    async def list_notices(self) -> List[NoticeResponse]:
+    async def list_notices(
+        self,
+        current_user: Optional[User] = None,
+        condominio_id: Optional[int] = None
+    ) -> List[NoticeResponse]:
         """Lista todos os avisos do condomínio para visualização pública dos condôminos."""
-        notices = await self.repo.list_all()
+        condo_id = condominio_id or (current_user.condominio_id if current_user else None)
+        notices = await self.repo.list_all(condominio_id=condo_id)
         return [
             NoticeResponse(
                 id=n.id,
@@ -32,7 +37,7 @@ class NoticeService:
         ]
 
     async def create_notice(self, current_user: User, data: NoticeCreate) -> NoticeResponse:
-        """Cria um novo aviso oficial (exclusivo para Síndico ou Administrador)."""
+        """Cria um novo aviso oficial (exclusivo para Síndico ou Administrador do condomínio)."""
         if current_user.tipo_usuario not in ["ADMIN", "SINDICO"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -57,9 +62,12 @@ class NoticeService:
                 raw_link = f"https://{raw_link}"
             link_clean = raw_link
 
+        from app.core.security import sanitize_text
+
         notice = Notice(
-            titulo=data.titulo.strip(),
-            mensagem=data.mensagem.strip(),
+            condominio_id=current_user.condominio_id,
+            titulo=sanitize_text(data.titulo),
+            mensagem=sanitize_text(data.mensagem),
             categoria=cat,
             link_anexo=link_clean,
             autor_id=current_user.id
@@ -79,18 +87,18 @@ class NoticeService:
         )
 
     async def delete_notice(self, current_user: User, notice_id: int) -> dict:
-        """Exclui um aviso do mural."""
+        """Exclui um aviso do mural verificando condomínio de origem."""
         if current_user.tipo_usuario not in ["ADMIN", "SINDICO"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Apenas o síndico ou administrador podem remover avisos."
             )
 
-        notice = await self.repo.get_by_id(notice_id)
+        notice = await self.repo.get_by_id(notice_id, condominio_id=current_user.condominio_id)
         if not notice:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Comunicado não encontrado."
+                detail="Comunicado não encontrado ou pertence a outro condomínio."
             )
 
         await self.repo.delete(notice)

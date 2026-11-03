@@ -3,8 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "SGC - Sistema de Gestão de Condomínio"
-    SECRET_KEY: str = "pim_iv_super_secret_jwt_key_segura_para_desenvolvimento_e_producao"
+    PROJECT_NAME: str = "CondoHub - Sistema de Gestão Condominial"
+    SECRET_KEY: str = "sgc_super_secret_jwt_key_segura_para_desenvolvimento_e_producao"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
 
@@ -23,7 +23,14 @@ class Settings(BaseSettings):
     MAIL_DEFAULT_SENDER: str = "sistema.academico.pim@gmail.com"
     MAIL_TLS: bool = True
     MAIL_SSL: bool = False
-    MAIL_SENDER_NAME: str = "Portal do Condomínio"
+    MAIL_SENDER_NAME: str = "CondoHub"
+
+    # Configurações de Segurança do Console / Diretoria (Whitelist de IPs)
+    CONSOLE_ALLOWED_IPS: str = ""
+    SUPERADMIN_ALLOWED_IPS: str = ""
+
+    # Proxies Reversos Confiáveis (ex: "10.0.0.1,192.168.1.1"). Vazio = nenhum proxy confiável (ignora X-Forwarded-For)
+    TRUSTED_PROXIES: str = ""
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),

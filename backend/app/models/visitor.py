@@ -8,6 +8,7 @@ class Visitor(Base):
     __tablename__ = "visitantes"
 
     id = Column(Integer, primary_key=True, index=True)
+    condominio_id = Column(Integer, ForeignKey("condominios.id", ondelete="RESTRICT"), nullable=False, default=1, index=True)
     unidade_id = Column(Integer, ForeignKey("unidades.id", ondelete="CASCADE"), nullable=False, index=True)
     autorizado_por_id = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"), nullable=True)
     nome = Column(String(150), nullable=False)
@@ -23,6 +24,7 @@ class Visitor(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     atualizado_em = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    condominio = relationship("Condominio", back_populates="visitantes")
     unidade = relationship("Unit")
     morador = relationship("User", foreign_keys=[autorizado_por_id])
     porteiro_entrada = relationship("User", foreign_keys=[porteiro_entrada_id])

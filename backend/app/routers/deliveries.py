@@ -4,7 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
 from app.routers.deps import get_current_user, get_db
-from app.schemas.delivery import DeliveryCreate, DeliveryDeliver, DeliveryResponse
+from app.schemas.delivery import (
+    DeliveryBatchDeliver,
+    DeliveryBatchDeliverResponse,
+    DeliveryCreate,
+    DeliveryDeliver,
+    DeliveryResponse
+)
 from app.services.delivery_service import DeliveryService
 
 router = APIRouter(prefix="/api/deliveries", tags=["Portaria & Encomendas"])
@@ -47,6 +53,17 @@ async def create_delivery(
     return await service.register_delivery(current_user=current_user, data=payload)
 
 
+@router.put("/deliver-batch", response_model=DeliveryBatchDeliverResponse, summary="Dar baixa em lote em encomendas (Portaria/Síndico)")
+async def mark_batch_delivered(
+    payload: DeliveryBatchDeliver,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> DeliveryBatchDeliverResponse:
+    """Marca múltiplas encomendas como entregues de uma só vez (ex: entrega de todos os pacotes de um morador)."""
+    service = DeliveryService(db)
+    return await service.mark_batch_as_delivered(current_user=current_user, data=payload)
+
+
 @router.put("/{delivery_id}/deliver", response_model=DeliveryResponse, summary="Dar baixa na entrega ao morador")
 async def mark_delivered(
     delivery_id: int,
@@ -57,3 +74,4 @@ async def mark_delivered(
     """Marca a encomenda como entregue quando o morador retira na guarita."""
     service = DeliveryService(db)
     return await service.mark_as_delivered(current_user=current_user, delivery_id=delivery_id, data=payload)
+

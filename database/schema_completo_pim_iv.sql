@@ -76,7 +76,7 @@ BEGIN
     END IF;
 END $$;
 
--- TABELA 3: AUDITORIA DE ACESSOS E LOGIN (Segurança / OWASP Top 10)
+-- TABELA 3: AUDITORIA DE ACESSOS E LOGIN
 CREATE TABLE IF NOT EXISTS logs_acesso (
     id BIGSERIAL PRIMARY KEY,
     usuario_id INT REFERENCES usuarios(id) ON DELETE SET NULL,
@@ -838,7 +838,7 @@ SELECT
     'Assembleia Geral Ordinária', 
     'Convocação oficial para a Assembleia Geral. Pauta: prestação de contas e eleição do conselho fiscal.', 
     'ASSEMBLEIA', 
-    'https://meet.google.com/exemplo-pim-unip', 
+    'https://meet.google.com/assembleia-geral', 
     u.id
 FROM usuarios u 
 WHERE u.email = 'admin@condominio.com'

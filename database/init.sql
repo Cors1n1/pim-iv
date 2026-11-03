@@ -53,8 +53,8 @@ CREATE TRIGGER trg_usuarios_atualizado_em
     EXECUTE FUNCTION trigger_atualizar_timestamp();
 
 -- ====================================================================
--- TABELA 2: AUDITORIA DE ACESSOS E LOGIN (Segurança / OWASP)
--- Registra tentativas de login para auditoria e controle de força bruta
+-- TABELA 2: AUDITORIA DE ACESSOS E LOGIN
+-- Registra tentativas de login para histórico e controle de tentativas
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS logs_acesso (
     id BIGSERIAL PRIMARY KEY,

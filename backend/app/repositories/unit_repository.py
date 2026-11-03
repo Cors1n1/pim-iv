@@ -10,9 +10,15 @@ class UnitRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_all(self, include_inactive: bool = True) -> List[Unit]:
-        """Lista unidades com dados do morador responsável pré-carregados."""
+    async def list_all(
+        self,
+        condominio_id: Optional[int] = None,
+        include_inactive: bool = True
+    ) -> List[Unit]:
+        """Lista unidades com dados do morador responsável pré-carregados e filtro de condomínio."""
         stmt = select(Unit).options(selectinload(Unit.morador_responsavel))
+        if condominio_id is not None:
+            stmt = stmt.where(Unit.condominio_id == condominio_id)
         if not include_inactive:
             stmt = stmt.where(Unit.ativo == True)
         stmt = stmt.order_by(Unit.bloco, Unit.numero)
@@ -25,19 +31,28 @@ class UnitRepository:
         await self.db.refresh(unit)
         return unit
 
-    async def get_by_id(self, unit_id: int) -> Optional[Unit]:
-        """Busca unidade por ID com dados do morador responsável."""
+    async def get_by_id(self, unit_id: int, condominio_id: Optional[int] = None) -> Optional[Unit]:
+        """Busca unidade por ID com dados do morador responsável e validação de condomínio."""
         stmt = (
             select(Unit)
             .options(selectinload(Unit.morador_responsavel))
             .where(Unit.id == unit_id)
         )
+        if condominio_id is not None:
+            stmt = stmt.where(Unit.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 
-    async def get_by_bloco_numero(self, bloco: str, numero: str) -> Optional[Unit]:
-        """Busca unidade por bloco e número (únicos)."""
+    async def get_by_bloco_numero(
+        self,
+        bloco: str,
+        numero: str,
+        condominio_id: Optional[int] = None
+    ) -> Optional[Unit]:
+        """Busca unidade por bloco e número dentro do mesmo condomínio."""
         stmt = select(Unit).where(Unit.bloco == bloco.strip(), Unit.numero == numero.strip())
+        if condominio_id is not None:
+            stmt = stmt.where(Unit.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 
@@ -75,3 +90,35 @@ class UnitRepository:
         await self.db.commit()
         await self.db.refresh(unit)
         return unit
+
+    async def count(self, condominio_id: Optional[int] = None) -> int:
+        """Retorna o total de unidades cadastradas no condomínio."""
+        from sqlalchemy import func
+        stmt = select(func.count(Unit.id))
+        if condominio_id is not None:
+            stmt = stmt.where(Unit.condominio_id == condominio_id)
+        result = await self.db.execute(stmt)
+        return result.scalar() or 0
+
+    async def search_units(
+        self,
+        condominio_id: int,
+        query: str,
+        limit: int = 20
+    ) -> List[Unit]:
+        """Busca unidades por bloco, número ou nome do morador no condomínio."""
+        clean_q = f"%{query.strip()}%"
+        stmt = (
+            select(Unit)
+            .outerjoin(Unit.morador_responsavel)
+            .options(selectinload(Unit.morador_responsavel))
+            .where(
+                Unit.condominio_id == condominio_id,
+                (Unit.bloco.ilike(clean_q)) | (Unit.numero.ilike(clean_q)) | (User.nome.ilike(clean_q))
+            )
+            .order_by(Unit.bloco, Unit.numero)
+            .limit(limit)
+        )
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+

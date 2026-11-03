@@ -53,7 +53,7 @@ class GuestRepository:
         await self.db.refresh(guest)
         return guest
 
-    async def list_today_guests(self) -> List[dict]:
+    async def list_today_guests(self, condominio_id: Optional[int] = None) -> List[dict]:
         from datetime import date
         from app.models.reservation import Reservation, CommonArea
         from app.models.user import User, Unit
@@ -66,8 +66,10 @@ class GuestRepository:
             .outerjoin(Unit, Reservation.unidade_id == Unit.id)
             .outerjoin(User, Reservation.usuario_id == User.id)
             .filter(Reservation.data_reserva == today, Reservation.status.in_(["CONFIRMADA", "BAIXA_PRIORIDADE"]))
-            .order_by(ReservationGuest.nome_completo.asc())
         )
+        if condominio_id is not None:
+            stmt = stmt.filter(CommonArea.condominio_id == condominio_id)
+        stmt = stmt.order_by(ReservationGuest.nome_completo.asc())
         result = await self.db.execute(stmt)
         items = []
         for g, res, area, unit, host in result.all():

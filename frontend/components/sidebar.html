@@ -1,0 +1,61 @@
+<aside class="sidebar" aria-label="Navegação principal">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-info">
+            <span class="brand-mark brand-mark-sm">
+              <img src="/icons/condohub-icon.png" alt="CondoHub" class="brand-sidebar-logo" />
+            </span>
+            <div class="sidebar-brand-text">
+              <strong id="sidebarCondoName">Condomínio</strong>
+              <span>Portal de gestão</span>
+            </div>
+          </div>
+          <button type="button" id="btnCloseMobileDrawer" class="btn-drawer-close" aria-label="Fechar menu" title="Fechar menu">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-close"/></svg>
+          </button>
+        </div>
+
+        <nav class="side-nav">
+          <p class="side-label">Menu</p>
+          <button type="button" class="nav-item active" id="navHome" data-window="windowOverview">
+            <svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg><span>Visão geral</span>
+          </button>
+          <button type="button" class="nav-item" id="navUnits" data-window="windowUnits" data-card="cardModuleUnits">
+            <svg class="ico" aria-hidden="true"><use href="#i-users"/></svg><span>Unidades e moradores</span>
+          </button>
+          <button type="button" class="nav-item" id="navDeliveries" data-window="windowDeliveries" data-card="cardModuleDeliveries">
+            <svg class="ico" aria-hidden="true"><use href="#i-package"/></svg><span id="navDeliveriesLabel">Encomendas</span>
+          </button>
+          <button type="button" class="nav-item" id="navReservations" data-window="windowReservations" data-card="cardModuleReservations">
+            <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>Reservas</span>
+          </button>
+          <button type="button" class="nav-item" id="navNotices" data-window="windowNotices" data-card="cardModuleNotices">
+            <svg class="ico" aria-hidden="true"><use href="#i-megaphone"/></svg><span>Mural de avisos</span>
+          </button>
+          <button type="button" class="nav-item" id="navTickets" data-window="windowTickets" data-card="cardModuleTickets">
+            <svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg><span>Ocorrências</span>
+          </button>
+          <button type="button" class="nav-item" id="navVisitors" data-window="windowVisitors" data-card="cardModuleVisitors">
+            <svg class="ico" aria-hidden="true"><use href="#i-user-check"/></svg><span id="navVisitorsLabel">Portaria &amp; Visitantes</span>
+          </button>
+          <button type="button" class="nav-item" id="navAudit" data-window="windowAudit" data-card="cardModuleAudit">
+            <svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Auditoria</span>
+          </button>
+          <button type="button" class="nav-item hidden" id="navSettings" data-window="windowSettings">
+            <svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>Configurações</span>
+          </button>
+          <button type="button" class="nav-item" id="navInstallApp" title="Instalar como aplicativo de celular no smartphone ou computador (PWA)">
+            <span style="font-size: 1.1rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 1.25rem;">📲</span><span>Instalar no Celular</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-meta">
+            <span id="userName" class="user-name">Carregando...</span>
+            <span id="userRoleBadge" class="role-badge">ADMIN</span>
+          </div>
+          <button id="btnLogout" type="button" class="btn-logout" title="Sair do sistema" aria-label="Sair do sistema">
+            <svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg>
+          </button>
+        </div>
+      </aside>

@@ -7,15 +7,35 @@
  *  - Suporte a instalação como aplicativo móvel (Android, iOS, Windows, macOS)
  */
 
-const CACHE_NAME = 'sgc-condominio-v1.0.3';
+const CACHE_NAME = 'sgc-condominio-v2.0.1';
 
-// Arquivos essenciais pré-carregados no momento da instalação
+// Arquivos essenciais pré-carregados no momento da instalação (PWA Offline)
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
   '/manifest.json',
+  '/components/topbar.html',
+  '/components/sidebar.html',
+  '/components/bottom_nav.html',
+  '/modules/auth_login.html',
+  '/modules/visao_geral.html',
+  '/modules/unidades.html',
+  '/modules/encomendas.html',
+  '/modules/reservas.html',
+  '/modules/mural_avisos.html',
+  '/modules/auditoria.html',
+  '/modules/ocorrencias.html',
+  '/modules/portaria_visitantes.html',
+  '/modules/configuracoes.html',
+  '/modals/convidados_modal.html',
+  '/modals/resposta_ocorrencia_modal.html',
+  '/modals/confirm_dialog_modal.html',
+  '/modals/troca_senha_modal.html',
+  '/modals/suspensao_modal.html',
+  '/modals/convite_morador_modal.html',
+  '/modals/reservas_dia_modal.html',
   '/icons/condohub-icon.png',
   '/icons/icon.svg',
   '/icons/icon-192.png',
@@ -58,8 +78,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Requisições para a API REST (/api/v1/): Estratégia Network-First
-  if (requestUrl.pathname.startsWith('/api/v1/')) {
+  // Requisições para a API REST (/api/): Estratégia Network-First (sempre fresco, nunca stale)
+  if (requestUrl.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -82,8 +102,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Requisições de navegação (HTML / Documentos): Network-First para exibir alterações imediatamente
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+  // Requisições de navegação e arquivos de código (.js, .html, .css): Network-First para garantir frescor imediato
+  const isCodeAsset = requestUrl.pathname.endsWith('.js') || requestUrl.pathname.endsWith('.html') || requestUrl.pathname.endsWith('.css');
+  if (event.request.mode === 'navigate' || event.request.destination === 'document' || isCodeAsset) {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
@@ -93,7 +114,7 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+        .catch(() => caches.match(event.request).then((cached) => cached || (event.request.mode === 'navigate' ? caches.match('/') : null)))
     );
     return;
   }

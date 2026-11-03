@@ -17,7 +17,7 @@ async def list_notices(
 ) -> List[NoticeResponse]:
     """Retorna os avisos cadastrados no condomínio para todos os moradores e funcionários."""
     service = NoticeService(db)
-    return await service.list_notices()
+    return await service.list_notices(current_user=_current_user)
 
 
 @router.post("", response_model=NoticeResponse, status_code=status.HTTP_201_CREATED, summary="Publicar novo comunicado oficial")

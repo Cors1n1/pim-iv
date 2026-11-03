@@ -1,0 +1,35 @@
+<div id="modalReplyTicket" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="replyTicketTitle">
+    <div class="custom-dialog-card" style="max-width: 520px;">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon">
+          <svg class="ico" aria-hidden="true"><use href="#i-alert-circle"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="replyTicketTitle" class="custom-dialog-title">Parecer da Administração</h3>
+          <p id="replyTicketSub" class="custom-dialog-message">Insira o parecer oficial do síndico para o condômino.</p>
+        </div>
+        <button id="btnCancelReplyTicketX" type="button" class="btn-dialog-close" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <form id="formReplyTicket" style="margin-top: 14px;">
+        <input type="hidden" id="replyTargetTicketId" />
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="selectReplyStatus">Novo status do chamado</label>
+          <select id="selectReplyStatus" required>
+            <option value="CONCLUIDO">Concluído / Resolvido</option>
+            <option value="EM_ANALISE">Em análise / Providências em andamento</option>
+          </select>
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 16px;">
+          <label for="inputReplyParecer">Parecer oficial do síndico</label>
+          <textarea id="inputReplyParecer" rows="4" placeholder="Descreva as medidas tomadas pela administração..." required></textarea>
+        </div>
+
+        <div class="custom-dialog-footer" style="padding: 0;">
+          <button id="btnCancelReplyTicket" type="button" class="btn-dialog-secondary">Cancelar</button>
+          <button type="submit" class="btn-dialog-primary">Registrar Parecer</button>
+        </div>
+      </form>
+    </div>
+  </div>

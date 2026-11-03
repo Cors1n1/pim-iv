@@ -10,18 +10,26 @@ class ReservationRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_areas(self, include_inactive: bool = False) -> List[CommonArea]:
+    async def list_areas(
+        self,
+        condominio_id: Optional[int] = None,
+        include_inactive: bool = False
+    ) -> List[CommonArea]:
         """Lista todas as áreas comuns do condomínio."""
         stmt = select(CommonArea)
+        if condominio_id is not None:
+            stmt = stmt.where(CommonArea.condominio_id == condominio_id)
         if not include_inactive:
             stmt = stmt.where(CommonArea.ativo == True)
         stmt = stmt.order_by(CommonArea.nome)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_area_by_id(self, area_id: int) -> Optional[CommonArea]:
-        """Busca área comum por ID."""
+    async def get_area_by_id(self, area_id: int, condominio_id: Optional[int] = None) -> Optional[CommonArea]:
+        """Busca área comum por ID e valida condomínio."""
         stmt = select(CommonArea).where(CommonArea.id == area_id)
+        if condominio_id is not None:
+            stmt = stmt.where(CommonArea.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 
@@ -38,10 +46,11 @@ class ReservationRepository:
         await self.db.refresh(area)
         return area
 
-    async def list_reservations(self) -> List[Reservation]:
-        """Lista todas as reservas com relacionamentos de área, morador e unidade."""
+    async def list_reservations(self, condominio_id: Optional[int] = None) -> List[Reservation]:
+        """Lista todas as reservas com relacionamentos de área, morador e unidade filtradas pelo condomínio."""
         stmt = (
             select(Reservation)
+            .join(CommonArea, Reservation.area_comum_id == CommonArea.id)
             .options(
                 selectinload(Reservation.area_comum),
                 selectinload(Reservation.usuario),
@@ -49,13 +58,16 @@ class ReservationRepository:
             )
             .order_by(Reservation.data_reserva.desc())
         )
+        if condominio_id is not None:
+            stmt = stmt.where(CommonArea.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_id(self, reservation_id: int) -> Optional[Reservation]:
+    async def get_by_id(self, reservation_id: int, condominio_id: Optional[int] = None) -> Optional[Reservation]:
         """Busca reserva específica por ID."""
         stmt = (
             select(Reservation)
+            .join(CommonArea, Reservation.area_comum_id == CommonArea.id)
             .options(
                 selectinload(Reservation.area_comum),
                 selectinload(Reservation.usuario),
@@ -63,6 +75,8 @@ class ReservationRepository:
             )
             .where(Reservation.id == reservation_id)
         )
+        if condominio_id is not None:
+            stmt = stmt.where(CommonArea.condominio_id == condominio_id)
         result = await self.db.execute(stmt)
         return result.scalars().first()
 

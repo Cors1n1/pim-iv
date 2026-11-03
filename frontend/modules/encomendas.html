@@ -1,0 +1,109 @@
+<section id="windowDeliveries" class="workspace-view workspace-window hidden" aria-labelledby="windowDeliveriesTitle">
+          <div class="window-frame">
+            <header class="window-header">
+              <div class="window-title-group">
+                <div class="window-icon"><svg class="ico" aria-hidden="true"><use href="#i-package"/></svg></div>
+                <div>
+                  <nav class="window-breadcrumb">
+                    <button type="button" class="breadcrumb-link" data-window-back="true">Visão geral</button>
+                    <span class="breadcrumb-sep">&rsaquo;</span>
+                    <span class="breadcrumb-current">Encomendas</span>
+                  </nav>
+                  <h3 id="windowDeliveriesTitle" class="window-title">Controle de encomendas</h3>
+                  <p id="windowDeliveriesSub" class="window-sub">Pacotes recebidos na portaria do condomínio</p>
+                </div>
+              </div>
+              <div class="window-actions">
+                <button type="button" class="btn-window-back" data-window-back="true" title="Voltar à Visão geral">
+                  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span>Voltar à Visão geral</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="window-body">
+              <div id="staffDeliveryActions" class="window-toolbar" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                  <button id="btnToggleNewDeliveryForm" type="button" class="btn-primary-sm">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Registrar chegada de pacote
+                  </button>
+                  <button id="btnBatchDeliverModal" type="button" class="btn-secondary-sm">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Baixa em lote por apartamento
+                  </button>
+                </div>
+                <div class="filter-group" style="margin:0;">
+                  <label for="filterDeliveryStatus" style="margin-right:0.4rem; font-size:0.85rem;">Status:</label>
+                  <select id="filterDeliveryStatus" style="padding:0.35rem 0.6rem; font-size:0.85rem; border-radius:var(--radius-md);">
+                    <option value="">Todas</option>
+                    <option value="AGUARDANDO_RETIRADA" selected>Apenas Pendentes (Aguardando)</option>
+                    <option value="ENTREGUE">Entregues</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Formulário retrátil para baixa em lote por apartamento -->
+              <form id="formBatchDeliver" class="form-mini hidden" style="margin-bottom:1.25rem;">
+                <h4>Dar baixa em todas as encomendas de um apartamento</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="selectBatchDeliverUnit">Apartamento</label>
+                    <select id="selectBatchDeliverUnit" required>
+                      <option value="">Carregando apartamentos...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputBatchRetiradoPor">Quem está retirando? (opcional)</label>
+                    <input type="text" id="inputBatchRetiradoPor" placeholder="Ex: Morador / Titular" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar entrega de todas</button>
+                  <button type="button" id="btnCancelBatchDeliver" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+
+              <form id="formNewDelivery" class="form-mini hidden">
+                <h4>Registrar recebimento de pacote na guarita</h4>
+                <div class="form-row">
+                  <div class="form-group-mini">
+                    <label for="selectDeliveryUnit">Apartamento de destino</label>
+                    <select id="selectDeliveryUnit" required>
+                      <option value="">Carregando apartamentos...</option>
+                    </select>
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputDeliveryDesc">Descrição do pacote</label>
+                    <input type="text" id="inputDeliveryDesc" placeholder="Ex: Caixa Mercado Livre / Envelope" required />
+                  </div>
+                  <div class="form-group-mini">
+                    <label for="inputDeliveryTracking">Código de rastreio (opcional)</label>
+                    <input type="text" id="inputDeliveryTracking" placeholder="Ex: BR123456789" />
+                  </div>
+                </div>
+                <div class="form-mini-actions">
+                  <button type="submit" class="btn-primary-sm">Confirmar recebimento</button>
+                  <button type="button" id="btnCancelNewDelivery" class="btn-secondary-sm">Cancelar</button>
+                </div>
+              </form>
+
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Apartamento</th>
+                      <th>Descrição</th>
+                      <th>Rastreio</th>
+                      <th>Chegada</th>
+                      <th>Status</th>
+                      <th id="thDeliveryActions">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="deliveriesTableBody">
+                    <tr><td colspan="6" class="table-empty">Carregando encomendas...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>

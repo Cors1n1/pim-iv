@@ -1,0 +1,37 @@
+<div id="modalForceChangePassword" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="forceChangePwTitle">
+    <div class="custom-dialog-card" style="max-width: 480px;">
+      <div class="custom-dialog-header">
+        <div class="custom-dialog-icon danger">
+          <svg class="ico" aria-hidden="true"><use href="#i-key"/></svg>
+        </div>
+        <div class="custom-dialog-headings">
+          <h3 id="forceChangePwTitle" class="custom-dialog-title">Primeiro Acesso - Troca de Senha Obrigatória</h3>
+          <p class="custom-dialog-message">Por diretrizes de segurança, você deve substituir a senha temporária por uma nova senha pessoal antes de acessar o sistema.</p>
+        </div>
+      </div>
+
+      <form id="formForceChangePassword" style="margin-top: 16px;">
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="inputForcePwCurrent">Senha temporária atual</label>
+          <input type="password" id="inputForcePwCurrent" placeholder="Digite a senha recebida" required autocomplete="current-password" />
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 12px;">
+          <label for="inputForcePwNew">Nova senha pessoal (mínimo 8 caracteres, maiúsculas, números e símbolos)</label>
+          <input type="password" id="inputForcePwNew" placeholder="Crie sua nova senha forte" minlength="8" required autocomplete="new-password" />
+        </div>
+
+        <div class="form-group-mini" style="margin-bottom: 16px;">
+          <label for="inputForcePwConfirm">Confirme a nova senha</label>
+          <input type="password" id="inputForcePwConfirm" placeholder="Repita a nova senha" minlength="8" required autocomplete="new-password" />
+        </div>
+
+        <div id="forcePwError" class="alert-box error hidden" style="margin-bottom: 14px; font-size: 0.85rem;"></div>
+
+        <div class="custom-dialog-footer" style="padding: 0; margin-top: 14px;">
+          <button id="btnForcePwLogout" type="button" class="btn-dialog-secondary">Sair do sistema</button>
+          <button id="btnForcePwSubmit" type="submit" class="btn-dialog-primary">Gravar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>

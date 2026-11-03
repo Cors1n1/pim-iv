@@ -1,6 +1,8 @@
 # Ambiente / SO
 .env
 .env.*
+*.env
+*.bak
 .flaskenv*
 .flasken
 !.env.example
@@ -29,6 +31,9 @@ venv/
 .venv/
 env/
 .env/
+.pytest_cache/
+_dbg*.py
+*_dbg*.py
 build/
 dist/
 *.egg-info/
@@ -41,70 +46,6 @@ yarn-error.log
 build/
 dist/
 coverage/
-
-# Java
-*.class
-*.log
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-target/
-build/
-.gradle/
-
-# C++
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.dylib
-*.out
-*.app
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-bin/
-build/
-
-# React / Next.js
-node_modules/
-.pnp
-.pnp.js
-coverage/
-build/
-.next/
-out/
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Godot
-.godot/
-*.translation
-export_presets.cfg
-
-# Unity
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]ser[Ss]ettings/
-*.csproj
-*.unityproj
-*.sln
-*.suo
-*.tmp
-*.user
-*.userprefs
 
 # Generic
 build/

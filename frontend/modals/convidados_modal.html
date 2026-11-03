@@ -1,0 +1,182 @@
+<div id="modalGuestsList" class="custom-dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guestsModalTitle">
+  <div class="custom-dialog-card modal-guests-card">
+    <!-- Barra de gradiente superior -->
+    <div class="modal-guests-accent-bar"></div>
+
+    <!-- Cabeçalho do Modal -->
+    <div class="custom-dialog-header modal-guests-header">
+      <div class="custom-dialog-icon guests-icon-gradient">
+        <svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>
+      </div>
+      <div class="custom-dialog-headings">
+        <div class="guests-title-wrap">
+          <h3 id="guestsModalTitle" class="custom-dialog-title">Lista de Convidados do Evento</h3>
+          <span class="badge-guest-security-sync">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-shield"/></svg>
+            Sincronizado c/ Portaria
+          </span>
+        </div>
+        <div class="guests-meta-chips-row">
+          <span class="guest-meta-chip">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-building"/></svg>
+            <strong id="guestAreaName">--</strong>
+          </span>
+          <span class="guest-meta-chip">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg>
+            <span id="guestReservationDate">--</span>
+          </span>
+        </div>
+      </div>
+      <button id="btnGuestsCloseX" type="button" class="btn-dialog-close" aria-label="Fechar">
+        <svg class="ico" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+
+    <!-- Cards de Métricas e KPIs Executivos -->
+    <div class="guests-kpi-grid">
+      <div class="guest-kpi-card">
+        <div class="kpi-icon-wrap kpi-blue">
+          <svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-number" id="guestCountTotal">0</span>
+          <span class="kpi-label">
+            <span class="label-full">Total Cadastrado</span>
+            <span class="label-short">Cadastrados</span>
+          </span>
+        </div>
+      </div>
+      <div class="guest-kpi-card">
+        <div class="kpi-icon-wrap kpi-green">
+          <svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-number text-success" id="guestCountEntered">0</span>
+          <span class="kpi-label">
+            <span class="label-full">Presentes no Espaço</span>
+            <span class="label-short">Presentes</span>
+          </span>
+        </div>
+      </div>
+      <div class="guest-kpi-card">
+        <div class="kpi-icon-wrap kpi-purple">
+          <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-number text-primary" id="guestCountInvited">0</span>
+          <span class="kpi-label">
+            <span class="label-full">Convites Despachados</span>
+            <span class="label-short">Convites</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso de Privacidade e Permissões -->
+    <div id="guestNonOwnerNotice" class="privacy-notice-badge hidden">
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+      <div>
+        <strong>Modo de Consulta (Portaria / Administração):</strong>
+        <span>Apenas o condômino titular da reserva pode adicionar, alterar ou remover convidados desta lista.</span>
+      </div>
+    </div>
+
+    <!-- Formulário Moderno para Adicionar Convidado -->
+    <form id="formAddGuest" class="guest-add-form">
+      <input type="hidden" id="guestTargetReservationId" />
+      <div class="guest-add-form-header">
+        <div class="guest-add-form-title">
+          <svg class="ico ico-xs text-primary" aria-hidden="true"><use href="#i-plus"/></svg>
+          <strong>Adicionar Convidado à Lista</strong>
+        </div>
+        <span class="guest-add-form-tip">Liberação imediata na portaria</span>
+      </div>
+
+      <div class="guest-form-row">
+        <div class="form-group-guest">
+          <label for="inputGuestNome">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-user"/></svg>
+            Nome Completo *
+          </label>
+          <input type="text" id="inputGuestNome" placeholder="Ex: Mariana Silva" required autocomplete="off" />
+        </div>
+        <div class="form-group-guest">
+          <label for="inputGuestDoc">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-shield"/></svg>
+            Documento (RG ou CPF)
+          </label>
+          <input type="text" id="inputGuestDoc" placeholder="Ex: 12.345.678-9 (opcional)" autocomplete="off" />
+        </div>
+        <div class="form-group-guest">
+          <label for="inputGuestEmail">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-mail"/></svg>
+            E-mail para Convite Digital
+          </label>
+          <input type="email" id="inputGuestEmail" placeholder="ex: convidado@email.com" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="guest-form-controls">
+        <label class="guest-checkbox-label" for="chkGuestSendInvite">
+          <input type="checkbox" id="chkGuestSendInvite" />
+          <span class="checkbox-custom"></span>
+          <span class="checkbox-text">Enviar convite digital com instruções de acesso por e-mail</span>
+        </label>
+        <div class="guest-form-btns-row">
+          <button type="submit" id="btnAddGuestSubmit" class="btn-primary-sm btn-add-guest-action">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+            <span>Salvar e Enviar Convite</span>
+          </button>
+          <button type="button" id="btnCancelAddGuest" class="btn-secondary-sm">
+            <span>Fechar</span>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Toolbar de Ações Rápidas & Filtro de Pesquisa -->
+    <div class="guest-toolbar-row">
+      <div class="guest-search-wrap">
+        <svg class="ico ico-xs guest-search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="text" id="inputSearchGuest" placeholder="Filtrar por nome ou documento..." autocomplete="off" />
+        <button type="button" id="btnClearGuestSearch" class="btn-clear-search hidden" title="Limpar filtro">
+          <svg class="ico ico-xs" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="guest-toolbar-actions">
+        <button type="button" class="btn-primary-sm btn-guest-add-toggle" id="btnToggleAddGuest" title="Adicionar e convidar nova pessoa">
+          <svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg>
+          <span>+ Adicionar Convidado</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabela de Convidados com contenção de overflow e scroll dedicado -->
+    <div class="guests-table-container">
+      <table class="data-table modal-guests-data-table">
+        <thead>
+          <tr>
+            <th class="col-nome">Convidado</th>
+            <th class="col-doc">Documento</th>
+            <th class="col-email">E-mail</th>
+            <th class="col-invite">Convite Digital</th>
+            <th class="col-entry">Status Portaria</th>
+            <th class="col-actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="guestsTableBody">
+          <!-- Injetado via JavaScript com estados vazios estilizados -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Rodapé do Modal -->
+    <div class="custom-dialog-footer modal-guests-footer">
+      <div class="guest-footer-info">
+        <svg class="ico ico-xs text-muted" aria-hidden="true"><use href="#i-check"/></svg>
+        <span>Controle de segurança integrado às portarias física e remota.</span>
+      </div>
+      <button id="btnCloseGuestsModal" type="button" class="btn-dialog-secondary">Fechar</button>
+    </div>
+  </div>
+</div>
